@@ -2,26 +2,37 @@
 
 This code was developed to improve the HAPI metadata served at https://cdaweb.gsfc.nasa.gov/hapi by using the CDAS REST service https://cdaweb.gsfc.nasa.gov/WebServices/REST/.
 
-# Use
+Four methods are used to create a HAPI `all.json` file. A HAPI `all.json` file is array of datasets from the `/catalog` endpoint with an additional `info` node for each dataset that contains the response to `/info` for that dataset. 
 
-Requires [`Node.js`](https://nodejs.org/en/)
+The methods use
 
-Execute `make all` to 
-
-1. Create a HAPI all.json catalog based on
-
-   https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml
+1. https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml
    
-   and queries to
+   and queries for JSON CDFML to
 
    https://cdaweb.gsfc.nasa.gov/WebServices/REST/
 
-2. Create a HAPI all.json using queries to HAPI server
+2. queries to
 
    https://cdaweb.gsfc.nasa.gov/hapi
 
+   The metadata for this server are created using master CDFs.
+
+3. queries to
+
+   https://cdaweb.gsfc.nasa.gov/registry/hdp/hapi
+
+   The metadata for this server is created using SPASE records.
+
+4. Using command line calls to `AutplotDataserver`, which can output HAPI `info` responses given a dataset id.
+
+   The metadata for this server are created using master CDFs.
+
+# Use
+
+Requires [`Node.js`](https://nodejs.org/en/).
+
 # To Do
 
-1. Develop a method for visualizing diff of `all-cdas.json` and `all-hapi.json`.
 1. Handle non-string `DEPEND_1`
 1. Validate using hapi-server.org/verify

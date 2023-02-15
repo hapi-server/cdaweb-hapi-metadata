@@ -30,10 +30,10 @@ if (argv.version === 'nl') {
   process.exit(1);
 }
 
-let outDir   = "hapi" + argv.version;
-let fnameAll = "all-hapi" + argv.version + ".json";
+let outDir   = "cache/" + argv.version;
+let fnameAll = "all-" + argv.version + ".json";
 
-if (!fs.existsSync(outDir)) {fs.mkdirSync(outDir)}
+if (!fs.existsSync(outDir)) {fs.mkdirSync(outDir, {recursive: true})}
 
 let CATALOG = {};
 
@@ -88,8 +88,7 @@ function info(CATALOG) {
   for (ididx in CATALOG) {
     // ididx = datset id index
 
-    let id  = CATALOG[ididx]['id'];
-
+    let id = CATALOG[ididx]['id'];
     let idf = id; // id for file name
     if (argv.version === 'bh') {
       idf = CATALOG[ididx]['x_SPDF_ID'];
@@ -97,19 +96,23 @@ function info(CATALOG) {
 
     if (DATSET_ID_RE.test(idf) == false) {
       CATALOG[ididx] = null;
-      continue;
     }
-    
-    N = N + 1;
+  }
 
+  CATALOG = CATALOG.filter(function (el) {return el != null;});
+
+  for (ididx in CATALOG) {
+    delete CATALOG[ididx]['status'];
+    let id = CATALOG[ididx]['id'];
+    let idf = id; // id for file name
+    if (argv.version === 'bh') {
+      idf = CATALOG[ididx]['x_SPDF_ID'];
+    }
     let fname = outDir + "/" + idf + ".json";
-    console.log(fname)
     if (fs.existsSync(fname)) {
-
       console.log("Reading: " + fname);
       let body = fs.readFileSync(fname, 'utf-8');
       finished(fname, body, ididx, true)
-
     } else {
       getInfo(fname, id, ididx);
     }
@@ -127,14 +130,14 @@ function info(CATALOG) {
     });
   }
 
-  function finished(fname, body, dsidx, fromCache) {
+  function finished(fname, body, ididx, fromCache) {
 
     if (!finished.N) {finished.N = 0}
     finished.N = finished.N + 1;
 
     body = JSON.parse(body);
 
-    CATALOG[dsidx]['info'] = body;
+    CATALOG[ididx]['info'] = body;
 
     if (fromCache == false) {
       // TODO: Don't write if error.
@@ -142,12 +145,33 @@ function info(CATALOG) {
       fs.writeFileSync(fname, JSON.stringify(body, null, 2), 'utf-8');
     }
 
-    if (finished.N == N) {
-      // Remove nulled elements.
-      CATALOG_FILTERED = CATALOG.filter(function (el) {return el != null;});
-      // TODO: Don't write if error.
+    if (finished.N == CATALOG.length) {
+      if (argv.version === 'bh') {
+
+        let fnameAllFull = fnameAll.replace('.json','-full.json');
+        console.log("Writing: " + fnameAllFull);
+        fs.writeFileSync(fnameAllFull, JSON.stringify(CATALOG, null, 2), 'utf-8');        
+
+        for (ididx in CATALOG) {
+          for (datasetkey of Object.keys(CATALOG[ididx])) {
+            if (datasetkey.toLowerCase().startsWith('x_')) {
+              if (datasetkey.toLowerCase() !== "x_spdf_id") {
+                delete CATALOG[ididx][datasetkey];
+              }
+            }
+          }
+          for (infokey of Object.keys(CATALOG[ididx]['info'])) {
+
+            if (infokey.toLowerCase().startsWith('x_')) {
+              delete CATALOG[ididx]['info'][infokey];
+            }
+          }
+        }
+
+      }
+
       console.log("Writing: " + fnameAll);
-      fs.writeFileSync(fnameAll, JSON.stringify(CATALOG_FILTERED, null, 2), 'utf-8');
+      fs.writeFileSync(fnameAll, JSON.stringify(CATALOG, null, 2), 'utf-8');
     }
   }
 }

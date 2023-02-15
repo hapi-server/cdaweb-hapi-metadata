@@ -24,13 +24,14 @@ let pool = {maxSockets: 3};
 let baseurl = "https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/";
 let allurl  = "https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml";
 
-if (!fs.existsSync('cdas')) {fs.mkdirSync('cdas')}
+let outDir  = "cache/bw";
+if (!fs.existsSync(outDir)) {fs.mkdirSync(outDir, {recursive: true})}
 
 catalog();
 
 function catalog() {
 
-  let fnameJSON = "cdas/all.json";
+  let fnameJSON = outDir + "/all.json";
 
   if (fs.existsSync(fnameJSON)) {
     console.log("Reading: " + fnameJSON);
@@ -67,20 +68,22 @@ function catalog() {
         continue;
       }
       //console.log("Keeping " + id);
-      let start = dataset['$']['timerange_start'].replace(" ","T") + "Z";
-      let stop = dataset['$']['timerange_stop'].replace(" ","T") + "Z";
+      let startDate = dataset['$']['timerange_start'].replace(" ","T") + "Z";
+      let stopDate = dataset['$']['timerange_stop'].replace(" ","T") + "Z";
       let contact = dataset['data_producer'][0]['$']['name'].trim() + ' @ ' + dataset['data_producer'][0]['$']['affiliation'].trim();
       allMeta.push({
         "id": id,
-        "start": start,
-        "stop": stop,
-        "contact": contact,
-        "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#" + id
+        "info": {
+          "startDate": startDate,
+          "stopDate": stopDate,
+          "contact": contact,
+          "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#" + id
+        }
       });
       allIds.push(id);
     }
 
-    let allIdsFile = "cdas/ids-all.txt";
+    let allIdsFile = outDir + "/ids-all.txt";
     console.log("Writing: " + allIdsFile);
     fs.writeFileSync(allIdsFile, allIds.join("\n"));
     //console.log("Wrote:   " + allIdsFile);
@@ -95,7 +98,7 @@ function variables(CATALOG) {
 
   for (ididx = 0; ididx < CATALOG.length; ididx++) {
     let url = baseurl + CATALOG[ididx]['id'] + "/variables";
-    let fname = "cdas/" + CATALOG[ididx]['id'] + "-variables.json";
+    let fname = outDir + "/" + CATALOG[ididx]['id'] + "-variables.json";
     requestVariables(url, fname, ididx);
   }
 
@@ -130,14 +133,14 @@ function variables(CATALOG) {
       //console.log("Wrote:   " + fname);
     }
 
-    CATALOG[ididx]['x_parameters'] = {};
+    CATALOG[ididx]['info']['x_parameters'] = {};
     let VariableDescription = body['VariableDescription'];
     for (variable of VariableDescription) {
       parameter = {
                     'name': variable['Name'],          
                     'description': variable['LongDescription'] || variable['ShortDescription']
                   };
-      CATALOG[ididx]['x_parameters'][variable['Name']] = parameter;
+      CATALOG[ididx]['info']['x_parameters'][variable['Name']] = parameter;
     }
 
     if (finished.N == CATALOG.length) {
@@ -151,25 +154,25 @@ function variableDetails(CATALOG) {
   for (ididx = 0; ididx < CATALOG.length; ididx++) {
     parameters = null;
     parameters = [];
-    for (name of Object.keys(CATALOG[ididx]['x_parameters'])) {
+    for (name of Object.keys(CATALOG[ididx]['info']['x_parameters'])) {
       parameters.push(name);
     }
     parameters = parameters.join(",")
 
-    let stop = moment(CATALOG[ididx]['start']).add(1,'day').toISOString().replace(".000Z","Z");
+    let stop = moment(CATALOG[ididx]['info']['startDate']).add(1,'day').toISOString().replace(".000Z","Z");
 
     let url = baseurl + CATALOG[ididx]['id'] + "/variables";
     url = baseurl
             + CATALOG[ididx]['id']
             + "/data/"
-            + CATALOG[ididx]['start'].replace(/-|:/g,"")
+            + CATALOG[ididx]['info']['startDate'].replace(/-|:/g,"")
             + "," 
             + stop.replace(/-|:/g,"")
             + "/"
             + parameters
             + "?format=json";
 
-    let fname = "cdas/" + CATALOG[ididx]['id'] + '-cdfml.json';
+    let fname = outDir + "/" + CATALOG[ididx]['id'] + '-cdfml.json';
     requestVariableDetails(url, fname, ididx);
   }
 
@@ -304,13 +307,13 @@ function variableDetails(CATALOG) {
 
     for (attribute of cdfGAttributes['attribute']) {
       if (attribute['name'] === 'TIME_RESOLUTION') {
-        CATALOG[ididx]['cadence'] = attribute['entry'][0]['value'];
+        CATALOG[ididx]['info']['cadence'] = attribute['entry'][0]['value'];
       }
       if (attribute['name'] === 'SPASE_DATASETRESOURCEID') {
-        CATALOG[ididx]['resourceID'] = attribute['entry'][0]['value'];
+        CATALOG[ididx]['info']['resourceID'] = attribute['entry'][0]['value'];
       }
       if (attribute['name'] === 'GENERATION_DATE') {
-        CATALOG[ididx]['creationDate'] = attribute['entry'][0]['value'];
+        CATALOG[ididx]['info']['creationDate'] = attribute['entry'][0]['value'];
       }
       // MODS => modificationDate
       // ACKNOWLEDGEMENT => citation or datasetCitation
@@ -320,16 +323,16 @@ function variableDetails(CATALOG) {
     for (variable of cdfVariables['variable']) {
       let vAttributesKept = cdfVAttributes(variable['cdfVAttributes']['attribute']);
 
-      if (!CATALOG[ididx]['x_parameters'][variable['name']]) {
-        CATALOG[ididx]['x_parameters'][variable['name']] = {};
+      if (!CATALOG[ididx]['info']['x_parameters'][variable['name']]) {
+        CATALOG[ididx]['info']['x_parameters'][variable['name']] = {};
         // CATALOG[ididx]['x_parameters'] was initialized with
         // all of the variables returned by /variables endpoint.
         // This list does not include support variables. So we add them
         // here. 
-        CATALOG[ididx]['x_parameters'][variable['name']]['name'] = variable['name'];
+        CATALOG[ididx]['info']['x_parameters'][variable['name']]['name'] = variable['name'];
       }
-      CATALOG[ididx]['x_parameters'][variable['name']]['vAttributesKept'] = vAttributesKept;
-      CATALOG[ididx]['x_parameters'][variable['name']]['variable'] = variable;
+      CATALOG[ididx]['info']['x_parameters'][variable['name']]['vAttributesKept'] = vAttributesKept;
+      CATALOG[ididx]['info']['x_parameters'][variable['name']]['variable'] = variable;
     }
 
     if (finished.N == CATALOG.length) {
@@ -399,86 +402,102 @@ function finalizeCatalog(CATALOG) {
 
   for (dataset of CATALOG) {
 
-
     let pidx = 0;
-    dataset['parameters'] = [];
+    dataset['info']['parameters'] = [];
 
-    if (dataset['cadence']) {
-      dataset['cadence'] = str2ISODuration(dataset['cadence']);
-    }  
+    if (dataset['info']['cadence']) {
+      dataset['info']['cadence'] = str2ISODuration(dataset['info']['cadence']);
+    }
 
     //console.log(dataset['id']);
     //console.log(Object.keys(dataset['x_parameters']));
 
-    for (parameter of Object.keys(dataset['x_parameters'])) {
+    for (parameter of Object.keys(dataset['info']['x_parameters'])) {
 
       //console.log(dataset['x_parameters'][parameter]);
 
-      if (dataset['x_parameters'][parameter]['vAttributesKept']['VAR_TYPE'] === "metadata") {
+      if (dataset['info']['x_parameters'][parameter]['vAttributesKept']['VAR_TYPE'] === "metadata") {
         continue;
       }
 
-      let copy = JSON.parse(JSON.stringify(dataset['x_parameters'][parameter]));
-      dataset['parameters'].push(copy);
+      let copy = JSON.parse(JSON.stringify(dataset['info']['x_parameters'][parameter]));
+      dataset['info']['parameters'].push(copy);
 
       // Move kept vAttributes up
-      for (key of Object.keys(dataset['x_parameters'][parameter]['vAttributesKept'])) {
-        dataset['parameters'][pidx][key] = dataset['x_parameters'][parameter]['vAttributesKept'][key];
+      for (key of Object.keys(dataset['info']['x_parameters'][parameter]['vAttributesKept'])) {
+        dataset['info']['parameters'][pidx][key] = dataset['info']['x_parameters'][parameter]['vAttributesKept'][key];
       }
       // Remove non-HAPI content
-      delete dataset['parameters'][pidx]['vAttributesKept'];
-      delete dataset['parameters'][pidx]['variable']
-      delete dataset['parameters'][pidx]['VAR_TYPE'];
+      delete dataset['info']['parameters'][pidx]['vAttributesKept'];
+      delete dataset['info']['parameters'][pidx]['variable']
+      delete dataset['info']['parameters'][pidx]['VAR_TYPE'];
 
       let vectorComponents = false;
       // Extract DEPEND_1
-      if (dataset['x_parameters'][parameter]['vAttributesKept']['DEPEND_1']) {
-        let DEPEND_1 = dataset['x_parameters'][parameter]['vAttributesKept']['DEPEND_1'];
-        let depend1 = extractDepend1(dataset['x_parameters'][DEPEND_1]['variable'])
+      if (dataset['info']['x_parameters'][parameter]['vAttributesKept']['DEPEND_1']) {
+        let DEPEND_1 = dataset['info']['x_parameters'][parameter]['vAttributesKept']['DEPEND_1'];
+        let depend1 = extractDepend1(dataset['info']['x_parameters'][DEPEND_1]['variable'])
         vectorComponents = extractVectorComponents(depend1)
         if (vectorComponents) {
-          dataset['parameters'][pidx]['vectorComponents'] = ['x', 'y', 'z'];
-          delete dataset['parameters'][pidx]['DEPEND_1'];
+          dataset['info']['parameters'][pidx]['vectorComponents'] = ['x', 'y', 'z'];
+          delete dataset['info']['parameters'][pidx]['DEPEND_1'];
         } else {
-          dataset['parameters'][pidx]['_x_DEPEND_1'] = depend1;
+          dataset['info']['parameters'][pidx]['_x_DEPEND_1'] = depend1;
         }
       }
 
       // Extract labels
-      if (dataset['x_parameters'][parameter]['vAttributesKept']['LABL_PTR_1']) {
-        let LABL_PTR_1 = dataset['x_parameters'][parameter]['vAttributesKept']['LABL_PTR_1'];
-        let label = extractLabel(dataset['x_parameters'][LABL_PTR_1]['variable'])
-        dataset['parameters'][pidx]['label'] = label;
-        delete dataset['parameters'][pidx]['LABL_PTR_1'];
+      if (dataset['info']['x_parameters'][parameter]['vAttributesKept']['LABL_PTR_1']) {
+        let LABL_PTR_1 = dataset['info']['x_parameters'][parameter]['vAttributesKept']['LABL_PTR_1'];
+        let label = extractLabel(dataset['info']['x_parameters'][LABL_PTR_1]['variable'])
+        dataset['info']['parameters'][pidx]['label'] = label;
+        delete dataset['info']['parameters'][pidx]['LABL_PTR_1'];
       }
 
       if (vectorComponents) {
-        let coordinateSystemName = extractCoordinateSystemName(dataset['parameters'][pidx]);
+        let coordinateSystemName = extractCoordinateSystemName(dataset['info']['parameters'][pidx]);
         if (coordinateSystemName) {
-          dataset['parameters'][pidx]['coordinateSystemName'] = coordinateSystemName;
+          dataset['info']['parameters'][pidx]['coordinateSystemName'] = coordinateSystemName;
         }
       }
 
       pidx = pidx + 1;
     }
-
   }
 
-  let fnameAllFull = 'all-cdas-full.json' 
+  let fnameAllFull = 'all-bw-full.json'
   console.log("Writing: " + fnameAllFull);
   fs.writeFileSync(fnameAllFull, JSON.stringify(CATALOG, null, 2));
 
   for (dataset of CATALOG) {
-    delete dataset['x_parameters'];
+    delete dataset['info']['x_parameters'];
+    delete dataset['x_gAttributes'];
   }
 
   for (dataset of CATALOG) {
-    let fnameDataset = 'cdas/' + dataset['id'] + '.json' 
+    let params = dataset['info']['parameters'];
+    params.unshift(
+              {
+                "name": "Time",
+                "type": "isotime",
+                "units": "UTC",
+                "length": 24,
+                "fill": null
+              });
+    if (params[params.length-1]['name'] !== 'Epoch') {
+      console.error('Expected last parameter to be Epoch');
+      process.exit(1);
+    }
+    params = params.slice(0, -1);
+  }
+
+  for (dataset of CATALOG) {
+    let fnameDataset = outDir + '/' + dataset['id'] + '.json';
     console.log("Writing: " + fnameDataset);
     fs.writeFileSync(fnameDataset, JSON.stringify(dataset, null, 2));
   }
 
-  let fnameAll = 'all-cdas.json' 
+  let fnameAll = 'all-bw.json';
   console.log("Writing: " + fnameAll);
   fs.writeFileSync(fnameAll, JSON.stringify(CATALOG, null, 2));
 

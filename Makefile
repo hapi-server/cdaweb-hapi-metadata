@@ -1,43 +1,56 @@
-IDREGEX=^AC_
+IDREGEX=^AC_AT
 
 all: node_modules
-	make cdas
-	make hapinl
-	make hapibh
+	make bw
+	make nl
+	make bh
 
 # Install nodejs dependencies
 node_modules:
 	npm install
 
-cdas:
-	node CDAS2HAPI.js --idregex '$(IDREGEX)'
+bw:
+	node CDAS2HAPIall.js --idregex '$(IDREGEX)'
+
+# Jeremy Faden's (jf) AutoplotDataServer HAPI server
+jf:
+	node HAPI2HAPIall.js --version 'jf' --idregex '$(IDREGEX)'	
 
 # Nand's Lal's (nl) production HAPI server
-hapinl:
-	node HAPI.js --version 'nl' --idregex '$(IDREGEX)'	
+nl:
+	node HAPI2HAPIall.js --version 'nl' --idregex '$(IDREGEX)'	
 
 # Bernie Harris' (bh) prototype HAPI server
-hapibh:
-	node HAPI.js --version 'bh' --idregex '$(IDREGEX)'	
+bh:
+	node HAPI2HAPIall.js --version 'bh' --idregex '$(IDREGEX)'	
+
+compare:
+	node compare.js
 
 distclean:
+	@make clean
 	@rm -rf node_modules/
 
-clean-cdas:
-	@rm -f all-cdas.json
-	@rm -f all-cdas-full.json
-	@rm -rf cdas/
+clean-bw:
+	@rm -f all-bw.json
+	@rm -f all-bw-full.json
+	@rm -rf cache/bw/
 
-clean-hapinl:
-	@rm -f all-hapinl.json
-	@rm -rf hapinl/
+clean-jf:
+	@rm -f all-jf.json
+	@rm -rf cache/jf/
 
-clean-hapibh:
-	@rm -f all-hapibh.json
-	@rm -rf hapibh/
+clean-nl:
+	@rm -f all-nl.json
+	@rm -rf cache/nl
+
+clean-bh:
+	@rm -f all-bh.json
+	@rm -rf cache/bh
 
 clean:
-	make clean-cdas
-	make clean-hapibh
-	make clean-hapinl
-	@rm -f package-lock.json
+	make clean-bw
+	make clean-bh
+	make clean-nl
+	make clean-jf
+	rm -f package-lock.json
