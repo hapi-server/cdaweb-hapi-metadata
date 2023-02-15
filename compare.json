@@ -1,0 +1,318 @@
+{
+  "AC_AT_DEF": {
+    "id": {
+      "bw": "AC_AT_DEF",
+      "nl": "AC_AT_DEF",
+      "bh": "spase://NASA/NumericalData/ACE/Attitude/Definitive/PT1H",
+      "jf": "AC_AT_DEF"
+    },
+    "title": {
+      "bh": "ACE Definitive Attitude, Hourly Values, Direction Cosines in RTN, GSE, and J2000 GCI Coordinates"
+    },
+    "label": {
+      "bh": "ACE Definitive Attitude, Hourly Values, Direction Cosines in RTN, GSE, and J2000 GCI Coordinates"
+    },
+    "x_SPDF_ID": {
+      "bh": "AC_AT_DEF"
+    },
+    "info": {
+      "startDate": {
+        "bw": "1997-08-26T00:00:00Z",
+        "nl": "1997-08-26T00:00:00Z",
+        "bh": "1997-08-26T00:00:00.000",
+        "jf": "2010-01-01T00:00:00.000Z"
+      },
+      "stopDate": {
+        "bw": "2023-02-10T12:00:00Z",
+        "nl": "2023-02-10T12:00:00Z",
+        "bh": "2023-02-14T14:04:57.314Z",
+        "jf": "2010-12-31T23:00:00.000Z"
+      },
+      "contact": {
+        "bw": "E. C. Stone @ California Institute of Technology",
+        "nl": "E. C. Stone @ California Institute of Technology",
+        "bh": "Edward.C.Stone.Jr"
+      },
+      "resourceURL": {
+        "bw": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_AT_DEF",
+        "nl": "https://cdaweb.gsfc.nasa.gov/misc/NotesA.html#AC_AT_DEF",
+        "bh": "https://cdaweb.gsfc.nasa.gov/cgi-bin/eval2.cgi?dataset=AC_AT_DEF&index=sp_phys"
+      },
+      "HAPI": {
+        "bw": "3.2",
+        "nl": "2.0",
+        "bh": "3.1",
+        "jf": "2.0"
+      },
+      "creationDate": {
+        "bw": "20120918",
+        "bh": "2023-02-15T14:04:57.314Z"
+      },
+      "cadence": {
+        "bw": "PT1H",
+        "bh": "PT1H"
+      },
+      "resourceID": {
+        "bw": "spase://NASA/NumericalData/ACE/Attitude/Definitive/PT1H",
+        "bh": "spase://NASA/NumericalData/ACE/Attitude/Definitive/PT1H"
+      },
+      "parameters": {
+        "Time": {
+          "bw": {
+            "name": "Time",
+            "type": "isotime",
+            "units": "UTC",
+            "length": 24,
+            "fill": null
+          },
+          "nl": {
+            "name": "Time",
+            "type": "isotime",
+            "units": "UTC",
+            "length": 24,
+            "fill": null
+          },
+          "jf": {
+            "fill": null,
+            "length": 24,
+            "name": "Time",
+            "type": "isotime",
+            "units": "UTC"
+          }
+        },
+        "RTN_ATT": {
+          "bw": {
+            "name": "RTN_ATT",
+            "description": "ACE s/c attitude, direction cosines in RTN coord.",
+            "fill": "-1.0E31",
+            "size": [
+              3
+            ],
+            "label": [
+              "r_RTN",
+              "t_RTN",
+              "n_RTN"
+            ]
+          },
+          "nl": {
+            "name": "RTN_ATT",
+            "type": "double",
+            "units": " ",
+            "fill": "-1.0E31",
+            "description": "ACE s/c attitude, direction cosines in RTN coord.",
+            "size": [
+              3
+            ]
+          },
+          "bh": {
+            "name": "RTN_ATT",
+            "description": "ACE Spacecraft Attitude, Direction Cosines, Radial-Tangential-Normal, RTN, Coordinates",
+            "type": "unknown",
+            "size": [
+              3
+            ],
+            "units": null,
+            "x_SPDF_VALIDMIN": "-1.0",
+            "x_SPDF_VALIDMAX": "1.0",
+            "fill": "-1.0e+31"
+          }
+        },
+        "GCI_ATT": {
+          "bw": {
+            "name": "GCI_ATT",
+            "description": "ACE s/c attitude, direction cosines in J2000 GCI coord.",
+            "fill": "-1.0E31",
+            "size": [
+              3
+            ],
+            "label": [
+              "x_GCI",
+              "y_GCI",
+              "z_GCI"
+            ]
+          },
+          "nl": {
+            "name": "GCI_ATT",
+            "type": "double",
+            "units": " ",
+            "fill": "-1.0E31",
+            "description": "ACE s/c attitude, direction cosines in J2000 GCI coord.",
+            "size": [
+              3
+            ]
+          },
+          "bh": {
+            "name": "GCI_ATT",
+            "description": "ACE Spacecraft Attitude, Direction Cosines, J2000 GCI Coordinates",
+            "type": "unknown",
+            "size": [
+              3
+            ],
+            "units": null,
+            "x_SPDF_VALIDMIN": "-1.0",
+            "x_SPDF_VALIDMAX": "1.0",
+            "fill": "-1.0e+31"
+          }
+        },
+        "GSE_ATT": {
+          "bw": {
+            "name": "GSE_ATT",
+            "description": "ACE s/c attitude, direction cosines in GSE coord.",
+            "fill": "-1.0E31",
+            "size": [
+              3
+            ],
+            "label": [
+              "x_GSE",
+              "y_GSE",
+              "z_GSE"
+            ]
+          },
+          "nl": {
+            "name": "GSE_ATT",
+            "type": "double",
+            "units": " ",
+            "fill": "-1.0E31",
+            "description": "ACE s/c attitude, direction cosines in GSE coord.",
+            "size": [
+              3
+            ]
+          },
+          "bh": {
+            "name": "GSE_ATT",
+            "description": "ACE Spacecraft Attitude, Direction Cosines, GSE Coordinates",
+            "type": "unknown",
+            "size": [
+              3
+            ],
+            "units": null,
+            "x_SPDF_VALIDMIN": "-1.0",
+            "x_SPDF_VALIDMAX": "1.0",
+            "fill": "-1.0e+31"
+          }
+        },
+        "Epoch": {
+          "bw": {
+            "name": "Epoch",
+            "label": "Epoch",
+            "units": "ms",
+            "fill": "-1.0E31"
+          }
+        },
+        "r_RTN": {
+          "jf": {
+            "description": "AC/DEF  ACE s/c attitude, direction cosines in RTN coord.",
+            "fill": "-1.0E31",
+            "name": "r_RTN",
+            "type": "double",
+            "units": null
+          }
+        },
+        "t_RTN": {
+          "jf": {
+            "description": "AC/DEF  ACE s/c attitude, direction cosines in RTN coord.",
+            "fill": "-1.0E31",
+            "name": "t_RTN",
+            "type": "double",
+            "units": null
+          }
+        },
+        "n_RTN": {
+          "jf": {
+            "description": "AC/DEF  ACE s/c attitude, direction cosines in RTN coord.",
+            "fill": "-1.0E31",
+            "name": "n_RTN",
+            "type": "double",
+            "units": null
+          }
+        },
+        "x_GCI": {
+          "jf": {
+            "description": "AC/DEF  ACE s/c attitude, direction cosines in J2000 GCI coord.",
+            "fill": "-1.0E31",
+            "name": "x_GCI",
+            "type": "double",
+            "units": null
+          }
+        },
+        "y_GCI": {
+          "jf": {
+            "description": "AC/DEF  ACE s/c attitude, direction cosines in J2000 GCI coord.",
+            "fill": "-1.0E31",
+            "name": "y_GCI",
+            "type": "double",
+            "units": null
+          }
+        },
+        "z_GCI": {
+          "jf": {
+            "description": "AC/DEF  ACE s/c attitude, direction cosines in J2000 GCI coord.",
+            "fill": "-1.0E31",
+            "name": "z_GCI",
+            "type": "double",
+            "units": null
+          }
+        },
+        "x_GSE": {
+          "jf": {
+            "description": "AC/DEF  ACE s/c attitude, direction cosines in GSE coord.",
+            "fill": "-1.0E31",
+            "name": "x_GSE",
+            "type": "double",
+            "units": null
+          }
+        },
+        "y_GSE": {
+          "jf": {
+            "description": "AC/DEF  ACE s/c attitude, direction cosines in GSE coord.",
+            "fill": "-1.0E31",
+            "name": "y_GSE",
+            "type": "double",
+            "units": null
+          }
+        },
+        "z_GSE": {
+          "jf": {
+            "description": "AC/DEF  ACE s/c attitude, direction cosines in GSE coord.",
+            "fill": "-1.0E31",
+            "name": "z_GSE",
+            "type": "double",
+            "units": null
+          }
+        }
+      },
+      "description": {
+        "bh": "ACE Definitive Attitude, Direction Cosines in Radial-Tangential-Normal, RTN, Geocentric Solar Ecliptic, GSE, and J2000 Geocentric Ecliptic, GCI, Coordinates. Data in GCI and RTN Coordinates are received Daily by the ACE Science Center, ASC, from the ACE Flight Dynamics Facility, FDF, at GSFC. ASC transforms the Data into the other Coordinate Systems. The Data are reported for the Beginning and End of each DSN Telemetry Pass, and also for the Beginning and End of each Spacecraft Maneuver during a DSN Pass. Because the Attitude and Orbit of the ACE Spacecraft change relatively slowly, the FDF does not provide the Data on finer Time Scales."
+      },
+      "time": {
+        "bh": "Epoch"
+      },
+      "contactID": {
+        "bh": "spase://SMWG/Person/Edward.C.Stone.Jr"
+      },
+      "additionalMetadata": {
+        "bh": [
+          {
+            "name": "ISTP",
+            "contentURL": "https://cdaweb.gsfc.nasa.gov/pub/software/cdawlib/0JSONS/ac_at_def_00000000_v01.json",
+            "aboutURL": "https://spdf.gsfc.nasa.gov/sp_use_of_cdf.html"
+          },
+          {
+            "name": "SPASE",
+            "contentURL": "https://cdaweb.gsfc.nasa.gov/registry/hdp/Spase.xql?id=spase://NASA/NumericalData/ACE/Attitude/Definitive/PT1H",
+            "aboutURL": "https://spase-group.org/"
+          }
+        ]
+      },
+      "modificationDate": {
+        "jf": "2023-02-15T14:05:04.273Z"
+      },
+      "sampleStartDate": {
+        "jf": "2010-01-01T00:00:00.000Z"
+      },
+      "sampleStopDate": {
+        "jf": "2010-12-31T23:00:00.000Z"
+      }
+    }
+  }
+}
