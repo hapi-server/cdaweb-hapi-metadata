@@ -1,12 +1,20 @@
 IDREGEX=^AC_AT
+AUTOPLOT=http://autoplot.org/devel/autoplot.jar
 
 .PHONY: all bw jf nl bh compare
 
 all: node_modules
+	@mkdir -p all
+	@echo "\n-----bw------\n"
 	make bw
+	@echo "\n-----nl------\n"
 	make nl
+	@echo "\n-----bh------\n"
 	make bh
+	@echo "\n-----jf------\n"
 	make jf
+	@echo "\n-----compare------\n"
+	make compare
 
 compare:
 	node compare.js
@@ -29,7 +37,8 @@ ap-test:
 
 bin/autoplot.jar:
 	@mkdir -p bin
-	@cd bin; curl -O http://autoplot.org/devel/autoplot.jar
+	@echo "Downloading $(AUTOPLOT)"
+	@cd bin; curl -s -O $(AUTOPLOT)
 
 jf: bin/autoplot.jar
 	node HAPI2HAPIall.js --version 'jf' --idregex '$(IDREGEX)'	
@@ -41,6 +50,7 @@ distclean:
 	@make clean
 	@rm -rf node_modules/
 	@rm -rf bin/
+	@rm -rf all/
 
 clean-bw:
 	@rm -f all/all-bw.json
