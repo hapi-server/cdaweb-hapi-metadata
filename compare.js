@@ -3,11 +3,11 @@ const fs = require('fs');
 let outFile = 'compare.json';
 
 let alls = {};
-let versions = ['bw','nl','bh'];
+let versions = ['bw','nl','bh', 'jf'];
 
 for (version of versions) {
   alls[version] = {};
-  let fname = 'all-' + version + '.json';
+  let fname = 'all/all-' + version + '.json';
   console.log("Reading: " + fname);
   let all = JSON.parse(fs.readFileSync(fname));
 

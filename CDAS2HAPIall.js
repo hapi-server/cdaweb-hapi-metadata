@@ -14,15 +14,19 @@ const argv    = require('yargs')
                     })
                   .argv;
 
+let HAPI_VERSION = "3.2";
 let DATSET_ID_RE = new RegExp(argv.idregex);
+
+let fnameAll = 'all/all-bw.json';
+let fnameAllFull = 'all/all-bw-full.json'
 
 // pool should be set outside of loop. See
 // https://www.npmjs.com/package/request#requestoptions-callback
 // Set max sockets to a single host.
 let pool = {maxSockets: 3};  
 
-let baseurl = "https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/";
-let allurl  = "https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml";
+let baseURL = "https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/";
+let allURL  = "https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml";
 
 let outDir  = "cache/bw";
 if (!fs.existsSync(outDir)) {fs.mkdirSync(outDir, {recursive: true})}
@@ -40,11 +44,11 @@ function catalog() {
     finished(JSON.parse(body), true);
     return;
   }
-  let reqOpts = {uri: allurl};
-  console.log("Requesting: " + allurl);
+  let reqOpts = {uri: allURL};
+  console.log("Requesting: " + allURL);
   request(reqOpts, function (err,res,body) {
     if (err) console.log(err);
-    console.log("Received: " + allurl);
+    console.log("Received: " + allURL);
     xml2js(body, function (err, jsonObj) {
       finished(jsonObj, false);
     });
@@ -97,7 +101,7 @@ function variables(CATALOG) {
   let ididx = 0;
 
   for (ididx = 0; ididx < CATALOG.length; ididx++) {
-    let url = baseurl + CATALOG[ididx]['id'] + "/variables";
+    let url = baseURL + CATALOG[ididx]['id'] + "/variables";
     let fname = outDir + "/" + CATALOG[ididx]['id'] + "-variables.json";
     requestVariables(url, fname, ididx);
   }
@@ -113,10 +117,10 @@ function variables(CATALOG) {
     }
 
     let reqOpts = {uri: url, pool: pool, headers: {'Accept':'application/json'}};
-    console.log("Requesting: " + url.replace(baseurl,""));
+    console.log("Requesting: " + url.replace(baseURL,""));
     request(reqOpts, function (err,res,body) {
       if (err) console.log(err);
-      console.log("Received: " + url.replace(baseurl, ""));
+      console.log("Received: " + url.replace(baseURL, ""));
       finished(ididx, fname, body, false);
     });
   }
@@ -133,6 +137,7 @@ function variables(CATALOG) {
       //console.log("Wrote:   " + fname);
     }
 
+    CATALOG[ididx]['info']['HAPI'] = HAPI_VERSION;
     CATALOG[ididx]['info']['x_parameters'] = {};
     let VariableDescription = body['VariableDescription'];
     for (variable of VariableDescription) {
@@ -161,8 +166,8 @@ function variableDetails(CATALOG) {
 
     let stop = moment(CATALOG[ididx]['info']['startDate']).add(1,'day').toISOString().replace(".000Z","Z");
 
-    let url = baseurl + CATALOG[ididx]['id'] + "/variables";
-    url = baseurl
+    let url = baseURL + CATALOG[ididx]['id'] + "/variables";
+    url = baseURL
             + CATALOG[ididx]['id']
             + "/data/"
             + CATALOG[ididx]['info']['startDate'].replace(/-|:/g,"")
@@ -465,7 +470,6 @@ function finalizeCatalog(CATALOG) {
     }
   }
 
-  let fnameAllFull = 'all-bw-full.json'
   console.log("Writing: " + fnameAllFull);
   fs.writeFileSync(fnameAllFull, JSON.stringify(CATALOG, null, 2));
 
@@ -497,7 +501,6 @@ function finalizeCatalog(CATALOG) {
     fs.writeFileSync(fnameDataset, JSON.stringify(dataset, null, 2));
   }
 
-  let fnameAll = 'all-bw.json';
   console.log("Writing: " + fnameAll);
   fs.writeFileSync(fnameAll, JSON.stringify(CATALOG, null, 2));
 

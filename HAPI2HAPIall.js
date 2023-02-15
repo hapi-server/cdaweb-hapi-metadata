@@ -4,6 +4,7 @@
 const fs      = require('fs');
 const request = require("request");
 const xml2js  = require('xml2js').parseString;
+const {exec}  = require('node:child_process');
 const argv    = require('yargs')
                   .default
                     ({
@@ -20,7 +21,9 @@ let DATSET_ID_RE = new RegExp(argv.idregex);
 let pool = {maxSockets: 3};
 
 let hapiURL; 
-if (argv.version === 'nl') {
+if (argv.version === 'nl' || argv.version === 'jf') {
+  // 'jf' method can not produce /catalog response, so
+  // response from 'nl' is used.
   hapiURL = "https://cdaweb.gsfc.nasa.gov/hapi";
 } else if (argv.version === 'bh') {
   pool = {maxSockets: 1};
@@ -31,7 +34,7 @@ if (argv.version === 'nl') {
 }
 
 let outDir   = "cache/" + argv.version;
-let fnameAll = "all-" + argv.version + ".json";
+let fnameAll = "all/all-" + argv.version + ".json";
 
 if (!fs.existsSync(outDir)) {fs.mkdirSync(outDir, {recursive: true})}
 
@@ -118,18 +121,6 @@ function info(CATALOG) {
     }
   }
 
-  function getInfo(fname, id, ididx) {
-
-    let url = hapiURL + "/info?id="+id;
-    let reqOpts = {uri: url, pool: pool};
-    console.log("Requesting: " + url);
-    request(reqOpts, function (err,res,body) {
-      if (err) console.log(err);
-      console.log("Received: " + url);
-      finished(fname, body, ididx, false);
-    });
-  }
-
   function finished(fname, body, ididx, fromCache) {
 
     if (!finished.N) {finished.N = 0}
@@ -138,6 +129,7 @@ function info(CATALOG) {
     body = JSON.parse(body);
 
     CATALOG[ididx]['info'] = body;
+    delete CATALOG[ididx]['info']['status'];
 
     if (fromCache == false) {
       // TODO: Don't write if error.
@@ -173,6 +165,81 @@ function info(CATALOG) {
       console.log("Writing: " + fnameAll);
       fs.writeFileSync(fnameAll, JSON.stringify(CATALOG, null, 2), 'utf-8');
     }
+  }
+
+  function getInfo(fname, id, ididx) {
+
+    let url = hapiURL + "/info?id="+id;
+    let reqOpts = {uri: url, pool: pool};
+    console.log("Requesting: " + url);
+    request(reqOpts, function (err,res,body) {
+      if (err) console.log(err);
+      console.log("Received: " + url);
+      if (argv.version == 'jf') {
+        // AutoplotDataServer requires all parameter IDs to be given;
+        // One can't request info for all parameters given a dataset ID.
+        // So we get the IDs from 'nl' and pass them to AutoplotDataServer.
+        let parameterArray = JSON.parse(body)['parameters'];
+        getInfoAP(fname, id, ididx, parameterArray);
+      } else {
+        finished(fname, body, ididx, false);        
+      }
+    });
+  }
+
+  function getInfoAP(fname, id, ididx, parameterArray) {
+
+    function combine(psidx, body) {
+
+      if (combine.N === undefined) {
+        combine.N = 0;
+      } else {
+        combine.N = combine.N + 1;
+      }
+
+      if (!combine.all) {
+        combine.all = body;
+        combine.all['_parameters'] = [];
+      }
+
+      combine.all['_parameters'][psidx] = body['parameters'];
+
+      if (combine.N == parameterArray.length - 2) {
+        combine.all['parameters'] = [];
+        for (psidx in combine.all['_parameters']) {
+          //console.log(combine.all['_parameters'][psidx])
+          if (psidx == 0) {
+            combine.all['parameters'] = combine.all['parameters'].concat(combine.all['_parameters'][psidx]);
+          } else {
+            combine.all['parameters'] = combine.all['parameters'].concat(combine.all['_parameters'][psidx].slice(1));            
+          }
+        }
+        delete combine.all['_parameters']
+        finished(fname, JSON.stringify(combine.all), ididx, false);
+      }
+    }
+
+    let psidx = 0;
+    for (let parameterSet of parameterArray) {
+      let name = parameterSet['name'];
+      if (name == 'Time') {
+        continue;
+      }
+
+      let uri = `vap+cdaweb:ds=${id}&id=${name}`;
+      let cmd = `java -Djava.awt.headless=true -cp bin/autoplot.jar org.autoplot.AutoplotDataServer -q --uri='${uri}' -f hapi-info`
+      doExec(cmd, psidx);
+      psidx = psidx + 1;      
+    }
+
+    function doExec(cmd, psidx) {
+      console.log("Requesting: " + cmd);
+      exec(cmd, (err, body, stderr) => {
+        if (err) console.log(err);
+        combine(psidx, JSON.parse(body));
+      });
+    }
+
   }
 }
 
