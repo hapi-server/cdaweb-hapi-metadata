@@ -1,11 +1,22 @@
-#curl -H "Accept: application/json" "https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/observatories" > observatories.json
-
-#curl -O https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml
+# Use
+#   (bash spot-check.sh) &> spot-check.log
+# to send all output to log file
 
 ID=AC_H2_CRIS
 PARAMETERS=flux_B
 START="2010-06-21T14:50:52Z"
+#STOP="2010-06-23T15:50:52Z"
 STOP="2010-07-30T14:50:52Z"
+
+ID=AMPTECCE_H0_MEPA@0
+PARAMETERS=SpinPeriod
+START="1985-06-21T14:50:52Z"
+STOP="1985-06-30T14:50:52Z"
+
+ID=OMNI_HRO_1MIN
+PARAMETERS=SYM_H
+START="2010-06-01T00:00:00Z"
+STOP="2010-07-01T00:00:00Z"
 
 #Fails for both
 #ID=A2_K0_MPA
@@ -19,12 +30,51 @@ STOP_STR=${STOP//-/}
 STOP_STR=${STOP_STR//:/}
 
 base="https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets"
-url="$base/$ID/data/$START_STR,$STOP_STR/$PARAMETERS?format=text"
+url="$base/${ID//@*/}/data/$START_STR,$STOP_STR/$PARAMETERS?format=text"
+#echo $url
+#time curl -s $url > spot-check.cdas.csv
 
-echo $url
-time curl -s $url > a
+# Not requesting gzip does not change timing
+#echo $url
+#time node ../../server-nodejs/bin/CDAWeb.js \
+#    --id ${ID//@*/} --parameters $PARAMETERS --start $START --stop $STOP \
+#    --encoding '' > spot-check.cdas.csv
 
-url="https://cdaweb.gsfc.nasa.gov/hapi/data?id=$ID&parameters=$PARAMETERS&time.min=$START&time.max=$STOP"
-echo $url
-time curl -s $url > b
+# HAPI server does not have ability to return gzipped
+#time curl -s -H 'Accept-Encoding: gzip' $url | gunzip > spot-check.hapi.csv
 
+rm -f /tmp/spot-check.*
+
+cmd="node ../../server-nodejs/bin/CDAWeb.js \
+--id ${ID//@*/} --parameters $PARAMETERS --start $START --stop $STOP \
+--format csv"
+echo "----"
+echo "$cmd"
+time $cmd > /tmp/spot-check.cdas.csv
+
+cmd="node ../../server-nodejs/bin/CDAWeb.js \
+--id ${ID//@*/} --parameters $PARAMETERS --start $START --stop $STOP \
+--format text"
+echo "----"
+echo "$cmd"
+time $cmd > /tmp/spot-check.cdas.text
+
+cmd="node ../../server-nodejs/bin/CDAWeb.js \
+--id ${ID//@*/} --parameters $PARAMETERS --start $START --stop $STOP \
+--format cdf"
+echo "----"
+echo "$cmd"
+time $cmd > /tmp/spot-check.cdas.cdf
+
+url="https://cdaweb.gsfc.nasa.gov/hapi/data"
+url="$url?id=$ID&parameters=$PARAMETERS&time.min=$START&time.max=$STOP"
+echo "----"
+echo "$url"
+time curl -s "$url" > /tmp/spot-check.hapi.csv
+
+url="$url&format=binary"
+echo "----"
+echo "$url"
+time curl -s "$url" > /tmp/spot-check.hapi.bin
+
+ls -lh /tmp/spot-check*

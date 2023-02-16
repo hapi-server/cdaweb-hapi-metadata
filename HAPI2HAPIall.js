@@ -189,7 +189,51 @@ function info(CATALOG) {
 
   function getInfoAP(fname, id, ididx, parameterArray) {
 
-    function combine(psidx, body) {
+    if (0) {
+      // Should work, but Autoplot throws error.
+      let parameters = [];
+      for (let pidx in parameterArray) {
+        let name = parameterArray[pidx]['name'];
+        if (name == 'Time') {
+          continue;
+        }
+        parameters.push(name);
+      }
+      parameters = parameters.join(",");
+
+      let uri = `vap+cdaweb:ds=${id}&id=${parameters}`;
+      let cmd = `java -Djava.awt.headless=true -cp bin/autoplot.jar org.autoplot.AutoplotDataServer -q --uri='${uri}' -f hapi-info`
+      console.log("Requesting: " + cmd);
+      exec(cmd, (err, body, stderr) => {
+        if (err) console.log(err);
+        console.log(combine(JSON.parse(body)));
+        //combine(JSON.parse(body));
+      });
+    }
+
+    if (1) {
+      let psidx = 0;
+      for (let parameterSet of parameterArray) {
+        let name = parameterSet['name'];
+        if (name == 'Time') {
+          continue;
+        }
+
+        let uri = `vap+cdaweb:ds=${id}&id=${name}`;
+        let cmd = `java -Djava.awt.headless=true -cp bin/autoplot.jar org.autoplot.AutoplotDataServer -q --uri='${uri}' -f hapi-info`
+        doExec(cmd, psidx);
+        psidx = psidx + 1;      
+      }
+
+      function doExec(cmd, psidx) {
+        console.log("Requesting: " + cmd);
+        exec(cmd, (err, body, stderr) => {
+          if (err) console.log(err);
+          combine(psidx, JSON.parse(body));
+        });
+      }
+
+      function combine(psidx, body) {
 
       if (combine.N === undefined) {
         combine.N = 0;
@@ -219,27 +263,7 @@ function info(CATALOG) {
       }
     }
 
-    let psidx = 0;
-    for (let parameterSet of parameterArray) {
-      let name = parameterSet['name'];
-      if (name == 'Time') {
-        continue;
-      }
-
-      let uri = `vap+cdaweb:ds=${id}&id=${name}`;
-      let cmd = `java -Djava.awt.headless=true -cp bin/autoplot.jar org.autoplot.AutoplotDataServer -q --uri='${uri}' -f hapi-info`
-      doExec(cmd, psidx);
-      psidx = psidx + 1;      
     }
-
-    function doExec(cmd, psidx) {
-      console.log("Requesting: " + cmd);
-      exec(cmd, (err, body, stderr) => {
-        if (err) console.log(err);
-        combine(psidx, JSON.parse(body));
-      });
-    }
-
   }
 }
 

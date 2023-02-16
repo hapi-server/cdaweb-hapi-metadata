@@ -1,0 +1,35 @@
+----
+node ../../server-nodejs/bin/CDAWeb.js --id OMNI_HRO_1MIN --parameters SYM_H --start 2010-06-01T00:00:00Z --stop 2010-07-01T00:00:00Z --format csv
+
+real	0m1.233s
+user	0m0.244s
+sys	0m0.033s
+----
+node ../../server-nodejs/bin/CDAWeb.js --id OMNI_HRO_1MIN --parameters SYM_H --start 2010-06-01T00:00:00Z --stop 2010-07-01T00:00:00Z --format text
+
+real	0m1.166s
+user	0m0.142s
+sys	0m0.028s
+----
+node ../../server-nodejs/bin/CDAWeb.js --id OMNI_HRO_1MIN --parameters SYM_H --start 2010-06-01T00:00:00Z --stop 2010-07-01T00:00:00Z --format cdf
+
+real	0m0.657s
+user	0m0.144s
+sys	0m0.024s
+----
+https://cdaweb.gsfc.nasa.gov/hapi/data?id=OMNI_HRO_1MIN&parameters=SYM_H&time.min=2010-06-01T00:00:00Z&time.max=2010-07-01T00:00:00Z
+
+real	0m0.561s
+user	0m0.057s
+sys	0m0.033s
+----
+https://cdaweb.gsfc.nasa.gov/hapi/data?id=OMNI_HRO_1MIN&parameters=SYM_H&time.min=2010-06-01T00:00:00Z&time.max=2010-07-01T00:00:00Z&format=binary
+
+real	0m0.324s
+user	0m0.041s
+sys	0m0.019s
+-rw-r--r--  1 weigel  wheel   373K Feb 15 20:52 /tmp/spot-check.cdas.cdf
+-rw-r--r--  1 weigel  wheel   1.1M Feb 15 20:52 /tmp/spot-check.cdas.csv
+-rw-r--r--  1 weigel  wheel   1.5M Feb 15 20:52 /tmp/spot-check.cdas.text
+-rw-r--r--  1 weigel  wheel   1.2M Feb 15 20:52 /tmp/spot-check.hapi.bin
+-rw-r--r--  1 weigel  wheel   1.2M Feb 15 20:52 /tmp/spot-check.hapi.csv
