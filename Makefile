@@ -24,7 +24,10 @@ bw:
 
 # Nand's Lal's (nl) production HAPI server
 nl:
-	node HAPI2HAPIall.js --version 'nl' --idregex '$(IDREGEX)'	
+	node HAPI2HAPIall.js --version 'nl' --idregex '$(IDREGEX)'
+
+nljf:
+	node HAPI2HAPIall.js --maxsockets 5 --version 'nljf' --idregex '$(IDREGEX)' --hapiurl 'https://jfaden.net/server/cdaweb/hapi'
 
 # Bernie Harris' (bh) prototype HAPI server
 bh:
@@ -65,6 +68,10 @@ clean-nl:
 	@rm -f all/all-nl.json
 	@rm -rf cache/nl
 
+clean-nljf:
+	@rm -f all/all-nljf.json
+	@rm -rf cache/nljf
+
 clean-bh:
 	@rm -f all/all-bh.json
 	@rm -rf cache/bh
@@ -73,5 +80,6 @@ clean:
 	make clean-bw
 	make clean-bh
 	make clean-nl
+	make clean-nljf
 	make clean-jf
 	rm -f package-lock.json

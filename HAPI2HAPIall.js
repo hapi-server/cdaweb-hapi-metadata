@@ -9,28 +9,33 @@ const argv    = require('yargs')
                   .default
                     ({
                       'idregex': '^AC_',
-                      'version': 'nl'
+                      'version': 'nl',
+                      'hapiurl': '',
+                      'maxsockets': 3
                     })
                   .argv;
 
 let DATSET_ID_RE = new RegExp(argv.idregex);
+let HAPIURL = argv.hapiurl;
 
 // pool should be set outside of loop. See
 // https://www.npmjs.com/package/request#requestoptions-callback
 // Set max sockets to a single host.
-let pool = {maxSockets: 3};
+let pool = {maxSockets: argv.maxsockets};
 
-let hapiURL; 
-if (argv.version === 'nl' || argv.version === 'jf') {
-  // 'jf' method can not produce /catalog response, so
-  // response from 'nl' is used.
-  hapiURL = "https://cdaweb.gsfc.nasa.gov/hapi";
-} else if (argv.version === 'bh') {
-  pool = {maxSockets: 1};
-  hapiURL  = "https://cdaweb.gsfc.nasa.gov/registry/hdp/hapi";
-} else {
-  console.error("version must be either 'nl' or 'bh'.");
-  process.exit(1);
+let hapiURL = HAPIURL;
+if (hapiURL === '') { 
+  if (argv.version === 'nljf' || argv.version === 'nl' || argv.version === 'jf') {
+    // 'jf' method can not produce /catalog response, so
+    // response from 'nl' is used.
+    hapiURL = "https://cdaweb.gsfc.nasa.gov/hapi";
+  } else if (argv.version === 'bh') {
+    pool = {maxSockets: 1};
+    hapiURL  = "https://cdaweb.gsfc.nasa.gov/registry/hdp/hapi";
+  } else {
+    console.error("version must be either 'nl' or 'bh'.");
+    process.exit(1);
+  }
 }
 
 let outDir   = "cache/" + argv.version;
