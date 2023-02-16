@@ -82,7 +82,7 @@ function catalog(cb) {
       ids.push(dataset['id']);
     }
 
-    let fnameIds = outDir + "/ids-hapi.txt";
+    let fnameIds = outDir + "/ids.txt";
     console.log("Writing: " + fnameIds);
     fs.writeFileSync(fnameIds, ids.join("\n"));
 

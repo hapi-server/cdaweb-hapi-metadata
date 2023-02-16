@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-let outFile = 'compare.json';
+let outFile = 'compare-meta.json';
 
 let alls = {};
 let versions = ['bw','nl','bh', 'jf'];

@@ -87,7 +87,7 @@ function catalog() {
       allIds.push(id);
     }
 
-    let allIdsFile = outDir + "/ids-all.txt";
+    let allIdsFile = outDir + "/ids.txt";
     console.log("Writing: " + allIdsFile);
     fs.writeFileSync(allIdsFile, allIds.join("\n"));
     //console.log("Wrote:   " + allIdsFile);

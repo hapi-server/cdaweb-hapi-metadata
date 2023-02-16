@@ -1,7 +1,7 @@
 IDREGEX=^AC_AT
 AUTOPLOT=http://autoplot.org/devel/autoplot.jar
 
-.PHONY: all bw jf nl bh compare
+.PHONY: all bw jf nl bh compare-meta
 
 all: node_modules
 	@mkdir -p all
@@ -13,11 +13,11 @@ all: node_modules
 	make bh
 	@echo "\n-----jf------\n"
 	make jf
-	@echo "\n-----compare------\n"
-	make compare
+	@echo "\n-----compare-meta------\n"
+	make compare-meta
 
-compare:
-	node compare.js
+compare-meta:
+	node compare-meta.js
 
 bw:
 	node CDAS2HAPIall.js --idregex '$(IDREGEX)'

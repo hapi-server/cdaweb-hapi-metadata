@@ -1,6 +1,5 @@
-# Use
-#   (bash spot-check.sh) &> spot-check.log
-# to send all output to log file
+# To send all output to log file, use
+#   (bash compare-data.sh) &> compare-data.log
 
 ID=AC_H2_CRIS
 PARAMETERS=flux_B
@@ -37,61 +36,68 @@ STOP_STR=${STOP_STR//:/}
 base="https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets"
 url="$base/${ID//@*/}/data/$START_STR,$STOP_STR/$PARAMETERS?format=text"
 #echo $url
-#time curl -s $url > spot-check.cdas.csv
+#time curl -s $url > compare-data.cdas.csv
 
 # Not requesting gzip does not change timing
 #echo $url
 #time node ../../server-nodejs/bin/CDAWeb.js \
 #    --id ${ID//@*/} --parameters $PARAMETERS --start $START --stop $STOP \
-#    --encoding '' > spot-check.cdas.csv
+#    --encoding '' > compare-data.cdas.csv
 
 # HAPI server does not have ability to return gzipped
-#time curl -s -H 'Accept-Encoding: gzip' $url | gunzip > spot-check.hapi.csv
+#time curl -s -H 'Accept-Encoding: gzip' $url | gunzip > compare-data.hapi.csv
 
-rm -f /tmp/spot-check.*
+#cmd="node -v"
+# $cmd > a
 
-cmd="node ../../server-nodejs/bin/CDAWeb.js \
+rm -f /tmp/compare-data.*
+
+cmd="node ../CDAS2HAPIcsv.js \
 --id ${ID//@*/} --parameters $PARAMETERS --start $START --stop $STOP \
 --format csv --debug"
-echo "----"
+echo -e "\n"
+echo "---- HAPI CSV via transform of CDAS text response ----"
 echo "$cmd"
-time $cmd > /tmp/spot-check.cdas.csv
-head -11 /tmp/spot-check.cdas.csv
+/usr/bin/time -ah $cmd > /tmp/compare-data.cdas.csv
+head -11 /tmp/compare-data.cdas.csv
 
 
-cmd="node ../../server-nodejs/bin/CDAWeb.js \
+cmd="node ../CDAS2HAPIcsv.js \
 --id ${ID//@*/} --parameters $PARAMETERS --start $START --stop $STOP \
 --format text --debug"
-echo "----"
+echo -e "\n"
+echo "---- CDAS text unaltered ----"
 echo "$cmd"
-time $cmd > /tmp/spot-check.cdas.text
-head -6 /tmp/spot-check.cdas.text
-grep /tmp/spot-check.cdas.text -e "^[0-9]" | head -3
+/usr/bin/time -ah $cmd > /tmp/compare-data.cdas.text
+head -6 /tmp/compare-data.cdas.text
+grep /tmp/compare-data.cdas.text -e "^[0-9]" | head -3
 
-exit
 
-cmd="node ../../server-nodejs/bin/CDAWeb.js \
+cmd="node ../CDAS2HAPIcsv.js \
 --id ${ID//@*/} --parameters $PARAMETERS --start $START --stop $STOP \
 --format cdf"
-echo "----"
+echo -e "\n"
+echo "---- CDAS CDF unaltered ----"
 echo "$cmd"
-time $cmd > /tmp/spot-check.cdas.cdf
+/usr/bin/time -ah $cmd > /tmp/compare-data.cdas.cdf
 
 
 url="https://cdaweb.gsfc.nasa.gov/hapi/data"
 url="$url?id=$ID&parameters=$PARAMETERS&time.min=$START&time.max=$STOP"
-echo "----"
+echo -e "\n"
+echo "---- HAPI CSV via production server ----"
 echo "$url"
-time curl -s "$url" > /tmp/spot-check.hapi.csv
-head -3 /tmp/spot-check.hapi.csv
+/usr/bin/time -ah curl -s "$url" > /tmp/compare-data.hapi.csv
+head -3 /tmp/compare-data.hapi.csv
 
 
 url="$url&format=binary"
-echo "----"
+echo -e "\n"
+echo "---- HAPI Binary via production server ----"
 echo "$url"
-time curl -s "$url" > /tmp/spot-check.hapi.bin
+/usr/bin/time -ah curl -s "$url" > /tmp/compare-data.hapi.bin
 
 
-ls -lh /tmp/spot-check*
-
-
+echo -e "\n"
+echo "---- Response files ----"
+ls -lh /tmp/compare-data*
