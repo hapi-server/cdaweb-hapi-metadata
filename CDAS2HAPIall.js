@@ -32,7 +32,7 @@ let outDir  = "cache/bw";
 if (!fs.existsSync(outDir)) {fs.mkdirSync(outDir, {recursive: true})}
 
 function obj2json(obj) {return JSON.stringify(obj, null, 2)};
-function writecb(err) { console.error(err) };
+//function writecb(err) { console.error(err) };
 
 catalog();
 
@@ -64,7 +64,8 @@ function catalog() {
 
     if (fromCache == false) {
       console.log("Writing: " + fnameJSON);
-      fs.writeFile(fnameJSON, obj2json(body), 'utf-8', writecb);
+      //fs.writeFile(fnameJSON, obj2json(body), 'utf-8', () => {});
+      fs.writeFileSync(fnameJSON, obj2json(body), 'utf-8');
     }    
 
     let CATALOG = extractDatasetInfo(body);
@@ -79,8 +80,8 @@ function catalog() {
     }
     let allIdsFile = outDir + "/ids.txt";
     console.log("Writing: " + allIdsFile);
-    fs.writeFile(allIdsFile, allIds.join("\n"), writecb);
-
+    //fs.writeFile(allIdsFile, allIds.join("\n"), () => {});
+    fs.writeFileSync(allIdsFile, allIds.join("\n"), () => {});
   }
 }
 
@@ -123,7 +124,8 @@ function variables(CATALOG) {
 
     if (fromCache == false) {
       console.log("Writing: " + fname);
-      fs.writeFile(fname, obj2json(variablesResponse), writecb);
+      //fs.writeFile(fname, obj2json(variablesResponse), () => {});
+      fs.writeFileSync(fname, obj2json(variablesResponse));
     }
 
     extractParameterNames(variablesResponse, CATALOG, ididx);
@@ -228,7 +230,8 @@ function variableDetails(CATALOG) {
       if (fromCache == false) {
         let fnameOrphan = fname.replace(".json", ".orphan.json");
         console.log("Writing: " + fnameOrphan);
-        fs.writeFile(fnameOrphan, obj2json(orphanAttributes['attribute']), writecb);
+        //fs.writeFile(fnameOrphan, obj2json(orphanAttributes['attribute']), () => {});
+        fs.writeFileSync(fnameOrphan, obj2json(orphanAttributes['attribute']));
       }      
     }
 
@@ -242,11 +245,13 @@ function variableDetails(CATALOG) {
 
     if (fromCache == false) {
       console.log("Writing: " + fname);
-      fs.writeFile(fname, obj2json(body), writecb);
+      //fs.writeFile(fname, obj2json(body), () => {});
+      fs.writeFileSync(fname, obj2json(body));
       if (body['Warning'].length > 0) {
         let fnameWarn = fname.replace(".json", ".warning.json");
         console.log("Writing: " + fnameWarn);
-        fs.writeFile(fnameWarn, obj2json(body['Warning']), writecb);
+        //fs.writeFile(fnameWarn, obj2json(body['Warning']), () => {});
+        fs.writeFileSync(fnameWarn, obj2json(body['Warning']));
       }
     }
 
@@ -516,15 +521,25 @@ function finalizeCatalog(CATALOG) {
 
   // Write HAPI all file with extra 
   console.log("Writing: " + fnameAllFull);
-  fs.writeFile(fnameAllFull, obj2json(CATALOG), writecb);
+  //fs.writeFile(fnameAllFull, obj2json(CATALOG), () => {});
+  fs.writeFileSync(fnameAllFull, obj2json(CATALOG));
   for (dataset of CATALOG) {
     delete dataset['info']['x_parameters'];
     delete dataset['x_gAttributes'];
   }
 
   for (dataset of CATALOG) {
+
     let parameters = dataset['info']['parameters'];
     let Np = dataset['info']['parameters'].length;
+    if (parameters[Np-1]['name'] !== 'Epoch') {
+      // Epoch was a variable in CDFML that is not in the /variables list.
+      console.error('Expected last parameter to be Epoch');
+      process.exit(1);
+    }
+    // Remove integer Epoch parameter.
+    parameters = parameters.slice(0, -1);
+    // Prepend Time parameter
     parameters.unshift(
                 {
                   "name": "Time",
@@ -533,23 +548,18 @@ function finalizeCatalog(CATALOG) {
                   "length": 24,
                   "fill": null
                 });
-    if (parameters[Np-1]['name'] !== 'Epoch') {
-      // Epoch was a variable in CDFML that is not in the /variables list.
-      console.error('Expected last parameter to be Epoch');
-      process.exit(1);
-    }
-    // Remove integer Epoch parameter.
-    parameters = parameters.slice(0, -1);
   }
 
   // Write one info file per dataset
   for (dataset of CATALOG) {
     let fnameDataset = outDir + '/' + dataset['id'] + '.json';
     console.log("Writing: " + fnameDataset);
-    fs.writeFile(fnameDataset, obj2json(dataset), writecb);
+    //fs.writeFile(fnameDataset, obj2json(dataset), () => {});
+    fs.writeFileSync(fnameDataset, obj2json(dataset));
   }
 
   // Write HAPI all.json containing all content from all info files.
   console.log("Writing: " + fnameAll);
-  fs.writeFile(fnameAll, obj2json(CATALOG), writecb);
+  //fs.writeFile(fnameAll, obj2json(CATALOG), () => {});
+  fs.writeFileSync(fnameAll, obj2json(CATALOG));
 }
