@@ -3,6 +3,15 @@
 // and queries to
 //   https://cdaweb.gsfc.nasa.gov/WebServices/REST/
 
+let HAPI_VERSION = "3.2";
+
+let baseURL = "https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/";
+let allURL  = "https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml";
+
+let outDir       = "cache/bw";
+let fnameAll     = 'all/all-bw.json';
+let fnameAllFull = 'all/all-bw-full.json'
+
 const fs      = require('fs');
 const request = require("request");
 const moment  = require('moment');
@@ -10,29 +19,35 @@ const xml2js  = require('xml2js').parseString;
 const argv    = require('yargs')
                   .default
                     ({
-                      'idregex': '^AC_'
+                      'idregex': '^AC_',
+                      'maxsockets': 3
                     })
                   .argv;
 
-let HAPI_VERSION = "3.2";
 let DATSET_ID_RE = new RegExp(argv.idregex);
-
-let fnameAll = 'all/all-bw.json';
-let fnameAllFull = 'all/all-bw-full.json'
 
 // pool should be set outside of loop. See
 // https://www.npmjs.com/package/request#requestoptions-callback
 // Set max sockets to a single host.
-let pool = {maxSockets: 3};  
+let pool = {maxSockets: 3};
 
-let baseURL = "https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/";
-let allURL  = "https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml";
-
-let outDir  = "cache/bw";
 if (!fs.existsSync(outDir)) {fs.mkdirSync(outDir, {recursive: true})}
 
-function obj2json(obj) {return JSON.stringify(obj, null, 2)};
-//function writecb(err) { console.error(err) };
+function obj2json(obj) {return JSON.stringify(obj, null, 2)}
+
+console.warning = function(file, msg) {
+  file = file.replace(".json", ".warning.txt");
+  if (!console.warning.file) {
+    console.warning.file = file;
+    fs.writeFileSync(file, msg.trim());
+  } else {
+    fs.appendFileSync(file, msg.trim());
+  }
+  console.log(msg.trim());
+}
+
+// Callback for the async fs.writeFile() calls.
+function writecb(err) {if (err) console.error(err)}
 
 catalog();
 
@@ -64,8 +79,8 @@ function catalog() {
 
     if (fromCache == false) {
       console.log("Writing: " + fnameJSON);
-      //fs.writeFile(fnameJSON, obj2json(body), 'utf-8', () => {});
-      fs.writeFileSync(fnameJSON, obj2json(body), 'utf-8');
+      fs.writeFile(fnameJSON, obj2json(body), 'utf-8', writecb);
+      //fs.writeFileSync(fnameJSON, obj2json(body), 'utf-8');
     }    
 
     let CATALOG = extractDatasetInfo(body);
@@ -80,8 +95,8 @@ function catalog() {
     }
     let allIdsFile = outDir + "/ids.txt";
     console.log("Writing: " + allIdsFile);
-    //fs.writeFile(allIdsFile, allIds.join("\n"), () => {});
-    fs.writeFileSync(allIdsFile, allIds.join("\n"), () => {});
+    fs.writeFile(allIdsFile, allIds.join("\n"), writecb);
+    //fs.writeFileSync(allIdsFile, allIds.join("\n"));
   }
 }
 
@@ -124,8 +139,8 @@ function variables(CATALOG) {
 
     if (fromCache == false) {
       console.log("Writing: " + fname);
-      //fs.writeFile(fname, obj2json(variablesResponse), () => {});
-      fs.writeFileSync(fname, obj2json(variablesResponse));
+      fs.writeFile(fname, obj2json(variablesResponse), writecb);
+      //fs.writeFileSync(fname, obj2json(variablesResponse));
     }
 
     extractParameterNames(variablesResponse, CATALOG, ididx);
@@ -230,28 +245,50 @@ function variableDetails(CATALOG) {
       if (fromCache == false) {
         let fnameOrphan = fname.replace(".json", ".orphan.json");
         console.log("Writing: " + fnameOrphan);
-        //fs.writeFile(fnameOrphan, obj2json(orphanAttributes['attribute']), () => {});
-        fs.writeFileSync(fnameOrphan, obj2json(orphanAttributes['attribute']));
+        fs.writeFile(fnameOrphan, obj2json(orphanAttributes['attribute']), writecb);
+        //fs.writeFileSync(fnameOrphan, obj2json(orphanAttributes['attribute']));
       }      
     }
-
-    // Keep only first two data records.
+    
     for ([idx, variable] of Object.entries(cdfVariables['variable'])) {
       let cdfVarRecords = variable['cdfVarData']['record'];
+
+      if (variable['name'] === 'Epoch') {
+        let startDate = CATALOG[ididx]['info']['startDate'];
+        let sampleStartDate = cdfVarRecords[0]['value'][0];
+        if (!moment(startDate).isSame(sampleStartDate)) {
+          console.warning(fname.replace("-cdfml",""), "         Warning: Given start of  " + startDate + " differs from");
+          console.warning(fname.replace("-cdfml",""), "                  first record at " + sampleStartDate);
+        }
+        sampleStopDate = cdfVarRecords.slice(-1)[0]['value'][0];
+
+        let Nr = cdfVarRecords.length;
+        if (Nr >= 50) {
+          console.warning(fname.replace("-cdfml",""), `         Warning: For ${CATALOG[ididx]['id']}, sample start/stop set at first and 50th record,`);
+          console.warning(fname.replace("-cdfml",""), "                  but no checks made to determine if no fill in records.");
+          CATALOG[ididx]['info']['sampleStartDate'] = sampleStartDate;
+          CATALOG[ididx]['info']['sampleStopDate'] = cdfVarRecords[49]['value'][0];
+        } else {
+          console.warning(fname.replace("-cdfml",""), `         Warning: Recieved ${Nr} records; want >= 50 to compute sampleStopDate`);
+        }
+      }
+
+      // Keep only first two data records.
+      // Can't do b/c we need it cached for sample start/stop above.
       if (cdfVarRecords.length > 2) {
-        body['CDF'][0]['cdfVariables']["variable"][idx]['cdfVarData']['record'] = cdfVarRecords.slice(0, 2);
+        //body['CDF'][0]['cdfVariables']["variable"][idx]['cdfVarData']['record'] = cdfVarRecords.slice(0, 2);
       }
     }
 
     if (fromCache == false) {
       console.log("Writing: " + fname);
-      //fs.writeFile(fname, obj2json(body), () => {});
-      fs.writeFileSync(fname, obj2json(body));
+      fs.writeFile(fname, obj2json(body), writecb);
+      //fs.writeFileSync(fname, obj2json(body));
       if (body['Warning'].length > 0) {
         let fnameWarn = fname.replace(".json", ".warning.json");
         console.log("Writing: " + fnameWarn);
-        //fs.writeFile(fnameWarn, obj2json(body['Warning']), () => {});
-        fs.writeFileSync(fnameWarn, obj2json(body['Warning']));
+        fs.writeFile(fnameWarn, obj2json(body['Warning']), writecb);
+        //fs.writeFileSync(fnameWarn, obj2json(body['Warning']));
       }
     }
 
@@ -263,6 +300,7 @@ function variableDetails(CATALOG) {
     }
   }
 }
+
 
 function extractDatasetInfo(allJSONResponse) {
 
@@ -318,11 +356,24 @@ function extractDatasetAttributes(cdfGAttributes, CATALOG, ididx) {
       CATALOG[ididx]['info']['resourceID'] = attribute['entry'][0]['value'];
     }
     if (attribute['name'] === 'GENERATION_DATE') {
-      CATALOG[ididx]['info']['creationDate'] = attribute['entry'][0]['value'];
+      let creationDate = attribute['entry'][0]['value'];
+      CATALOG[ididx]['info']['creationDate'] = str2ISODateTime('GENERATION_DATE',creationDate);
+
     }
-    // MODS => modificationDate
-    // ACKNOWLEDGEMENT => citation or datasetCitation
-    // RULES_OF_USE => newly proposed datasetTermsOfUse https://github.com/hapi-server/data-specification/issues/155
+    if (attribute['name'] === 'ACKNOWLEDGEMENT') {
+      CATALOG[ididx]['info']['datasetCitation'] = catCharEntries(attribute['entry']);
+    }
+    if (attribute['name'] === 'RULES_OF_USE') {
+      CATALOG[ididx]['info']['datasetTermsOfUse'] = catCharEntries(attribute['entry']);
+    }
+  }
+
+  function catCharEntries(entries) {
+    let cat = "";
+    for (entry of entries) {
+      cat = cat.trim() + " " + entry['value'];
+    }
+    return cat;
   }
 }
 
@@ -346,12 +397,14 @@ function extractParameterAttributes(cdfVariables, CATALOG, ididx) {
   function extractKeepers(attributes) {
     let keptAttributes = {}
     for (attribute of attributes) {
-      //console.log(attribute['name'])
       if (attribute['name'] === 'LABLAXIS') {
         keptAttributes['label'] = attribute['entry'][0]['value'];
       }
       if (attribute['name'] === 'FILLVAL') {
         keptAttributes['fill'] = attribute['entry'][0]['value'];
+      }
+      if (attribute['name'] === 'MISSING_VALUE') {
+        keptAttributes['_fillMissing'] = attribute['entry'][0]['value'];
       }
       if (attribute['name'] === 'UNITS') {
         keptAttributes['units'] = attribute['entry'][0]['value'];
@@ -369,7 +422,11 @@ function extractParameterAttributes(cdfVariables, CATALOG, ididx) {
       }
       if (attribute['name'] === 'VAR_TYPE') {
         keptAttributes['VAR_TYPE'] = attribute['entry'][0]['value'];
-      }      
+      }
+      if (attribute['name'] === 'DEPEND_2') {
+        console.error(variable + " has a DEPEND_2");
+        process.exit(0);
+      }
     }
     return keptAttributes;
   }
@@ -406,6 +463,7 @@ function extractDepend1(depend1Variable) {
 }
 
 function extractVectorComponents(depend1) {
+
   let vectorComponents = false;
 
   if (depend1.length == 3) {
@@ -449,13 +507,41 @@ function str2ISODuration(cadenceStr) {
   return cadence;
 }
 
+function str2ISODateTime(key, str) {
+
+  let stro = str;  
+
+  // moment.js won't handle YYYY-MM-DD +0000.
+  str = str.replace(/([0-9]{4})([0-9]{2})([0-9]{2})/,"$1-$2-$3Z");
+  if (str !== stro) {
+    console.log(`         Note: ${key} = ${stro} => ${str}`);
+    return str;
+  }
+  // moment.js won't handle YYYYMMDD +0000.
+  str = str.replace(/([0-9]{4})-([0-9]{2})-([0-9]{2})/,"$1-$2-$3Z");
+  if (str !== stro) {
+    console.log(`         Note: ${key} = ${stro} => ${str}`);
+    return str;
+  }
+
+  // See if moment.js can parse string. If so, cast to ISO.
+  moment.suppressDeprecationWarnings = true
+  let dateObj = moment(str + " +0000");
+  if (dateObj.isValid()) {
+    console.log(`         Note: ${key} = ${stro} => ${dateObj.toISOString()}`);
+    return dateObj.toISOString();
+  } else {
+    console.log(`         Warning: Unparsed ${key} = ${stro}`);
+  }  
+}
+
 function finalizeCatalog(CATALOG) {
 
   // Move HAPI-related parameter metadata from info['x_parameters']
   // to info['parameters']. Then delete info['x_parameters']
 
-  for (dataset of CATALOG) {
-
+  for (let dataset of CATALOG) {
+    
     if (dataset['info']['cadence']) {
       dataset['info']['cadence'] = str2ISODuration(dataset['info']['cadence']);
     }
@@ -465,7 +551,7 @@ function finalizeCatalog(CATALOG) {
     let pidx = 0;
     let parameters = [];
     for (parameter of Object.keys(x_parameters)) {
-
+      
       // Don't put metadata parameters into parameters array.
       if (x_parameters[parameter]['vAttributesKept']['VAR_TYPE'] === "metadata") {
         continue;
@@ -479,11 +565,6 @@ function finalizeCatalog(CATALOG) {
         parameters[pidx][key] = x_parameters[parameter]['vAttributesKept'][key];
       }
 
-      // Remove non-HAPI content
-      delete parameters[pidx]['vAttributesKept'];
-      delete parameters[pidx]['variable']
-      delete parameters[pidx]['VAR_TYPE'];
-
       // Extract DEPEND_1
       let vectorComponents = false;
       if (x_parameters[parameter]['vAttributesKept']['DEPEND_1']) {
@@ -491,7 +572,7 @@ function finalizeCatalog(CATALOG) {
         let depend1 = extractDepend1(x_parameters[DEPEND_1]['variable'])
         vectorComponents = extractVectorComponents(depend1)
         if (vectorComponents) {
-          dataset['info']['parameters'][pidx]['vectorComponents'] = ['x', 'y', 'z'];
+          parameters[pidx]['vectorComponents'] = ['x', 'y', 'z'];
           delete parameters[pidx]['DEPEND_1'];
         } else {
           parameters[pidx]['_x_DEPEND_1'] = depend1;
@@ -507,59 +588,60 @@ function finalizeCatalog(CATALOG) {
       }
 
       if (vectorComponents) {
-        let coordinateSystemName = extractCoordinateSystemName(dataset['info']['parameters'][pidx]);
+        let coordinateSystemName = extractCoordinateSystemName(parameters[pidx]);
         if (coordinateSystemName) {
           parameters[pidx]['coordinateSystemName'] = coordinateSystemName;
         }
       }
 
+      // Remove non-HAPI content
+      delete parameters[pidx]['vAttributesKept'];
+      delete parameters[pidx]['variable']
+      delete parameters[pidx]['VAR_TYPE'];
+
       pidx = pidx + 1;
     }
 
-    dataset['info']['parameters'] = parameters;
-  }
-
-  // Write HAPI all file with extra 
-  console.log("Writing: " + fnameAllFull);
-  //fs.writeFile(fnameAllFull, obj2json(CATALOG), () => {});
-  fs.writeFileSync(fnameAllFull, obj2json(CATALOG));
-  for (dataset of CATALOG) {
-    delete dataset['info']['x_parameters'];
-    delete dataset['x_gAttributes'];
-  }
-
-  for (dataset of CATALOG) {
-
-    let parameters = dataset['info']['parameters'];
-    let Np = dataset['info']['parameters'].length;
+    let Np = parameters.length;
     if (parameters[Np-1]['name'] !== 'Epoch') {
       // Epoch was a variable in CDFML that is not in the /variables list.
       console.error('Expected last parameter to be Epoch');
       process.exit(1);
     }
+
+    let firstTimeValue = x_parameters['Epoch']['variable']['cdfVarData']['record'][0]['value'][0];
+    let timePadValue = x_parameters['Epoch']['variable']['cdfVarInfo']['padValue'];
+
     // Remove integer Epoch parameter.
     parameters = parameters.slice(0, -1);
+
     // Prepend Time parameter
     parameters.unshift(
                 {
                   "name": "Time",
                   "type": "isotime",
                   "units": "UTC",
-                  "length": 24,
-                  "fill": null
+                  "length": firstTimeValue.length,
+                  "fill": timePadValue
                 });
+
+
+    dataset['info']['parameters'] = parameters;
   }
 
   // Write one info file per dataset
   for (dataset of CATALOG) {
+    delete dataset['info']['x_parameters'];
+    delete dataset['x_gAttributes'];
+
     let fnameDataset = outDir + '/' + dataset['id'] + '.json';
     console.log("Writing: " + fnameDataset);
-    //fs.writeFile(fnameDataset, obj2json(dataset), () => {});
-    fs.writeFileSync(fnameDataset, obj2json(dataset));
+    fs.writeFile(fnameDataset, obj2json(dataset), writecb);
+    //fs.writeFileSync(fnameDataset, obj2json(dataset));
   }
 
   // Write HAPI all.json containing all content from all info files.
   console.log("Writing: " + fnameAll);
-  //fs.writeFile(fnameAll, obj2json(CATALOG), () => {});
-  fs.writeFileSync(fnameAll, obj2json(CATALOG));
+  fs.writeFile(fnameAll, obj2json(CATALOG), writecb);
+  //fs.writeFileSync(fnameAll, obj2json(CATALOG));
 }
