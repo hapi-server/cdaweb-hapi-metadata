@@ -1,20 +1,24 @@
 # To send all output to log file, use
 #   (bash compare-data.sh) &> compare-data.log
 
+
+ID=AMPTECCE_H0_MEPA@0
+PARAMETERS=SpinPeriod
+# This START/STOP ...
+START="1985-06-21T14:50:52Z"
+STOP="1985-06-26T00:00:00Z"
+# ... shows first and third records with timestamps
+START="1985-06-25T16:15.47265097"
+STOP="1985-06-25T16:15.47633562"
+# but
+START="1985-06-21T14:50:52.472Z"
+STOP="1985-06-26T00:00:00.477Z"
+
 ID=AC_H2_CRIS
 PARAMETERS=flux_B
 START="2010-06-21T14:50:52Z"
 #STOP="2010-06-23T15:50:52Z"
 STOP="2010-07-30T14:50:52Z"
-
-ID=AMPTECCE_H0_MEPA@0
-PARAMETERS=SpinPeriod
-# This START/STOP
-START="1985-06-21T14:50:52Z"
-STOP="1985-06-26T00:00:00Z"
-# shows first and third records with timestamps
-#START="1985-06-25T16:15:47265097"
-#STOP="1985-06-25T16:15:47633562"
 
 #ID=OMNI_HRO_1MIN
 #PARAMETERS=SYM_H
@@ -48,37 +52,39 @@ url="$base/${ID//@*/}/data/$START_STR,$STOP_STR/$PARAMETERS?format=text"
 
 #cmd="node -v"
 # $cmd > a
+TMPDIR=$TMPDIR/compare
+mkdir $TMPDIR
+ln -s $TMPDIR compare
+rm -f $TMPDIR/compare-data.*
 
-rm -f /tmp/compare-data.*
-
-cmd="node ../CDAS2HAPIcsv.js \
+cmd="node CDAS2HAPIcsv.js \
 --id ${ID//@*/} --parameters $PARAMETERS --start $START --stop $STOP \
 --format csv --debug"
 echo -e "\n"
 echo "---- HAPI CSV via transform of CDAS text response ----"
 echo "$cmd"
-/usr/bin/time -ah $cmd > /tmp/compare-data.cdas.csv
-head -11 /tmp/compare-data.cdas.csv
+/usr/bin/time -ah $cmd > $TMPDIR/compare-data.cdas.csv
+head -11 $TMPDIR/compare-data.cdas.csv
 
 
-cmd="node ../CDAS2HAPIcsv.js \
+cmd="node CDAS2HAPIcsv.js \
 --id ${ID//@*/} --parameters $PARAMETERS --start $START --stop $STOP \
 --format text --debug"
 echo -e "\n"
 echo "---- CDAS text unaltered ----"
 echo "$cmd"
-/usr/bin/time -ah $cmd > /tmp/compare-data.cdas.text
-head -6 /tmp/compare-data.cdas.text
-grep /tmp/compare-data.cdas.text -e "^[0-9]" | head -3
+/usr/bin/time -ah $cmd > $TMPDIR/compare-data.cdas.text
+head -6 $TMPDIR/compare-data.cdas.text
+grep $TMPDIR/compare-data.cdas.text -e "^[0-9]" | head -3
 
 
-cmd="node ../CDAS2HAPIcsv.js \
+cmd="node CDAS2HAPIcsv.js \
 --id ${ID//@*/} --parameters $PARAMETERS --start $START --stop $STOP \
 --format cdf"
 echo -e "\n"
 echo "---- CDAS CDF unaltered ----"
 echo "$cmd"
-/usr/bin/time -ah $cmd > /tmp/compare-data.cdas.cdf
+/usr/bin/time -ah $cmd > $TMPDIR/compare-data.cdas.cdf
 
 
 url="https://cdaweb.gsfc.nasa.gov/hapi/data"
@@ -86,17 +92,17 @@ url="$url?id=$ID&parameters=$PARAMETERS&time.min=$START&time.max=$STOP"
 echo -e "\n"
 echo "---- HAPI CSV via production server ----"
 echo "$url"
-/usr/bin/time -ah curl -s "$url" > /tmp/compare-data.hapi.csv
-head -3 /tmp/compare-data.hapi.csv
+/usr/bin/time -ah curl -s "$url" > $TMPDIR/compare-data.hapi.csv
+head -3 $TMPDIR/compare-data.hapi.csv
 
 
 url="$url&format=binary"
 echo -e "\n"
 echo "---- HAPI Binary via production server ----"
 echo "$url"
-/usr/bin/time -ah curl -s "$url" > /tmp/compare-data.hapi.bin
+/usr/bin/time -ah curl -s "$url" > $TMPDIR/compare-data.hapi.bin
 
 
 echo -e "\n"
 echo "---- Response files ----"
-ls -lh /tmp/compare-data*
+ls -lh compare/compare-data*

@@ -55,7 +55,7 @@ function mkdirSync(dir, opts) {
     fs.mkdirSync(dir, opts, {recursive: true});
 }
 function appendSync(fname, data) {
-  fs.appendFileSync(fname, data.trim());
+  fs.appendFileSync(fname, data, {flags: "a+"});
 }
 // End wrapped Node.js functions
 /////////////////////////////////////////////////////////////////////////////
@@ -69,19 +69,32 @@ function incrementTime(timestr, incr, unit) {
 function sameDateTime(a, b) {
   return moment(a).isSame(b);
 }
-function str2ISODateTime(key, str) {
+function str2ISODateTime(key, stro) {
 
-  // moment.js won't handle YYYY-MM-DD +0000.
-  str = str.replace(/([0-9]{4})([0-9]{2})([0-9]{2})/,"$1-$2-$3");
-  // moment.js won't handle YYYYMMDD +0000.
-  str = str.replace(/([0-9]{4})-([0-9]{2})-([0-9]{2})/,"$1-$2-$3Z");
+  str = stro.trim();
+
+  // e.g., 201707006
+  str = str.replace(/^([0-9]{4})([0-9]{3})([0-9]{2})$/,"$1$2");
+  if (str.length === 7) {    
+    let y_doy = str.replace(/^([0-9]{4})([0-9]{3})$/,"$1-$2").split("-");
+    str = new Date(new Date(y_doy[0]+'-01-01Z').getTime() + parseInt(y_doy[1])*86400000).toISOString().slice(0,10);
+  } else {
+    str = str.replace(/([0-9]{4})([0-9]{2})([0-9]{2})/,"$1-$2-$3");
+    str = str.replace(/([0-9]{4})-([0-9]{2})-([0-9]{2})/,"$1-$2-$3Z");
+  }
 
   // See if moment.js can parse string. If so, cast to ISO 8601.
   moment.suppressDeprecationWarnings = true
-  let dateObj = moment(str + " +0000");
+  let offset = ""
+  if (str.length === 8) {
+    let offset = " +0000";
+  }
+  let dateObj = moment(str + offset);
   if (dateObj.isValid()) {
-    log(`\tNote: ${key} = ${str} => ${dateObj.toISOString()}`);
-    return dateObj.toISOString();
+    str = dateObj.toISOString().slice(0, 10);
+    if (str.split("-")[0] === "8888") return undefined;
+    log(`\tNote: ${key} = ${stro} => ${str}`);
+    return str;
   } else {
     return undefined;
   }  
@@ -117,8 +130,19 @@ function str2ISODuration(cadenceStr) {
 // Begin convenience functions
 function obj2json(obj) {return JSON.stringify(obj, null, 2)}
 
-function log(msg) {
-  console.log(msg.replace(/^\t/,'  '));  
+function log(msg, msgf) {
+  msg = msg.replace(/^\t/,'  ');
+  mkdirSync(argv.cachedir);
+  let fname = argv.cachedir + "/log.txt";
+  if (!log.fname) {
+    log.fname = fname;
+  }
+  if (msgf) {
+    appendSync(fname, msgf + "\n");
+  } else {
+    appendSync(fname, msg + "\n");    
+  }
+  console.log(msg);  
 }
 function warning(dsid, msg) {
   let warnDir = argv.cachedir + "/" + dsid.split("_")[0];
@@ -127,13 +151,11 @@ function warning(dsid, msg) {
   msgf = "Warning: " + msg.replace(/^\t/,'');
   if (!warning.fname) {
     warning.fname = fname;
-    writeSync(fname, msgf);
-  } else {
-    appendSync(fname, msgf);
   }
+  appendSync(fname, "\t" + msgf);
   const chalk = require("chalk");
   msg = "\t" + chalk.yellow.bold("Warning: ") + msg;
-  log(msg);
+  log(msg, msgf);
 }
 function error(msg, exit) {
   if (Array.isArray(msg)) {
@@ -162,7 +184,7 @@ function catalog() {
   // Request all.xml to get dataset names.
   // Then call variables() to get list of variables for each dataset.
 
-  let fnameAllJSON = argv.cachedir + "/all.json";
+  let fnameAllJSON = argv.cachedir + "/all.xml.json";
 
   if (existsSync(fnameAllJSON)) {
     log("Reading: " + fnameAllJSON);
@@ -372,6 +394,8 @@ function variableDetails(CATALOG) {
       }
     }
 
+    CATALOG[ididx]['additionalMetadata'] = {};
+    CATALOG[ididx]['additionalMetadata']['CDF'] = body['CDF'][0];
     CATALOG[ididx]['x_gAttributes'] = body['CDF'][0]['cdfGAttributes'];
     CATALOG[ididx]['x_variables'] = body['CDF'][0]['cdfVariables'];
 
@@ -433,8 +457,10 @@ function finalizeCatalog(CATALOG) {
   CATALOG = null
   CATALOG = CATALOGexpanded;
 
+  let allIds = [];
   for (let dataset of CATALOG) {
 
+    allIds.push(dataset['id']);
     log(dataset['id']);
 
     extractParameterAttributes(dataset);
@@ -562,6 +588,11 @@ function finalizeCatalog(CATALOG) {
   }
 
   // Write HAPI all.json containing all content from all info files.
+  let allIdsFile = argv.cachedir + "/ids-hapi.txt";
+  log("Writing: " + allIdsFile);
+  writeAsync(allIdsFile, allIds.join("\n"));
+
+  // Write HAPI all.json containing all content from all info files.
   log("Writing: " + argv.all);
   writeAsync(argv.all, obj2json(CATALOG));
 }
@@ -595,7 +626,7 @@ function extractDatasetInfo(allJSONResponse) {
     });
   }
 
-  let allIdsFile = argv.cachedir + "/ids.txt";
+  let allIdsFile = argv.cachedir + "/ids-cdasr.txt";
   log("Writing: " + allIdsFile);
   writeSync(allIdsFile, allIds.join("\n"));
 
@@ -631,12 +662,12 @@ function extractDatasetAttributes(dataset) {
       dataset['info']['resourceID'] = attribute['entry'][0]['value'];
     }
     if (attribute['name'] === 'GENERATION_DATE') {
-      let creationDate = attribute['entry'][0]['value'];
-      creationDate = str2ISODateTime('GENERATION_DATE', creationDate);
+      let creationDateo = attribute['entry'][0]['value'];
+      creationDate = str2ISODateTime('GENERATION_DATE', creationDateo);
       if (creationDate) {
         dataset['info']['creationDate'] = creationDate;
       } else {
-        warning(dataset['id'], "Could not parse GENERATION_DATE = " + creationDate);
+        warning(dataset['id'], "Could not parse GENERATION_DATE = " + creationDateo);
       }
     }
     if (attribute['name'] === 'ACKNOWLEDGEMENT') {
