@@ -12,8 +12,8 @@
     "url": "https://github.com/hapi-server/server-nodejs.git"
   },
   "dependencies": {
-    "asyn": "^0.0.1",
     "async": "^3.2.4",
+    "chalk": "^3.0.0",
     "moment": "^2.18.1",
     "request": "^2.88.2",
     "xml2js": "^0.4.23",

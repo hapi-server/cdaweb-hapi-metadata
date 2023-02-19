@@ -32,6 +32,7 @@ const request = require("request");
 // https://www.npmjs.com/package/request#requestoptions-callback
 let pool = {maxSockets: argv.maxsockets};
 function get(opts, cb) {
+  log("\tRequesting: " + opts['uri']);
   opts['pool'] = pool;
   request(opts, cb);
 }
@@ -50,7 +51,8 @@ function readSync(fname) {
   return fs.readFileSync(fname, 'utf-8');
 }
 function mkdirSync(dir, opts) {
-  fs.mkdirSync(dir, opts);
+  if (!fs.existsSync(dir))
+    fs.mkdirSync(dir, opts, {recursive: true});
 }
 function appendSync(fname, data) {
   fs.appendFileSync(fname, data.trim());
@@ -69,45 +71,45 @@ function sameDateTime(a, b) {
 }
 function str2ISODateTime(key, str) {
 
-  let stro = str;  
-
   // moment.js won't handle YYYY-MM-DD +0000.
-  str = str.replace(/([0-9]{4})([0-9]{2})([0-9]{2})/,"$1-$2-$3Z");
-  if (str !== stro) {
-    log(`\tNote: ${key} = ${stro} => ${str}`);
-    return str;
-  }
+  str = str.replace(/([0-9]{4})([0-9]{2})([0-9]{2})/,"$1-$2-$3");
   // moment.js won't handle YYYYMMDD +0000.
   str = str.replace(/([0-9]{4})-([0-9]{2})-([0-9]{2})/,"$1-$2-$3Z");
-  if (str !== stro) {
-    log(`\tNote: ${key} = ${stro} => ${str}`);
-    return str;
-  }
 
-  // See if moment.js can parse string. If so, cast to ISO.
+  // See if moment.js can parse string. If so, cast to ISO 8601.
   moment.suppressDeprecationWarnings = true
   let dateObj = moment(str + " +0000");
   if (dateObj.isValid()) {
-    log(`\tNote: ${key} = ${stro} => ${dateObj.toISOString()}`);
+    log(`\tNote: ${key} = ${str} => ${dateObj.toISOString()}`);
     return dateObj.toISOString();
   } else {
-    log(`\tWarning: Unparsed ${key} = ${stro}`);
+    return undefined;
   }  
 }
-function str2ISODuration(cadenceStr, fnameCDFML) {
+function str2ISODuration(cadenceStr) {
   let cadence;
   if (cadenceStr.match(/day/)) {
     cadence = "P" + cadenceStr.replace(/\s.*days?/,'D');
   } else if (cadenceStr.match(/hour/)) {
     cadence = "PT" + cadenceStr.replace(/\s.*hours?/,'H');
+  } else if (cadenceStr.match(/hr/)) {
+    cadence = "PT" + cadenceStr.replace(/\s.*hrs?/,'H');
   } else if (cadenceStr.match(/minute/)) {
     cadence = "PT" + cadenceStr.replace(/\s.*minutes?/,'M');
+  } else if (cadenceStr.match(/min/)) {
+    cadence = "PT" + cadenceStr.replace(/\s.*mins?/,'M');
   } else if (cadenceStr.match(/second/)) {
     cadence = "PT" + cadenceStr.replace(/\s.*seconds?/,'S');
+  } else if (cadenceStr.match(/sec/)) {
+    cadence = "PT" + cadenceStr.replace(/\s.*secs?/,'S');
+  } else if (cadenceStr.match(/millisecond/)) {
+    cadence = "PT" + cadenceStr.replace(/\s.*milliseconds?/,'S');
+  } else if (cadenceStr.match(/ms/)) {
+    cadence = "PT" + cadenceStr.replace(/\s.*ms/,'S');
   } else {
-    warning(fnameCDFML, "\tWarning: Could not parse cadence: " + cadenceStr);
+    cadence = undefined;
   }
-  return cadence;
+  return cadence.trim();
 }
 // End time-related functions
 /////////////////////////////////////////////////////////////////////////////
@@ -118,15 +120,33 @@ function obj2json(obj) {return JSON.stringify(obj, null, 2)}
 function log(msg) {
   console.log(msg.replace(/^\t/,'  '));  
 }
-function warning(fname, msg) {
-  fname = fname.replace(".json", ".warning.txt");
+function warning(dsid, msg) {
+  let warnDir = argv.cachedir + "/" + dsid.split("_")[0];
+  mkdirSync(warnDir);
+  let fname = warnDir + "/" + dsid + ".warning.txt";
+  msgf = "Warning: " + msg.replace(/^\t/,'');
   if (!warning.fname) {
     warning.fname = fname;
-    writeSync(fname, msg.replace(/^\t/,''));
+    writeSync(fname, msgf);
   } else {
-    appendSync(fname, msg.replace(/^\t/,''));
+    appendSync(fname, msgf);
   }
+  const chalk = require("chalk");
+  msg = "\t" + chalk.yellow.bold("Warning: ") + msg;
   log(msg);
+}
+function error(msg, exit) {
+  if (Array.isArray(msg)) {
+    console.error("");
+    for (m of msg) {
+      console.error("Error: " + m);
+    }
+  } else {
+    console.error("\nError: " + msg);
+  }
+  if (exit === undefined || exit == true) {
+    process.exit(1);
+  }
 }
 // End convenience functions
 /////////////////////////////////////////////////////////////////////////////
@@ -142,20 +162,24 @@ function catalog() {
   // Request all.xml to get dataset names.
   // Then call variables() to get list of variables for each dataset.
 
-  let fnameJSON = argv.cachedir + "/all.json";
+  let fnameAllJSON = argv.cachedir + "/all.json";
 
-  if (existsSync(fnameJSON)) {
-    log("Reading: " + fnameJSON);
-    let body = readSync(fnameJSON);
+  if (existsSync(fnameAllJSON)) {
+    log("Reading: " + fnameAllJSON);
+    let body = readSync(fnameAllJSON);
     finished(JSON.parse(body), true);
     return;
   }
 
-  let reqOpts = {uri: argv.allxml};
-  log("Requesting: " + argv.allxml);
-  get(reqOpts, function (err,res,body) {
+  get({uri: argv.allxml}, function (err,res,body) {
+
     if (err) log(err);
     log("Received: " + argv.allxml);
+
+    let fnameAllXML = argv.cachedir + "/all.xml";
+    log("Writing: " + fnameAllXML);
+    writeSync(fnameAllXML, obj2json(body), 'utf-8');
+
     xml2js(body, function (err, jsonObj) {
       finished(jsonObj, false);
     });
@@ -164,22 +188,11 @@ function catalog() {
   function finished(body, fromCache) {
 
     if (fromCache == false) {
-      log("Writing: " + fnameJSON);
-      writeAsync(fnameJSON, obj2json(body), 'utf-8');
-    }    
+      log("Writing: " + fnameAllJSON);
+      writeSync(fnameAllJSON, obj2json(body), 'utf-8');
+    }
 
     let CATALOG = extractDatasetInfo(body);
-
-    let allIds = [];
-    for (let dataset of CATALOG) {
-      // Could create allIds array in extractDatasetInfo()
-      // to avoid this loop.
-      allIds.push(dataset['id']);
-    }
-    let allIdsFile = argv.cachedir + "/ids.txt";
-    log("Writing: " + allIdsFile);
-    writeSync(allIdsFile, allIds.join("\n"));
-
     variables(CATALOG);
 
   }
@@ -193,13 +206,16 @@ function variables(CATALOG) {
   let ididx = 0;
   for (let ididx = 0; ididx < CATALOG.length; ididx++) {
     let url = argv.cdasr + CATALOG[ididx]['id'] + "/variables";
-    let fnameVariables = argv.cachedir + "/" + CATALOG[ididx]['id'] + "-variables.json";
+    let dirId = argv.cachedir + "/" + CATALOG[ididx]['id'].split("_")[0];
+    mkdirSync(dirId)    
+    let fnameVariables = dirId + "/" + CATALOG[ididx]['id'] + "-variables.json";
     requestVariables(url, fnameVariables, ididx);
   }
 
   function requestVariables(url, fnameVariables, ididx) {
 
     log(CATALOG[ididx]['id']);
+
     if (existsSync(fnameVariables)) {
       log("\tReading: " + fnameVariables);
       let body = readSync(fnameVariables);
@@ -208,7 +224,6 @@ function variables(CATALOG) {
     }
 
     let reqOpts = {uri: url, headers: {'Accept':'application/json'}};
-    log("\tRequesting: " + url.replace(argv.cdasr,""));
     get(reqOpts, function (err, res, body) {
       if (err) log(err);
       log("\tReceived: " + url.replace(argv.cdasr, ""));
@@ -247,9 +262,31 @@ function variableDetails(CATALOG) {
       parameters.push(name);
     }
     parameters = parameters.join(",")
-    //parameters = parameters[0];
+    requestVariableDetails(ididx, parameters);
+  }
 
-    let stop = incrementTime(CATALOG[ididx]['info']['startDate'], 1, 'hour');
+  function requestVariableDetails(ididx, parameters) {
+
+    log(CATALOG[ididx]['id']);
+
+    let fnameCDFML = argv.cachedir + "/" + CATALOG[ididx]['id'].split("_")[0] + "/" + CATALOG[ididx]['id'] + '-cdfml.json';
+    if (existsSync(fnameCDFML)) {
+      log("\tReading: " + fnameCDFML);
+      let body = readSync(fnameCDFML);
+      finished(ididx, fnameCDFML, body, true);
+      return;
+    }
+
+    if (!requestVariableDetails.tries) {
+      requestVariableDetails.tries = {};
+    }
+    if (!requestVariableDetails.tries[ididx]) {
+      requestVariableDetails.tries[ididx] = 0;
+    }
+    requestVariableDetails.tries[ididx] += 1;
+
+    let minutes = Math.pow(10, requestVariableDetails.tries[ididx]);
+    let stop = incrementTime(CATALOG[ididx]['info']['startDate'], minutes, 'minute');
     let url = argv.cdasr + CATALOG[ididx]['id'] + "/variables";
     url = argv.cdasr
             + CATALOG[ididx]['id']
@@ -261,27 +298,26 @@ function variableDetails(CATALOG) {
             + parameters
             + "?format=json";
 
-    let fnameCDFML = argv.cachedir + "/" + CATALOG[ididx]['id'] + '-cdfml.json';
-    requestVariableDetails(url, fnameCDFML, ididx);
-  }
-
-  function requestVariableDetails(url, fnameCDFML, ididx) {
-    
-    log(CATALOG[ididx]['id']);
-
-    if (existsSync(fnameCDFML)) {
-      log("\tReading: " + fnameCDFML);
-      let body = readSync(fnameCDFML);
-      finished(ididx, fnameCDFML, body, true)
-      return;
-    }
-
     let reqOpts = {uri: url, headers: {'Accept':'application/json'}};
-    log("\tRequesting: " + url);
     get(reqOpts, function (err,res,body) {
-      if (err) log(err);
-      log("\tReceived: " + url);
-      finished(ididx, fnameCDFML, body, false);
+      log("\tReceived: " + url.replace(argv.cdasr, ""));
+      if (err) {
+        error(err, true);
+      }
+      if (!body) {
+        err = true;
+        reason = "Empty body";
+      }
+      if (body.match("Internal Server Error") || body.match("Bad Request") || body.match("No data available") || body.match("Not Found")) {
+        err = true;
+        reason = body;
+      }
+      if (err && requestVariableDetails.tries[ididx] < 4) {
+        log("\tRetrying " + CATALOG[ididx]['id'] + " due to " + reason);
+        requestVariableDetails(ididx, parameters)
+      } else {
+        finished(ididx, fnameCDFML, body, false);
+      }
     });
   }
 
@@ -290,75 +326,39 @@ function variableDetails(CATALOG) {
     if (!finished.N) {finished.N = 0;}
     finished.N = finished.N + 1;
 
-    if (!body) {
-      console.error("Problem with: " + fnameCDFML);
-      return;
-    }
-
-    if (body.match("Internal Server Error") || body.match("Bad Request") || body.match("No data available") || body.match("Not Found")) {
-      console.error("Problem with: " + fnameCDFML);
-      return;
-    }
-
     body = JSON.parse(body);
 
     if (!body['CDF']) {
-      console.error("Problem with: " + fnameCDFML);
+      error("Problem with: " + fnameCDFML, false);
       return;
+      process.exit(1);
     }
   
     if (body && body['Error'] && body['Error'].length > 0) {
-      console.error("Request for "
-          + CATALOG[ididx]['id']
-          + " gave\nError: "
-          + body['Error'][0]
-          + "\nMessage: "
-          + body['Message'][0]
-          + "\nStatus: "
-          + body['Message'][0]);
+      error("\tRequest for "+ CATALOG[ididx]['id'] + " gave\n\t\tError: " + body['Error'][0] 
+        + "\n\t\tMessage: " + body['Message'][0] + "\nStatus: " + body['Message'][0], false);
       return;
     }
 
     let cdfVariables = body['CDF'][0]['cdfVariables'];
     if (cdfVariables.length > 1) {        
-      console.error("Case of more than one cdfVariable not implemented.");
-      console.error(cdfVariables)
-      process.exit(1);
+      error(["Case of more than one cdfVariable not implemented.", cdfVariables], true);
     }
 
     let orphanAttributes = body['CDF'][0]['orphanAttributes'];
     if (orphanAttributes && orphanAttributes['attribute'].length > 0) {
       if (fromCache == false) {
         let fnameOrphan = fnameCDFML.replace(".json", ".orphan.json");
-        log("Writing: " + fnameOrphan);
+        log("\tWriting: " + fnameOrphan);
         writeAsync(fnameOrphan, obj2json(orphanAttributes['attribute']));
       }      
     }
     
+    // Keep only first two data records.
     for (let [idx, variable] of Object.entries(cdfVariables['variable'])) {
-      let cdfVarRecords = variable['cdfVarData']['record'];
-
-      if (variable['name'] === 'Epoch') {
-        let startDate = CATALOG[ididx]['info']['startDate'];
-        let sampleStartDate = cdfVarRecords[0]['value'][0];
-        if (!sameDateTime(startDate, sampleStartDate)) {
-          warning(fnameCDFML.replace("-cdfml",""), "\tWarning: Given start of  " + startDate + " differs from first record at " + sampleStartDate);
-        }
-        sampleStopDate = cdfVarRecords.slice(-1)[0]['value'][0];
-
-        let Nr = cdfVarRecords.length;
-        if (Nr >= 50) {
-          CATALOG[ididx]['info']['sampleStartDate'] = sampleStartDate;
-          CATALOG[ididx]['info']['sampleStopDate'] = cdfVarRecords[49]['value'][0];
-        } else {
-          warning(fnameCDFML.replace("-cdfml",""), `\tWarning: Received ${Nr} records; want >= 50 to compute sampleStopDate`);
-        }
-      }
-
-      // Keep only first two data records.
-      // Can't do b/c we need it cached for sample start/stop above.
-      if (cdfVarRecords.length > 2) {
-        body['CDF'][0]['cdfVariables']["variable"][idx]['cdfVarData']['record'] = cdfVarRecords.slice(0, 2);
+      if (variable['cdfVarData']['record'].length > 2) {
+        body['CDF'][0]['cdfVariables']["variable"][idx]['cdfVarData']['record'] 
+          = body['CDF'][0]['cdfVariables']["variable"][idx]['cdfVarData']['record'].slice(0,2)
       }
     }
 
@@ -366,30 +366,87 @@ function variableDetails(CATALOG) {
       log("\tWriting: " + fnameCDFML);
       writeSync(fnameCDFML, obj2json(body));
       if (body['Warning'].length > 0) {
-        let fnameWarn = fnameCDFML.replace(".json", ".warning.json");
-        log("\tWriting: " + fnameWarn);
-        writeAsync(fnameWarn, obj2json(body['Warning']));
+        let fnameCDFMLWarn = fnameCDFML.replace(".json", ".warning.json");
+        log("\tWriting: " + fnameCDFMLWarn);
+        writeAsync(fnameCDFML, obj2json(body['Warning']));
       }
     }
 
-    extractDatasetAttributes(body['CDF'][0]['cdfGAttributes'], CATALOG, ididx);
-    extractParameterAttributes(body['CDF'][0]['cdfVariables'], CATALOG, ididx);
+    CATALOG[ididx]['x_gAttributes'] = body['CDF'][0]['cdfGAttributes'];
+    CATALOG[ididx]['x_variables'] = body['CDF'][0]['cdfVariables'];
 
     if (finished.N == CATALOG.length) {
-      finalizeCatalog(CATALOG, fnameCDFML);
+      finalizeCatalog(CATALOG);
     }
   }
 }
 
-function finalizeCatalog(CATALOG, fnameCDFML) {
+function subsetDataset(dataset) {
+  // Look for parameters that have more than one DEPEND_0.
+  let x_parameters = dataset['info']['x_parameters'];
+  let DEPEND_0s = {};
+  for (parameter of Object.keys(x_parameters)) {
+    let DEPEND_0 = x_parameters[parameter]['x_vAttributesKept']['x_DEPEND_0'];
+    if (DEPEND_0 !== undefined) {
+      DEPEND_0s[DEPEND_0] = DEPEND_0;
+    }
+  }
+  DEPEND_0s = Object.keys(DEPEND_0s);
+  if (DEPEND_0s.length == 1) {
+    return undefined;
+  }
 
-  // Move HAPI-related parameter metadata from info['x_parameters']
-  // to info['parameters']. Then delete info['x_parameters']
+  log("\tNote: " + DEPEND_0s.length + " DEPEND_0s");
+  let datasets = [];
+  for ([sdsidx, DEPEND_0] of Object.entries(DEPEND_0s)) {
+    newdataset = JSON.parse(JSON.stringify(dataset));
+    newdataset['id'] = newdataset['id'] + "@" + sdsidx;
+    for (parameter of Object.keys(newdataset['info']['x_parameters'])) {
+      let depend_0 = x_parameters[parameter]['x_vAttributesKept']['x_DEPEND_0'];
+      if (depend_0 !== DEPEND_0) {
+        delete parameter;
+      }
+    }
+    datasets.push(newdataset)
+  }
+  return datasets;
+}
+
+function finalizeCatalog(CATALOG) {
+
+  // Move HAPI-related parameter metadata from info['x_parameters'] to
+  // info['parameters']. Then delete x_ keys.
+
+  let CATALOGexpanded = JSON.parse(JSON.stringify(CATALOG));
+  for (let [dsidx, dataset] of Object.entries(CATALOG)) {
+
+    extractParameterAttributes(dataset);
+    extractDatasetAttributes(dataset);
+
+    let subdatasets = subsetDataset(dataset);
+    if (subdatasets !== undefined) {
+      log("\tNote: " + subdatasets.length + " sub-datasets");
+      CATALOGexpanded.splice(dsidx, 1, ...subdatasets);
+    }
+  }
+
+  CATALOG = null
+  CATALOG = CATALOGexpanded;
 
   for (let dataset of CATALOG) {
-    
+
+    log(dataset['id']);
+
+    extractParameterAttributes(dataset);
+    extractDatasetAttributes(dataset);
+
     if (dataset['info']['cadence']) {
-      dataset['info']['cadence'] = str2ISODuration(dataset['info']['cadence'], fnameCDFML);
+      let cadence = str2ISODuration(dataset['info']['cadence']);
+      if (cadence !== undefined) {
+        dataset['info']['cadence'] = cadence;
+      } else {
+        warning(dataset['id'], "Could not parse cadence: " + dataset['info']['cadence']);
+      }
     }
 
     let x_parameters = dataset['info']['x_parameters'];
@@ -397,11 +454,10 @@ function finalizeCatalog(CATALOG, fnameCDFML) {
     let pidx = 0;
     let parameters = [];
     for (parameter of Object.keys(x_parameters)) {
-      
-      // Don't put metadata parameters into parameters array.
-      if (x_parameters[parameter]['vAttributesKept']['VAR_TYPE'] !== "data") {
-        if (x_parameters[parameter]['name'] !== 'Epoch') {
-          //warning(fnameCDFML, "\tNote: Skipping non-data parameter " + parameter);
+
+      if (x_parameters[parameter]['x_vAttributesKept']['x_VAR_TYPE'] !== "data") {
+        // Don't put metadata parameters into parameters array.
+        if (!x_parameters[parameter]['name'].startsWith('Epoch')) {
           continue;
         }
       }
@@ -410,30 +466,40 @@ function finalizeCatalog(CATALOG, fnameCDFML) {
       parameters.push(copy);
 
       // Move kept vAttributes up
-      for (let key of Object.keys(x_parameters[parameter]['vAttributesKept'])) {
-        parameters[pidx][key] = x_parameters[parameter]['vAttributesKept'][key];
+      for (let key of Object.keys(x_parameters[parameter]['x_vAttributesKept'])) {
+        parameters[pidx][key] = x_parameters[parameter]['x_vAttributesKept'][key];
+      }
+
+
+      let DEPEND_0 = x_parameters[parameter]['x_vAttributesKept']['x_DEPEND_0'];
+      if (DEPEND_0 && !DEPEND_0.startsWith('Epoch')) {
+        warning(dataset['id'], `${parameter} has DEPEND_0 name of '${DEPEND_0}'; expected 'Epoch'`);
       }
 
       // Extract DEPEND_1
       let vectorComponents = false;
-      if (x_parameters[parameter]['vAttributesKept']['DEPEND_1']) {
-        let DEPEND_1 = x_parameters[parameter]['vAttributesKept']['DEPEND_1'];
-        let depend1 = extractDepend1(x_parameters[DEPEND_1]['variable'])
-        vectorComponents = extractVectorComponents(depend1)
-        if (vectorComponents) {
-          parameters[pidx]['vectorComponents'] = ['x', 'y', 'z'];
-          delete parameters[pidx]['DEPEND_1'];
+      if (x_parameters[parameter]['x_vAttributesKept']['x_DEPEND_1']) {
+        let DEPEND_1 = x_parameters[parameter]['x_vAttributesKept']['x_DEPEND_1'];
+        let depend1 = extractDepend1(x_parameters[DEPEND_1]['x_variable']);
+        if (Array.isArray(depend1)) {
+          vectorComponents = extractVectorComponents(depend1)
+          if (vectorComponents) {
+            parameters[pidx]['vectorComponents'] = ['x', 'y', 'z'];
+          } else {
+            warning(dataset['id'], "Un-handled DEPEND_1")
+          }
         } else {
-          parameters[pidx]['_x_DEPEND_1'] = depend1;
+          parameters[pidx]['bins'] = depend1;
         }
+        delete parameters[pidx]['x_DEPEND_1'];
       }
 
       // Extract labels
-      if (x_parameters[parameter]['vAttributesKept']['LABL_PTR_1']) {
-        let LABL_PTR_1 = x_parameters[parameter]['vAttributesKept']['LABL_PTR_1'];
-        let label = extractLabel(x_parameters[LABL_PTR_1]['variable'])
+      if (x_parameters[parameter]['x_vAttributesKept']['x_LABL_PTR_1']) {
+        let LABL_PTR_1 = x_parameters[parameter]['x_vAttributesKept']['x_LABL_PTR_1'];
+        let label = extractLabel(x_parameters[LABL_PTR_1]['x_variable'])
         parameters[pidx]['label'] = label;
-        delete parameters[pidx]['LABL_PTR_1'];
+        delete parameters[pidx]['x_LABL_PTR_1'];
       }
 
       if (vectorComponents) {
@@ -444,25 +510,23 @@ function finalizeCatalog(CATALOG, fnameCDFML) {
       }
 
       // Remove non-HAPI content
-      delete parameters[pidx]['vAttributesKept'];
-      delete parameters[pidx]['variable']
-      delete parameters[pidx]['VAR_TYPE'];
+      delete parameters[pidx]['x_vAttributesKept'];
+      delete parameters[pidx]['x_variable']
+      delete parameters[pidx]['x_VAR_TYPE'];
+      delete parameters[pidx]['x_DEPEND_0'];
 
       pidx = pidx + 1;
     }
 
     let Np = parameters.length;
-    if (parameters[Np-1]['name'] !== 'Epoch') {
+    if (!parameters[Np-1]['name'].startsWith('Epoch')) {
       // Epoch is a non-data variable in CDFML that is not in 
       // list returned by the /variables call.
-      console.error('Expected last parameter to be Epoch');
-      log(CATALOG[ididx])
-      log(parameters)
-      process.exit(1);
+      error("Expected last parameter name to start with 'Epoch' not " + parameters[Np-1], true);
     }
 
-    let firstTimeValue = x_parameters['Epoch']['variable']['cdfVarData']['record'][0]['value'][0];
-    let timePadValue = x_parameters['Epoch']['variable']['cdfVarInfo']['padValue'];
+    let firstTimeValue = x_parameters['Epoch']['x_variable']['cdfVarData']['record'][0]['value'][0];
+    let timePadValue = x_parameters['Epoch']['x_variable']['cdfVarInfo']['padValue'];
 
     // Remove integer Epoch parameter.
     parameters = parameters.slice(0, -1);
@@ -477,20 +541,25 @@ function finalizeCatalog(CATALOG, fnameCDFML) {
                   "fill": timePadValue
                 });
 
-
     dataset['info']['parameters'] = parameters;
   }
 
   // Write one info file per dataset
   for (let dataset of CATALOG) {
-    delete dataset['info']['x_parameters'];
+    delete dataset['x_variables'];    
     delete dataset['x_gAttributes'];
+    delete dataset['info']['x_parameters'];
 
-    let fnameInfo = argv.cachedir + '/' + dataset['id'] + '.json';
-    //log("\tWriting: " + fnameInfo);
+    let fnameInfo = argv.cachedir + '/' + dataset['id'].split("_")[0] + '/' + dataset['id'] + '.json';
     writeAsync(fnameInfo, obj2json(dataset));
+    if (CATALOG.length == 1) {
+      log(`\tWrote: ${fnameInfo}`);
+    }
   }
-  log(`Wrote ${CATALOG.length} info files to ${argv.cachedir}`);
+
+  if (CATALOG.length > 1) {
+    log(`Wrote ${CATALOG.length} info files to ${argv.cachedir}`);
+  }
 
   // Write HAPI all.json containing all content from all info files.
   log("Writing: " + argv.all);
@@ -500,21 +569,24 @@ function finalizeCatalog(CATALOG, fnameCDFML) {
 function extractDatasetInfo(allJSONResponse) {
 
   let CATALOG = [];
+  let allIds = [];
   let datasets = allJSONResponse['sites']['datasite'][0]['dataset'];
   for (let dataset of datasets) {
+
     let id = dataset['$']['serviceprovider_ID'];
+    allIds.push(id);
+
     let re = new RegExp(argv.idregex);
     if (re.test(id) == false) {
-      //log("Skipping " + id);
       continue;
     }
-    //log("Keeping " + id);
     let startDate = dataset['$']['timerange_start'].replace(" ","T") + "Z";
     let stopDate = dataset['$']['timerange_stop'].replace(" ","T") + "Z";
     let contact = dataset['data_producer'][0]['$']['name'].trim() + ' @ ' + dataset['data_producer'][0]['$']['affiliation'].trim();
     CATALOG.push({
       "id": id,
       "info": {
+        "HAPI": HAPI_VERSION,
         "startDate": startDate,
         "stopDate": stopDate,
         "contact": contact,
@@ -522,12 +594,19 @@ function extractDatasetInfo(allJSONResponse) {
       }
     });
   }
+
+  let allIdsFile = argv.cachedir + "/ids.txt";
+  log("Writing: " + allIdsFile);
+  writeSync(allIdsFile, allIds.join("\n"));
+
+  if (CATALOG.length == 0) {
+    error(`Regex '${argv.idregex}' did not match and dataset ids.`, true);
+  }
   return CATALOG;
 }
 
 function extractParameterNames(variablesResponse, CATALOG, ididx) {
 
-  CATALOG[ididx]['info']['HAPI'] = HAPI_VERSION;
   CATALOG[ididx]['info']['x_parameters'] = {};
   let VariableDescription = variablesResponse['VariableDescription'];
   for (let variable of VariableDescription) {
@@ -540,27 +619,31 @@ function extractParameterNames(variablesResponse, CATALOG, ididx) {
   return CATALOG;
 }
 
-function extractDatasetAttributes(cdfGAttributes, CATALOG, ididx) {
+function extractDatasetAttributes(dataset) {
   
-  CATALOG[ididx]['x_gAttributes'] = cdfGAttributes;
+  cdfGAttributes = dataset['x_gAttributes'];
 
   for (let attribute of cdfGAttributes['attribute']) {
     if (attribute['name'] === 'TIME_RESOLUTION') {
-      CATALOG[ididx]['info']['cadence'] = attribute['entry'][0]['value'];
+      dataset['info']['cadence'] = attribute['entry'][0]['value'];
     }
     if (attribute['name'] === 'SPASE_DATASETRESOURCEID') {
-      CATALOG[ididx]['info']['resourceID'] = attribute['entry'][0]['value'];
+      dataset['info']['resourceID'] = attribute['entry'][0]['value'];
     }
     if (attribute['name'] === 'GENERATION_DATE') {
       let creationDate = attribute['entry'][0]['value'];
-      CATALOG[ididx]['info']['creationDate'] = str2ISODateTime('GENERATION_DATE',creationDate);
-
+      creationDate = str2ISODateTime('GENERATION_DATE', creationDate);
+      if (creationDate) {
+        dataset['info']['creationDate'] = creationDate;
+      } else {
+        warning(dataset['id'], "Could not parse GENERATION_DATE = " + creationDate);
+      }
     }
     if (attribute['name'] === 'ACKNOWLEDGEMENT') {
-      CATALOG[ididx]['info']['datasetCitation'] = catCharEntries(attribute['entry']);
+      dataset['info']['datasetCitation'] = catCharEntries(attribute['entry']);
     }
     if (attribute['name'] === 'RULES_OF_USE') {
-      CATALOG[ididx]['info']['datasetTermsOfUse'] = catCharEntries(attribute['entry']);
+      dataset['info']['datasetTermsOfUse'] = catCharEntries(attribute['entry']);
     }
   }
 
@@ -569,15 +652,15 @@ function extractDatasetAttributes(cdfGAttributes, CATALOG, ididx) {
     for (let entry of entries) {
       cat = cat.trim() + " " + entry['value'];
     }
-    return cat;
+    return cat.slice(1);
   }
 }
 
-function extractParameterAttributes(cdfVariables, CATALOG, ididx) {
+function extractParameterAttributes(dataset) {
 
-  let x_parameters = CATALOG[ididx]['info']['x_parameters'];
-  for (let variable of cdfVariables['variable']) {
-
+  cdfVariables = dataset['x_variables'];
+  let x_parameters = dataset['info']['x_parameters'];
+  for (let [idx, variable] of Object.entries(cdfVariables['variable'])) {
     let vAttributesKept = extractKeepers(variable['cdfVAttributes']['attribute']);
 
     if (!x_parameters[variable['name']]) {
@@ -588,46 +671,55 @@ function extractParameterAttributes(cdfVariables, CATALOG, ididx) {
       x_parameters[variable['name']]['name'] = variable['name'];
     }
 
-    x_parameters[variable['name']]['vAttributesKept'] = vAttributesKept;
-    x_parameters[variable['name']]['variable'] = variable;
+    x_parameters[variable['name']]['x_vAttributesKept'] = vAttributesKept;
+    x_parameters[variable['name']]['x_variable'] = variable;
   }
+}
 
-  function extractKeepers(attributes) {
-    let keptAttributes = {}
-    for (let attribute of attributes) {
-      if (attribute['name'] === 'LABLAXIS') {
-        keptAttributes['label'] = attribute['entry'][0]['value'];
-      }
-      if (attribute['name'] === 'FILLVAL') {
-        keptAttributes['fill'] = attribute['entry'][0]['value'];
-      }
-      if (attribute['name'] === 'MISSING_VALUE') {
-        keptAttributes['_fillMissing'] = attribute['entry'][0]['value'];
-      }
-      if (attribute['name'] === 'UNITS') {
-        keptAttributes['units'] = attribute['entry'][0]['value'];
-      }
-      if (attribute['name'] === 'DIM_SIZES') {
-        let size = attribute['entry'][0]['value'];
-        if (size !== "0")
-          keptAttributes['size'] = [parseInt(size)];
-      }
-      if (attribute['name'] === 'DEPEND_1') {
-        keptAttributes['DEPEND_1'] = attribute['entry'][0]['value'];
-      }
-      if (attribute['name'] === 'LABL_PTR_1') {
-        keptAttributes['LABL_PTR_1'] = attribute['entry'][0]['value'];
-      }
-      if (attribute['name'] === 'VAR_TYPE') {
-        keptAttributes['VAR_TYPE'] = attribute['entry'][0]['value'];
-      }
-      if (attribute['name'] === 'DEPEND_2') {
-        console.error(variable + " has a DEPEND_2");
-        process.exit(0);
-      }
+function extractKeepers(attributes) {
+
+  let keptAttributes = {}
+  for (let attribute of attributes) {
+    if (attribute['name'] === 'LABLAXIS') {
+      keptAttributes['label'] = attribute['entry'][0]['value'];
     }
-    return keptAttributes;
+    if (attribute['name'] === 'FILLVAL') {
+      keptAttributes['fill'] = attribute['entry'][0]['value'];
+    }
+    if (attribute['name'] === 'MISSING_VALUE') {
+      keptAttributes['_fillMissing'] = attribute['entry'][0]['value'];
+    }
+    if (attribute['name'] === 'UNITS') {
+      keptAttributes['units'] = attribute['entry'][0]['value'];
+    }
+    if (attribute['name'] === 'CATDESC') {
+      keptAttributes['description'] = attribute['entry'][0]['value'];
+    }
+    if (attribute['name'] === 'FIELDNAM') {
+      keptAttributes['x_labelTitle'] = attribute['entry'][0]['value'];
+    }
+    if (attribute['name'] === 'DIM_SIZES') {
+      let size = attribute['entry'][0]['value'];
+      if (size !== "0")
+        keptAttributes['size'] = [parseInt(size)];
+    }
+    if (attribute['name'] === 'DEPEND_0') {
+      keptAttributes['x_DEPEND_0'] = attribute['entry'][0]['value'];
+    }
+    if (attribute['name'] === 'DEPEND_1') {
+      keptAttributes['x_DEPEND_1'] = attribute['entry'][0]['value'];
+    }
+    if (attribute['name'] === 'DEPEND_2') {
+      error(variable + " has a DEPEND_2", true);
+    }
+    if (attribute['name'] === 'LABL_PTR_1') {
+      keptAttributes['x_LABL_PTR_1'] = attribute['entry'][0]['value'];
+    }
+    if (attribute['name'] === 'VAR_TYPE') {
+      keptAttributes['x_VAR_TYPE'] = attribute['entry'][0]['value'];
+    }
   }
+  return keptAttributes;
 }
 
 function extractLabel(labelVariable) {
@@ -635,29 +727,45 @@ function extractLabel(labelVariable) {
   let delimiter = labelVariable['cdfVarData']['record'][0]['elementDelimiter'];
   let re = new RegExp(delimiter,'g');
   let label = labelVariable['cdfVarData']['record'][0]['value'][0];
-  label
-    .replace(re,"")
-    .replace(/[^\S\r\n]/g,"")
-    .trim()
-    .split("\n")
-  return label;
+  return label
+          .replace(re, "")
+          .replace(/[^\S\r\n]/g,"")
+          .trim()
+          .split("\n");
 }
 
 function extractDepend1(depend1Variable) {
 
-  if (depend1Variable['cdfVarInfo']['cdfDatatype'] !== "CDF_CHAR") {
-    console.error("DEPEND_1 variable '" + depend1Variable['name'] + "' is not of type CDF_CHAR");
-    console.error('This case is not implemented.');
-    process.exit(0);
+  let DEPEND_1_TYPE = depend1Variable['cdfVarInfo']['cdfDatatype'];
+  if (!['CDF_CHAR', 'CDF_UCHAR'].includes(DEPEND_1_TYPE)) {
+    // Return a bins object;
+    let bins = {};
+    let keptAttributes = extractKeepers(depend1Variable['cdfVAttributes']['attribute']);
+    bins['centers'] = depend1Variable['cdfVarData']['record'][0]['value'][0].split(" ");
+    if (['CDF_FLOAT', 'CDF_DOUBLE', 'CDF_REAL4', 'CDF_REAL8'].includes(DEPEND_1_TYPE)) {
+      for (cidx in bins['centers']) {
+        bins['centers'][cidx] = parseFloat(bins['centers'][cidx]);
+      }
+    } else if (DEPEND_1_TYPE.startsWith('CDF_INT') || DEPEND_1_TYPE.startsWith('CDF_UINT')) {
+      for (cidx in bins['centers']) {
+        bins['centers'][cidx] = parseInt(bins['centers'][cidx]);
+      }
+    } else {
+      error("Un-handled DEPEND_1 type: " + DEPEND_1_TYPE);
+    }
+    bins['name'] = keptAttributes['name'];
+    bins['units'] = keptAttributes['units'];
+    bins['description'] = keptAttributes['description'];
+    return bins;
   }
 
+  // Return an array of strings.
   let delimiter = depend1Variable['cdfVarData']['record'][0]['elementDelimiter'];
-  let re = new RegExp(delimiter,'g');
   let depend1 = depend1Variable['cdfVarData']['record'][0]['value'][0]
-                .replace(re,"")
-                .replace(/[^\S\r\n]/g,"")
-                .trim()
-                .split("\n")
+                  .replace( new RegExp(delimiter,'g'), "")
+                  .replace(/[^\S\r\n]/g,"")
+                  .trim()
+                  .split("\n")
     return depend1;
 }
 
