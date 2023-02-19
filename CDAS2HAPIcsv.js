@@ -99,7 +99,7 @@ function extractURL(body) {
 function makeRequest(url, data, cb) {
 
   if (DEBUG) {
-    console.log("Requesting: \n  " + url);
+    console.error("Requesting: \n  " + url);
   }
 
   let opts =
@@ -127,7 +127,7 @@ function makeRequest(url, data, cb) {
         process.exit(1);
       }
       if (DEBUG) {
-        console.log("Finished request:\n  " + url);
+        console.error("Finished request:\n  " + url);
       }
       cb(body);
   })
