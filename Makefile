@@ -17,7 +17,7 @@ all: node_modules
 	make compare-meta
 
 compare-meta:
-	node compare-meta.js
+	cd compare && mkdir -p meta && node compare-meta.js
 
 bw:
 	node CDAS2HAPIall.js --idregex '$(IDREGEX)'

@@ -14,6 +14,14 @@ compare:
 	@diff -w data/$(ID).hapi.csv.tmp data/$(ID).cdas.csv.tmp && echo "No differences"
 	@echo "--------------------------------------------------------------------"
 
+
+C1_JP_PSE:
+	bash compare-data.sh \
+		"C1_JP_PSE" "event_code__C1_JP_PSE" \
+		"2000-08-01T00:00:00Z" "2000-08-20T00:00:00.000Z" \
+		2>&1 | tee data/C1_JP_PSE.log
+	@make compare ID=C1_JP_PSE 2>&1 | tee data/C1_JP_PSE.log
+
 AC_H2_CRIS:
 	bash compare-data.sh \
 		"AC_H2_CRIS" "flux_B" \
