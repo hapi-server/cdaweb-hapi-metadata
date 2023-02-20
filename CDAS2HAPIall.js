@@ -18,7 +18,8 @@ const argv = require('yargs')
                   'all': 'all/all-bw.json',
                   'allfull': 'all/all-bw-full.json',
                   'cdasr': 'https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/',
-                  'allxml': 'https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml'
+                  'allxml': 'https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml',
+                  'debug': false
                 })
               .argv;
 
@@ -441,10 +442,19 @@ function variableDetails(CATALOG) {
 }
 
 function subsetDataset(dataset) {
+
   // Look for parameters that have more than one DEPEND_0.
   let x_parameters = dataset['info']['x_parameters'];
   let DEPEND_0s = {};
   for (parameter of Object.keys(x_parameters)) {
+
+    //console.log(parameter)
+    //console.log(x_parameters[parameter]['x_variable']['cdfVAttributes'])
+    //console.log(x_parameters[parameter]['x_vAttributesKept'])
+    //if (x_parameters[parameter]['x_variable']['cdfVAttributes']['x_VAR_TYPE'] !== "data") {
+    //  continue;
+    //}
+
     let DEPEND_0 = x_parameters[parameter]['x_vAttributesKept']['x_DEPEND_0'];
     if (DEPEND_0 !== undefined) {
       DEPEND_0s[DEPEND_0] = DEPEND_0;
@@ -481,7 +491,7 @@ function finalizeCatalog(CATALOG) {
   for (let [dsidx, dataset] of Object.entries(CATALOG)) {
 
     if (!dataset['x_variables']) {
-      error(dataset['id'], "  Omitting " + dataset['id'] + " from HAPI all.json because no variable attributes.", false);
+      error(dataset['id'], "Omitting " + dataset['id'] + " from HAPI all.json because no variable attributes.", false);
       continue;
     }
 
@@ -504,7 +514,7 @@ function finalizeCatalog(CATALOG) {
   for (let dataset of CATALOG) {
 
     if (!dataset['x_variables']) {
-      error(dataset['id'], "  Omitting " + dataset['id'] + " from HAPI all.json because not variable attributes.", false);
+      error(dataset['id'], "Omitting " + dataset['id'] + " from HAPI all.json because no variable attributes.", false);
       continue;
     }
 
@@ -523,7 +533,7 @@ function finalizeCatalog(CATALOG) {
     }
 
     let x_parameters = dataset['info']['x_parameters'];
-    console.log(x_parameters)
+
     let pidx = 0;
     let parameters = [];
     for (parameter of Object.keys(x_parameters)) {
@@ -532,10 +542,17 @@ function finalizeCatalog(CATALOG) {
       if (x_parameters[parameter]['x_vAttributesKept']['x_VAR_TYPE'] !== "data") {
         // Don't put metadata parameters into parameters array.
         if (!x_parameters[parameter]['name'].toLowerCase().startsWith('epoch')) {
-          console.log('Omitting' + x_parameters[parameter]['name'])
+          //console.log('Omitting ' + x_parameters[parameter]['name'])
           continue;
         }
       }
+
+      if (x_parameters[parameter]['x_vAttributesKept']['x_DEPEND_2'] === null) {
+        error(dataset['id'], x_parameters[parameter]['name'] + " has an un-handled DEPEND_2. Omitting dataset.", false);
+        dataset = null;
+        break;
+      }
+      if (dataset === null) {continue;}
 
       let copy = JSON.parse(obj2json(x_parameters[parameter]));
       parameters.push(copy);
@@ -569,7 +586,7 @@ function finalizeCatalog(CATALOG) {
           if (vectorComponents) {
             parameters[pidx]['x_vectorComponents'] = ['x', 'y', 'z'];
           } else {
-            warning(dataset['id'], "Un-handled DEPEND_1 for " + parameter);
+            warning(dataset['id'], "Un-handled DEPEND_1 vector components for " + parameter + ": " + depend1.join(", "));
           }
         } else {
           parameters[pidx]['bins'] = depend1;
@@ -771,7 +788,7 @@ function extractParameterAttributes(dataset) {
   let x_parameters = dataset['info']['x_parameters'];
 
   for (let [idx, variable] of Object.entries(cdfVariables['variable'])) {
-    let vAttributesKept = extractKeepers(dataset['id'], variable['cdfVAttributes']['attribute']);
+    let vAttributesKept = extractVariableAttributes(dataset['id'], variable);
 
     if (!x_parameters[variable['name']]) {
       x_parameters[variable['name']] = {};
@@ -795,15 +812,19 @@ function extractParameterAttributes(dataset) {
     } else if (cdftype .startsWith('CDF_EPOCH')) {
       return "integer";
     } else {
-      error(dataset['id'], "Unhandled CDF datatype " + cdftype);
+      error(dataset['id'], "Un-handled CDF datatype " + cdftype);
     }
   }
 }
 
-function extractKeepers(dsid, attributes) {
+function extractVariableAttributes(dsid, variable) {
 
+  let attributes = variable['cdfVAttributes']['attribute']
   let keptAttributes = {}
   for (let attribute of attributes) {
+    if (0) {
+      console.log(dsid + "/" + variable['name'] + " has attribute " + attribute['name']);
+    }
     if (attribute['name'] === 'LABLAXIS') {
       keptAttributes['label'] = attribute['entry'][0]['value'];
     }
@@ -834,7 +855,7 @@ function extractKeepers(dsid, attributes) {
       keptAttributes['x_DEPEND_1'] = attribute['entry'][0]['value'];
     }
     if (attribute['name'] === 'DEPEND_2') {
-      error(dsid, variable + " has a DEPEND_2", true);
+      keptAttributes['x_DEPEND_1'] = null;
     }
     if (attribute['name'] === 'LABL_PTR_1') {
       keptAttributes['x_LABL_PTR_1'] = attribute['entry'][0]['value'];
@@ -864,7 +885,7 @@ function extractDepend1(dsid, depend1Variable) {
   if (!['CDF_CHAR', 'CDF_UCHAR'].includes(DEPEND_1_TYPE)) {
     // Return a bins object;
     let bins = {};
-    let keptAttributes = extractKeepers(dsid, depend1Variable['cdfVAttributes']['attribute']);
+    let keptAttributes = extractVariableAttributes(dsid, depend1Variable);
     bins['centers'] = depend1Variable['cdfVarData']['record'][0]['value'][0].split(" ");
     if (['CDF_FLOAT', 'CDF_DOUBLE', 'CDF_REAL4', 'CDF_REAL8'].includes(DEPEND_1_TYPE)) {
       for (cidx in bins['centers']) {
@@ -875,7 +896,7 @@ function extractDepend1(dsid, depend1Variable) {
         bins['centers'][cidx] = parseInt(bins['centers'][cidx]);
       }
     } else {
-      error(null, "Un-handled DEPEND_1 type: " + DEPEND_1_TYPE, true);
+      error(null, "Un-handled DEPEND_1 type for bins variable " + depend1Variable['name'] + DEPEND_1_TYPE, true);
     }
     bins['name'] = keptAttributes['name'];
     bins['units'] = keptAttributes['units'];

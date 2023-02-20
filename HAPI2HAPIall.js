@@ -11,7 +11,7 @@ const argv    = require('yargs')
                       'idregex': '^AC_',
                       'version': 'nl',
                       'hapiurl': '',
-                      'maxsockets': 3
+                      'maxsockets': 1
                     })
                   .argv;
 
