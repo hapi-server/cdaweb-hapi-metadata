@@ -14,16 +14,13 @@ This repository contains
 
 The four methods are
 
-1. `bw`, which uses the new in this repository that uses
-
-   https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml
+1. `bw`, which uses the new in this repository that uses https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml
 
    and queries for JSON [CDFML](https://cdf.gsfc.nasa.gov/html/cdfml.html) to
 
    https://cdaweb.gsfc.nasa.gov/WebServices/REST/.
 
-
-2. `nl`, which uses an approach similar to the above.
+2. `nl`, which uses an approach similar to the above for datasets with virtual variables. Otherwise, it uses raw CDF files.
 
    [This code](https://git.mysmce.com/spdf/hapi-nand) is used for the [production CDAWeb HAPI server](https://cdaweb.gsfc.nasa.gov/hapi).
 

@@ -2,5 +2,6 @@ all/
 bin/
 cache/
 compare/data
+compare/meta
 node_modules/
 package-lock.json
