@@ -312,7 +312,7 @@ function masters(CATALOG) {
     let reqOpts = { uri: urlCDF, outFile: fnameMasterCDF };
     util.get(reqOpts, (err, obj) => {
       if (err) {
-        util.error(dataset['id'], [urlCDF, err], false);
+        util.error(dataset['id'], [urlCDF, 'Error message', err], false);
         obj = { json: null, xml: null };
       }
       datasets[idx]['_masters']['cdf']['json'] = obj['json'];
