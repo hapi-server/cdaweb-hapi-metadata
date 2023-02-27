@@ -132,7 +132,7 @@ function main() {
             url: masterskt,
           },
           json: {
-            url: mastercdf,
+            url: masterjson,
           },
         },
       });
