@@ -134,9 +134,9 @@ function get(opts, cb) {
     if (/json/.test(headers['content-type'])) {
       cb(null, JSON.parse(body));
     } else if (/xml/.test(headers['content-type'])) {
-      xml2js(body, (err, obj) => cb(null, obj));
+      xml2js(body, (err, obj) => cb(err, obj));
     } else if (/cdf/.test(headers['content-type'])) {
-      cdf2json(outFile, (err, obj) => cb(null, obj));
+      cdf2json(outFile, (err, obj) => cb(err, obj));
     } else {
       cb(null, body.toString());
     }    
