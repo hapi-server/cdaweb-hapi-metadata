@@ -13,7 +13,7 @@ const argv = require('yargs')
                 ({
                   'idregex': '^AC_',
                   'skip': '^ALOUETTE2,AIM_CIPS_SCI_3A',
-                  'maxsockets': 3,
+                  'maxsockets': 1,
                   'maxage': 3600*24,
                   'cachedir': "cache/bw",
                   'all': 'cache/bw/all-hapi.json',
@@ -189,13 +189,16 @@ function inventory(CATALOG, cb) {
         util.log("Writing: " + inventoryJSON);
         util.writeSync(inventoryJSON, util.obj2json(inventory[id]));
 
+        inventory_flat = inventory_flat.sort(function(a, b) {
+          return a[0] - b[0];
+        });
+
         let inventoryCSV = baseDir + "/../" + id + "-files.csv";
         util.log("Writing: " + inventoryCSV);
         util.writeSync(inventoryCSV, inventory_flat.join("\n"));
 
         if (getInventory.finished == CATALOG['datasets'].length) {
           util.log.debug("Finished inventory for all datasets");
-          //util.log.debug(inventory);
           cb(CATALOG)
         }
       }
@@ -214,13 +217,21 @@ function inventory(CATALOG, cb) {
           parent["dirs"] = {};
           if (err) {
             util.error(null, [url, err], false);
-            finished();
+            finished(id);
             return;
           }
-          const $ = cheerio.load(html);
+          const $ = "";
+          try {
+            $ = cheerio.load(html);
+          } catch (err) {
+            util.error(id, err, false);
+            finished(id);
+            return;
+          }
+
           $("tr").each((i, elem) => {
             // .each is sync so no callback needed.
-            if (i > 3) { 
+            if (i > 2) { 
               // May break if Apache dir listing HTML changes.
               // First three links are not relevant.
               let cols = $(elem).find('td');
@@ -429,6 +440,13 @@ function variableDetails(CATALOG) {
     }
     requestVariableDetails.tries[ididx] += 1;
 
+    let maxRetries = 3;
+    if (requestVariableDetails.tries[ididx] == maxRetries + 1) {
+      util.log("Aborting");
+      finished(ididx, null, null, false);
+      return;
+    }
+
     let seconds = 100*Math.pow(timeRangeScalePower, requestVariableDetails.tries[ididx] - 1);
 
     let stop = util.incrementTime(datasets[ididx]['info']['startDate'], seconds, 'seconds');
@@ -468,7 +486,7 @@ function variableDetails(CATALOG) {
         }
       }
       let maxRetries = 3;
-      if (err && requestVariableDetails.tries[ididx] < maxRetries + 4) {
+      if (err) {
         util.rmSync(fnameCDFML);
         util.rmSync(fnameCDFML + ".httpheaders");
         util.log("Retry (#" + requestVariableDetails.tries[ididx] + "/" + maxRetries + ") " + datasets[ididx]['id'] + " due to '" + reason + "'.");
@@ -484,9 +502,11 @@ function variableDetails(CATALOG) {
     if (!finished.N) {finished.N = 0;}
     finished.N = finished.N + 1;
 
-    if (body && !body['CDF']) {
+    if (!body) {
+      util.error(datasets[ididx]['id'], "Problem with " + datasets[ididx]['id'] + ": JSON has no CDF element. Omitting.", false);
+      datasets[ididx] = null;
+    } else if (!body['CDF']) {
       util.error(datasets[ididx]['id'], "Problem with " + datasets[ididx]['id'] + ": JSON has no CDF element. Omitting. Returned content: \n" + util.obj2json(body), false);
-      //datasets[ididx]['_data'] = null;
       datasets[ididx] = null;
       if (body['Error'] && body['Error'].length > 0) {
         util.error(datasets[ididx]['id'],
@@ -499,7 +519,7 @@ function variableDetails(CATALOG) {
             ]
             , false);
       }
-    } else if (body && body['CDF'] && !body['CDF'][0]) {
+    } else if (body['CDF'] && !body['CDF'][0]) {
       util.error(datasets[ididx]['id'], "Problem with " + datasets[ididx]['id'] + ": JSON has no CDF[0] element. Omitting. Returned content: \n" + util.obj2json(body), true);
     } else {
       let cdfVariables = body['CDF'][0]['cdfVariables'];
@@ -556,6 +576,40 @@ function buildHAPI(CATALOG) {
 
   let datasets = CATALOG['datasets'];
 
+  let No = datasets.length;
+  datasets = datasets.filter(el => {return el !== null});
+  if (No != datasets.length) {
+    util.error(null, `${No-datasets.length}/${datasets.length} null datasets`, false);
+  }
+
+  for (let dataset of datasets) {
+
+    let cdasVariables = [];
+    for (cdasVariable of dataset['_variables']['VariableDescription']) {
+      cdasVariables.push(cdasVariable['Name']);
+    }
+
+    let cdfVariables = [];
+    for (let [idx, variable] of Object.entries(dataset['_data']['cdfVariables']['variable'])) {
+      vAttributesKept = extractVariableAttributes(dataset['id'], variable);
+      if (vAttributesKept['_VAR_TYPE'] === "data") {
+        cdfVariables.push(variable['name']);
+      }
+    }
+
+    console.log(cdfVariables)
+    if (cdasVariables.length != cdfVariables.length) {
+      util.error(dataset['id'], 
+            ["VAR_TYPE='data' variables found CDAS in /data response:", 
+              cdasVariables.join(", "), 
+              "does not match that CDAS /variables response:",
+              cdfVariables.join(", ")], true);
+    }
+  }
+
+  //process.exit()
+  //console.log(datasets);
+
   util.log.debug("Looking for datasets with more than one DEPEND_0.");
   datasets = subsetDatasets(datasets);
 
@@ -603,10 +657,10 @@ function buildHAPI(CATALOG) {
     let DEPEND_0s = [];    
     let pidx = 0;
     parameter_array = [];
+
     for (let name of Object.keys(parameters)) {
 
       let parameter = parameters[name];
-
       let varType = parameter['_vAttributesKept']['_VAR_TYPE'];
 
       if (parameter['_vAttributesKept']['_DEPEND_2'] === null) {
@@ -784,8 +838,6 @@ function subsetDatasets(datasets) {
 
   for (let [dsidx, dataset] of Object.entries(datasets)) {
 
-    util.log(dataset['id']);
-
     if (!dataset['_variables']) {
       util.error(dataset['id'], "Omitting " + dataset['id'] 
             + " from HAPI all.json because no variable attributes.", false);
@@ -812,6 +864,8 @@ function subsetDatasets(datasets) {
     let DEPEND_0s = {};
     for (parameter of Object.keys(parameters)) {
 
+      console.log(parameter)
+      console.log(parameters[parameter]['_vAttributesKept'])
       if (parameters[parameter]['_vAttributesKept']['_VAR_TYPE'] !== "data") {
         continue;
       }
@@ -881,7 +935,6 @@ function extractParameterAttributes(dataset) {
 
   for (let [idx, variable] of Object.entries(cdfVariables)) {
     let vAttributesKept = extractVariableAttributes(dataset['id'], variable);
-
     if (!parameters[variable['name']]) {
       parameters[variable['name']] = {};
       // CATALOG[ididx]['parameters'] was initialized with all of the 
