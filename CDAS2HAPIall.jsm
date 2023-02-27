@@ -92,7 +92,11 @@ function get(opts, cb) {
   opts.method = "GET";
   request(opts, function (err,res,body) {
     if (res && res.statusCode !== 200) {
-      error(null, [opts.uri, "Status code " + res.statusCode], false);
+      if (res.statusCode === 503 || res.statusCode === 429) {
+        error(null, [opts.uri, "Status code " + res.statusCode, "Headers: ", obj2json(res.headers)], false);
+      } else {
+        error(null, [opts.uri, "Status code " + res.statusCode], false);
+      }
       cb(null, null);
       return;      
     }
@@ -233,29 +237,49 @@ function warning(dsid, msg) {
 }
 
 function error(dsid, msg, exit) {
-  let errorDir = util.argv.cachedir;
+
+  let errorDirAll;
+  let errorDirDataset;
+  let fnameAll;
+  let fnameDataset;
   if (dsid) {
-    errorDir = util.argv.cachedir + "/" + dsid.split("_")[0];
+    errorDirDataset = util.argv.cachedir + "/" + dsid.split("_")[0];
+    fnameDataset = util.argv.cachedir + "/" + dsid + ".error.txt";
+    mkdirSync(errorDirDataset);
+    if (!error.fnameDataset) {
+      fs.rmSync(fnameDataset, { recursive: true, force: true });
+      error.fnameDataset = fnameDataset;
+    }
   }
-  mkdirSync(errorDir);
-  let fname = errorDir + "/" + dsid + ".error.txt";
-  if (!error.fname) {
-    fs.rmSync(fname, { recursive: true, force: true });
-    error.fname = fname;
+  errorDirAll = util.argv.cachedir;
+  fnameAll = errorDirAll + "/all.error.txt";
+  mkdirSync(errorDirAll);
+  if (!error.fnameAll) {
+    fs.rmSync(fnameAll, { recursive: true, force: true });
+    error.fnameAll = fnameAll;
   }
+
   if (Array.isArray(msg)) {
     msg = msg.join('\n').replace(/\n/g,'\n       ');
   } else {
     msg = msg.toString();
   }
-  appendSync(fname, "  " + msg);
+
+  if (dsid) {
+    appendSync(fnameDataset, "  " + msg);
+  }
+  appendSync(fnameAll, "  " + msg);
+
   const chalk = require("chalk");
   let msgf = msg.split("\n");
   msg = chalk.red.bold("Error: ") + msg;
+
   if (dsid) {
     msg = dsid + "\n" + msg;    
   }
+
   log(msg, msgf);
+
   if (exit === undefined || exit == true) {
     process.exit(1);
   }
