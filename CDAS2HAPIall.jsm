@@ -48,12 +48,12 @@ function get(opts, cb) {
   mkdirSync(outDir);
   let hrs = Infinity;
   if (fs.existsSync(outFileHeaders)) {
-    log(`Stating: ${outFileHeaders}`);
+    log.debug(`Stating: ${outFileHeaders}`);
     let stat = fs.statSync(outFileHeaders);
     hrs = (new Date().getTime() - stat['mtimeMs'])/3600000;
     let secs = hrs*3600;
-    log(`         file age    = ${secs.toFixed(0)} [s]`);
-    log(`         argv.maxage = ${util.argv.maxage} [s]`);
+    log.debug(`         file age    = ${secs.toFixed(0)} [s]`);
+    log.debug(`         argv.maxage = ${util.argv.maxage} [s]`);
     let headersLast = JSON.parse(fs.readFileSync(outFileHeaders,'utf-8'));
     parse(outFile, null, headersLast, cb);
     return;

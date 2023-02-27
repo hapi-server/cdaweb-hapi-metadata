@@ -22,6 +22,10 @@ inventory:
 	# Returns
 	# <Start>1997-09-02T00:00:00.000Z</Start><End>1997-09-28T23:00:00.000Z</End>
 
+rsync:
+	rsync -avz  --delete cache weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata
+	rsync -avz  --delete all weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata
+
 compare-meta:
 	cd compare && mkdir -p meta && node compare-meta.js
 

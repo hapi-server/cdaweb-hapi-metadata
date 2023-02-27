@@ -34,7 +34,7 @@ argv.include = argv.include.split(",");
 //argv.pool = {maxSockets: argv.maxsockets};
 let http = require("http");
 let pool = new http.Agent(); //Your pool/agent
-pool['maxSockets'] = 1;
+pool['maxSockets'] = argv.maxsockets;
 argv.pool = pool;
 
 const { util } = require("./CDAS2HAPIall.jsm");
@@ -67,8 +67,7 @@ function main() {
       util.log.debug(CATALOG);
       util.log.debug("CATALOG['datasets']:");
       util.log.debug(CATALOG['datasets']);
-      //inventory(CATALOG);
-      masters(CATALOG);
+      inventory(CATALOG, (CATALOG) => masters(CATALOG));      
   });
 
   function extractDatasets(json) {
@@ -150,45 +149,60 @@ function main() {
   }
 }
 
-function inventory(CATALOG) {
+function inventory(CATALOG, cb) {
 
   const cheerio = require('cheerio');
 
-  let INVENTORY = {};
-
-  for (let dsidx in CATALOG['datasets']) {
-    let rootURL = CATALOG['datasets'][dsidx]['_dataset']['access'][0]['URL'][0];
+  for (let dataset of CATALOG['datasets']) {
+    let rootURL = dataset['_dataset']['access'][0]['URL'][0];
     if (!rootURL.endsWith("/")) {
       rootURL = rootURL + "/";
     }
-    let id = CATALOG['datasets'][dsidx]['id'];
-    INVENTORY[id] = {};
-    getInventory(id, rootURL, INVENTORY[id]);
+    getInventory(dataset, rootURL);
   }
 
-  function getInventory(id, rootURL, dsInventory) {
+  function getInventory(dataset, rootURL) {
+
+    let id = dataset['id'];
+    let inventory = {};
+    inventory[id] = {};
+    let inventory_flat = [];
 
     if (getInventory.finished === undefined) getInventory.finished = 0;
     util.log.debug("Started a dir walk for " + id + " # walks dir walks left = " + getInventory.finished);
 
-    let outFile = "/tmp/" + id + "/index.html";
-    listdir(id, rootURL, outFile, dsInventory);
+    let outFile = argv.cachedir + "/" + id.split("_")[0] + "/" + id + "/files/index.html";
+    listdir(id, rootURL, outFile, inventory[id]);
 
     function finished(id) {
 
+      let baseDir = argv.cachedir + "/" + id.split("_")[0] + "/" + id ;
       listdir[id].started = listdir[id].started - 1;
       util.log.debug("Finished a dir listing for " + id + "; # left = " + listdir[id].started);
+
       if (listdir[id].started == 0) {
+
         util.log.debug("Finished walking dirs for " + id);
         getInventory.finished = getInventory.finished + 1;
+        dataset['_inventory'] = inventory[id];
+        let inventoryJSON = baseDir + "/files/" + id + "-inventory.json";
+        util.log("Writing: " + inventoryJSON);
+        util.writeSync(inventoryJSON, util.obj2json(inventory[id]));
+
+        let inventoryCSV = baseDir + "/../" + id + "-files.csv";
+        util.log("Writing: " + inventoryCSV);
+        util.writeSync(inventoryCSV, inventory_flat.join("\n"));
+
         if (getInventory.finished == CATALOG['datasets'].length) {
           util.log.debug("Finished inventory for all datasets");
-          util.log.debug(INVENTORY);
+          //util.log.debug(inventory);
+          cb(CATALOG)
         }
       }
     }
 
     function listdir(id, url, outFile, parent) { 
+
       if (listdir[id] === undefined) listdir[id] = {};
       if (listdir[id].started === undefined) listdir[id].started = 0;
       listdir[id].started = listdir[id].started + 1;
@@ -204,25 +218,43 @@ function inventory(CATALOG) {
             return;
           }
           const $ = cheerio.load(html);
-          $("a").each((i, elem) => {
+          $("tr").each((i, elem) => {
             // .each is sync so no callback needed.
             if (i > 3) { 
               // May break if Apache dir listing HTML changes.
               // First three links are not relevant.
-              let href = $(elem).attr("href");
+              let cols = $(elem).find('td');
+              let href = $($(cols[0]).find('a')[0]).attr("href");
+              let mtime = $(cols[1])
+                            .text()
+                            .replace(/([0-9]) ([0-9])/,"$1T$2")
+                            .trim()
+                          + "Z";
+              let size = $(cols[2]).text().trim();
               if (href.endsWith(".cdf")) {
-                //console.log(parent)
-                parent["files"].push(href);
+                let fileDate = href.replace(/.*([0-9]{4})([0-9]{2})([0-9]{2}).*/,"$1-$2-$3Z");
+                let fileVersion = href.replace(/.*(v.*)\.cdf/,"$1");
+                parent["files"].push([fileDate, url + href, mtime, size, fileVersion]);
+                inventory_flat.push(`${fileDate}, ${url + href}, ${mtime}, ${size}, ${fileVersion}`)
               }
               if (href.endsWith("/")) {
                 let subdir = href.replace("/","");
                 let newOutDir = outFile.split("/").slice(0, -1).join("/") + "/" + href
                 let newOutFile = newOutDir + "index.html";
                 parent["dirs"][subdir] = {};
+
                 listdir(id, url + href, newOutFile, parent["dirs"][subdir]);
               }
             }
           });
+
+
+          let inventoryFile = outFile.replace(".html", ".json");
+          const path = require("path");
+          let outDir = path.dirname(inventoryFile);
+          util.mkdirSync(outDir);
+          util.log("Writing: " + inventoryFile);
+          util.writeSync(inventoryFile, util.obj2json(parent));
           finished(id);
       });
     }
@@ -371,7 +403,7 @@ function variableDetails(CATALOG) {
   let datasets = CATALOG['datasets'];
 
   // Call /variables endpoint to get CDFML with data for all variables
-  // in each dataset. Then call finalizeCatalog().
+  // in each dataset. Then call buildHAPI().
 
   for (let ididx = 0; ididx < datasets.length; ididx++) {
     parameters = null;
@@ -412,7 +444,7 @@ function variableDetails(CATALOG) {
             + "?format=json";
 
     let headers = {'Accept': 'application/json'};
-    let fnameCDFML = argv.cachedir + "/" + datasets[ididx]['id'].split("_")[0] + "/" + datasets[ididx]['id'] + '-cdas.json';
+    let fnameCDFML = argv.cachedir + "/" + datasets[ididx]['id'].split("_")[0] + "/" + datasets[ididx]['id'] + "/" + datasets[ididx]['id'] + '-cdas.json';
     let reqOpts = {uri: url, headers: headers, 'outFile': fnameCDFML};
     util.get(reqOpts, function (err, body) {
       if (err) {
@@ -508,51 +540,14 @@ function variableDetails(CATALOG) {
     if (finished.N == datasets.length) {
       util.log.debug("datasets after variableDetails:");
       util.log.debug(datasets);
-      finalizeCatalog(CATALOG);
+      buildHAPI(CATALOG);
     }
   }
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-function subsetDataset(dataset) {
-
-  // Look for parameters that have more than one DEPEND_0.
-  let parameters = dataset['info']['parameters'];
-  let DEPEND_0s = {};
-  for (parameter of Object.keys(parameters)) {
-
-    if (parameters[parameter]['_vAttributesKept']['_VAR_TYPE'] !== "data") {
-      continue;
-    }
-
-    let DEPEND_0 = parameters[parameter]['_vAttributesKept']['_DEPEND_0'];
-    if (DEPEND_0 !== undefined) {
-      DEPEND_0s[DEPEND_0] = DEPEND_0;
-    }
-  }
-  DEPEND_0s = Object.keys(DEPEND_0s);
-  if (DEPEND_0s.length == 1) {
-    return undefined;
-  }
-
-  warning(dataset['id'], DEPEND_0s.length + " DEPEND_0s: " + DEPEND_0s.join(", "));
-  let datasets = [];
-  for ([sdsidx, DEPEND_0] of Object.entries(DEPEND_0s)) {
-    newdataset = JSON.parse(JSON.stringify(dataset));
-    newdataset['id'] = newdataset['id'] + "@" + sdsidx;
-    for (parameter of Object.keys(newdataset['info']['parameters'])) {
-      let depend_0 = parameters[parameter]['_vAttributesKept']['_DEPEND_0'];
-      if (depend_0 !== DEPEND_0) {
-        delete parameter;
-      }
-    }
-    datasets.push(newdataset)
-  }
-  return datasets;
-}
-
-function finalizeCatalog(CATALOG) {
+function buildHAPI(CATALOG) {
 
   // Move HAPI-related parameter metadata from info['parameters'] to
   // info['parameters']. Then delete x_ keys.
@@ -561,42 +556,11 @@ function finalizeCatalog(CATALOG) {
 
   let datasets = CATALOG['datasets'];
 
-  if (0) {
-    util.log.debug("Looking for datasets with more than one DEPEND_0.");
-
-    let datasetsExpanded = JSON.parse(JSON.stringify(datasets));
-
-    for (let [dsidx, dataset] of Object.entries(datasets)) {
-
-      util.log(dataset['id']);
-
-      if (!dataset['_variables']) {
-        util.error(dataset['id'], "Omitting " + dataset['id'] 
-              + " from HAPI all.json because no variable attributes.", false);
-        continue;
-      }
-
-      //extractParameterAttributes(dataset);
-      //extractDatasetAttributes(dataset);
-
-      let subdatasets = subsetDataset(dataset);
-      if (subdatasets !== undefined) {
-        util.log("Note: " + subdatasets.length + " sub-datasets");
-        datasetsExpanded.splice(dsidx, 1, ...subdatasets);
-      }
-    }
-
-    datasets = null
-    datasets = datasetsExpanded;
-
-    // Remove nulled elements.
-    datasets = datasets.filter(function (el) {return el != null;});
-  }
-
-  // Remove nulled elements.
-  datasets = datasets.filter(function (el) {return el != null;});
+  util.log.debug("Looking for datasets with more than one DEPEND_0.");
+  datasets = subsetDatasets(datasets);
 
   for (let dataset of datasets) {
+
     if (!dataset['_variables']) {
       util.error(dataset['id'], "Omitting " + dataset['id'] + " from HAPI all.json because no variable attributes.", false);
       continue;
@@ -672,7 +636,7 @@ function finalizeCatalog(CATALOG) {
 
       let DEPEND_0 = parameter['_vAttributesKept']['_DEPEND_0'];
       if (DEPEND_0 && !DEPEND_0.toLowerCase().startsWith('epoch')) {
-        warning(dataset['id'], `${parameter['name']} has DEPEND_0 name of '${DEPEND_0}'; expected 'Epoch'`);
+        util.warning(dataset['id'], `${parameter['name']} has DEPEND_0 name of '${DEPEND_0}'; expected 'Epoch'`);
       }
       DEPEND_0s.push(DEPEND_0);
 
@@ -716,47 +680,11 @@ function finalizeCatalog(CATALOG) {
     dataset['info']['parameters'] = parameter_array;
   }
 
-  // Remove nulled elements.
-  //datasets = datasets.filter(function (el) {return el != null;});
-
   util.log("\nCreated HAPI catalog and info responses.\n");
 
-  util.log("Getting SPASE records.\n");
-  for (let dataset of datasets) {
-    let resourceID = dataset['info']['resourceID']
-    if (!resourceID || !resourceID.startsWith("spase://")) {
-      util.warning(dataset['id'], "No SPASE link in resourceID");
-      finished(dataset, null);
-    }
-    let spaseURL = resourceID.replace("spase://","https://hpde.io/");
-    let spaseFile = argv.cachedir + '/' + dataset['id'].split("_")[0] + '/' + dataset['id'] + '.spase.xml';
-    getSPASE(dataset, spaseURL, spaseFile, writeFiles);
-  }
+  writeFiles(datasets);
 
-  function finished(dataset, obj) {
-    if (!finished.N) finished.N = 0;
-    finished.N = finished.N + 1;
-    if (obj === null) return;
-    dataset['info']['x_additionalMetadata'] = {"json": obj["json"]};
-    if (finished.N == datasets.length) {
-      util.log("\nGot SPASE records.\n");
-      writeFiles();
-    }
-  }
-
-  function getSPASE(dataset, url, outFile) {
-
-    util.get({"uri": url, "outFile": outFile},
-      (err, obj) => {
-        if (err) {
-          util.error(dataset['id'], [url, err], false);
-          obj = {'json': null, 'xml': null};
-        }
-        finished(dataset, obj);
-      });
-  }
-
-  function writeFiles() {
+  function writeFiles(datasets) {
 
     util.log("Writing HAPI info and info-full files.\n");
 
@@ -768,7 +696,7 @@ function finalizeCatalog(CATALOG) {
 
       allIds.push(dataset['id']);
 
-      let fnameInfoFull = argv.cachedir + '/' + dataset['id'].split("_")[0] + '/' + dataset['id'] + 'info-full.json';
+      let fnameInfoFull = argv.cachedir + '/' + dataset['id'].split("_")[0] + '/' + dataset['id'] + '-info-full.json';
       util.writeSync(fnameInfoFull, util.obj2json(dataset));
       if (dsidx <= 10) {
         util.log(`Wrote:   ${fnameInfoFull}`);
@@ -808,6 +736,110 @@ function finalizeCatalog(CATALOG) {
     util.log("Writing: " + argv.all);
     util.writeSync(argv.all, util.obj2json(datasets));
 
+
+  }
+}
+
+function spase(CATALOG) {
+
+  util.log("Getting SPASE records.\n");
+  for (let dataset of CATALOG['datasets']) {
+    let resourceID = dataset['info']['resourceID']
+    if (!resourceID || !resourceID.startsWith("spase://")) {
+      util.warning(dataset['id'], "No SPASE link in resourceID");
+      finished(dataset, null);
+    }
+    let spaseURL = resourceID.replace("spase://","https://hpde.io/") + ".xml";
+    let spaseFile = argv.cachedir + '/' + dataset['id'].split("_")[0] + '/' + dataset['id'] + "/" + dataset['id'] + '.spase.xml';
+    getSPASE(dataset, spaseURL, spaseFile, writeFiles);
+  }
+
+  function finished(dataset, obj) {
+    if (!finished.N) finished.N = 0;
+    finished.N = finished.N + 1;
+    if (obj === null) return;
+    dataset['info']['x_additionalMetadata'] = {"json": obj["json"]};
+    if (finished.N == datasets.length) {
+      util.log("\nGot SPASE records.\n");
+      buildHAPI();
+    }
+  }
+
+  function getSPASE(dataset, url, outFile) {
+
+    util.get({"uri": url, "outFile": outFile},
+      (err, obj) => {
+        if (err) {
+          util.error(dataset['id'], [url, err], false);
+          obj = {'json': null, 'xml': null};
+        }
+        finished(dataset, obj);
+      });
+  }
+}
+
+function subsetDatasets(datasets) {
+
+  let datasetsExpanded = JSON.parse(JSON.stringify(datasets));
+
+  for (let [dsidx, dataset] of Object.entries(datasets)) {
+
+    util.log(dataset['id']);
+
+    if (!dataset['_variables']) {
+      util.error(dataset['id'], "Omitting " + dataset['id'] 
+            + " from HAPI all.json because no variable attributes.", false);
+      continue;
+    }
+
+    extractParameterAttributes(dataset);
+    extractDatasetAttributes(dataset);
+
+    let subdatasets = subsetDataset(dataset);
+    if (subdatasets !== undefined) {
+      util.log("  Note: " + subdatasets.length + " sub-datasets");
+      datasetsExpanded.splice(dsidx, 1, ...subdatasets);
+    }
+  }
+
+  datasets = null;
+  return datasetsExpanded;
+
+  function subsetDataset(dataset) {
+
+    // Look for parameters that have more than one DEPEND_0.
+    let parameters = dataset['info']['parameters'];
+    let DEPEND_0s = {};
+    for (parameter of Object.keys(parameters)) {
+
+      if (parameters[parameter]['_vAttributesKept']['_VAR_TYPE'] !== "data") {
+        continue;
+      }
+
+      let DEPEND_0 = parameters[parameter]['_vAttributesKept']['_DEPEND_0'];
+      if (DEPEND_0 !== undefined) {
+        DEPEND_0s[DEPEND_0] = DEPEND_0;
+      }
+    }
+    DEPEND_0s = Object.keys(DEPEND_0s);
+    if (DEPEND_0s.length == 1) {
+      return undefined;
+    }
+
+    //util.warning(dataset['id'], DEPEND_0s.length + " DEPEND_0s: " + DEPEND_0s.join(", "));
+    let datasets = [];
+    for ([sdsidx, DEPEND_0] of Object.entries(DEPEND_0s)) {
+      newdataset = JSON.parse(JSON.stringify(dataset));
+      newdataset['id'] = newdataset['id'] + "@" + sdsidx;
+      for (parameter of Object.keys(newdataset['info']['parameters'])) {
+        let depend_0 = parameters[parameter]['_vAttributesKept']['_DEPEND_0'];
+        if (depend_0 !== DEPEND_0) {
+          delete newdataset['info']['parameters'][parameter];
+        }
+      }
+      datasets.push(newdataset)
+    }
+    return datasets;
   }
 }
 
