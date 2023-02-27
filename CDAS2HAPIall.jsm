@@ -253,7 +253,7 @@ function error(dsid, msg, exit) {
   let msgf = msg.split("\n");
   msg = chalk.red.bold("Error: ") + msg;
   if (dsid) {
-    msg = dsid + "\n" + msg;    
+    msg = chalk.red.bold(dsid) + "\n" + msg;    
   }
   log(msg, msgf);
   if (exit === undefined || exit == true) {

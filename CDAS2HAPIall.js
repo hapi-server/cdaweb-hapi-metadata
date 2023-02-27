@@ -654,7 +654,7 @@ function buildHAPI(CATALOG) {
       continue;
     }
 
-    util.log(dataset['id']);
+    //util.log(dataset['id']);
 
     if (/\s\s.*|\( | \)/.test(dataset['title'])) {
       util.warning(
