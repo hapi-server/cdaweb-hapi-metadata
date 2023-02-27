@@ -92,11 +92,7 @@ function get(opts, cb) {
   opts.method = "GET";
   request(opts, function (err,res,body) {
     if (res && res.statusCode !== 200) {
-      if (res.statusCode === 503 || res.statusCode === 429) {
-        error(null, [opts.uri, "Status code " + res.statusCode, "Headers: ", obj2json(res.headers)], false);
-      } else {
-        error(null, [opts.uri, "Status code " + res.statusCode], false);
-      }
+      error(null, [opts.uri, "Status code " + res.statusCode], false);
       cb(null, null);
       return;      
     }
@@ -135,12 +131,12 @@ function get(opts, cb) {
       fs.writeFileSync(outFile, body, encoding(headers));
     }
 
-    if (/json/.test(headers['content-type'])) {
+    if (/application\/json/.test(headers['content-type'])) {
       cb(null, JSON.parse(body));
-    } else if (/xml/.test(headers['content-type'])) {
-      xml2js(body, (err, obj) => cb(null, obj));
-    } else if (/cdf/.test(headers['content-type'])) {
-      cdf2json(outFile, (err, obj) => cb(null, obj));
+    } else if (/text\/xml/.test(headers['content-type'])) {
+      xml2js(body, (err, obj) => cb(err, obj));
+    } else if (/application\/x-cdf/.test(headers['content-type'])) {
+      cdf2json(outFile, (err, obj) => cb(err, obj));
     } else {
       cb(null, body.toString());
     }    
@@ -205,7 +201,7 @@ log.debug = function (msg) {
   }
 }
 
-function log(msg, msgf) {
+function log(msg, color) {
 
   mkdirSync(util.argv.cachedir);
   let fname = util.argv.cachedir + "/log.txt";
@@ -213,12 +209,13 @@ function log(msg, msgf) {
     fs.rmSync(fname, { recursive: true, force: true });
     log.fname = fname;
   }
-  if (msgf) {
-    appendSync(fname, msgf + "\n");
+  appendSync(fname, msg + "\n");
+  if (color === "blue") {
+    const chalk = require("chalk");
+    console.log(chalk.blue.bold(msg));
   } else {
-    appendSync(fname, msg + "\n");    
+    console.log(msg);
   }
-  console.log(msg);  
 }
 
 function warning(dsid, msg) {
@@ -237,49 +234,29 @@ function warning(dsid, msg) {
 }
 
 function error(dsid, msg, exit) {
-
-  let errorDirAll;
-  let errorDirDataset;
-  let fnameAll;
-  let fnameDataset;
+  let errorDir = util.argv.cachedir;
   if (dsid) {
-    errorDirDataset = util.argv.cachedir + "/" + dsid.split("_")[0];
-    fnameDataset = util.argv.cachedir + "/" + dsid + ".error.txt";
-    mkdirSync(errorDirDataset);
-    if (!error.fnameDataset) {
-      fs.rmSync(fnameDataset, { recursive: true, force: true });
-      error.fnameDataset = fnameDataset;
-    }
+    errorDir = util.argv.cachedir + "/" + dsid.split("_")[0];
   }
-  errorDirAll = util.argv.cachedir;
-  fnameAll = errorDirAll + "/all.error.txt";
-  mkdirSync(errorDirAll);
-  if (!error.fnameAll) {
-    fs.rmSync(fnameAll, { recursive: true, force: true });
-    error.fnameAll = fnameAll;
+  mkdirSync(errorDir);
+  let fname = errorDir + "/" + dsid + ".error.txt";
+  if (!error.fname) {
+    fs.rmSync(fname, { recursive: true, force: true });
+    error.fname = fname;
   }
-
   if (Array.isArray(msg)) {
     msg = msg.join('\n').replace(/\n/g,'\n       ');
   } else {
     msg = msg.toString();
   }
-
-  if (dsid) {
-    appendSync(fnameDataset, "  " + msg);
-  }
-  appendSync(fnameAll, "  " + msg);
-
-  const chalk = require("chalk");
+  appendSync(fname, "  " + msg);
   let msgf = msg.split("\n");
+  const chalk = require("chalk");
   msg = chalk.red.bold("Error: ") + msg;
-
   if (dsid) {
-    msg = dsid + "\n" + msg;    
+    msg = chalk.red.bold(dsid) + "\n" + msg;    
   }
-
   log(msg, msgf);
-
   if (exit === undefined || exit == true) {
     process.exit(1);
   }
@@ -353,4 +330,3 @@ function str2ISODuration(cadenceStr) {
 }
 // End time-related functions
 /////////////////////////////////////////////////////////////////////////////
-
