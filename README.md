@@ -63,6 +63,15 @@ See also `compare/Makefile` for commands that can be used to compare data respon
 
 # Comments and Notes
 
+all.xml has
+https://cdaweb.gsfc.nasa.gov/pub/data/ace/orbit/level_2_cdaweb/def_or/
+with stop of 2023, but only 1997 dir.
+
+all.xml has
+https://cdaweb.gsfc.nasa.gov/pub/data/ace/orbit/level_2_cdaweb/or_ssc
+which gives 301 to
+https://cdaweb.gsfc.nasa.gov/pub/data/ace/orbit/level_2_cdaweb/or_ssc/
+
 * The production HAPI server https://cdaweb.gsfc.nasa.gov/hapi has many datasets in its list for which the metadata or data responses are not valid. It appears the [HAPI verifier](https://hapi-server.org/verify) was never run on all datasets. The code `CDAS2HAPIall.js` catches many of the problem datasets, logs them, and omits them from the HAPI `all.json` file.
 
 * The initial generation of the the HAPI `all.json` using `CDAS2HAPIall.js` can take up to 30 minutes. The production HAPI server becomes responsive at 9 am daily due to a similar update that appears to block the meain thread. However, in general, a full update is only needed when content other than the `startDate` and `stopDate` changes. Updating the `startDate` and `stopDate` only requires one call to the [CDASR web service](https://cdaweb.gsfc.nasa.gov/WebServices/REST/) and takes less than one second. This can be done using `node CDAS2HAPIall.js --fastupdate`.

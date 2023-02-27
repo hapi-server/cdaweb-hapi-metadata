@@ -3,8 +3,15 @@ const convert = require('xml-js');
 const xml2js = require('xml2js').parseString;
 
 // read file
-const xmlFile = fs.readFileSync('ac_or_ssc_00000000_v01.xml','utf-8');
+const xmlFile = fs.readFileSync('../cache/bw/AC/ac_or_def_00000000_v01-cdfxdf.xml','utf-8');
+const { DOMParser, XMLSerializer } = require('@xmldom/xmldom')
 
+xmlDoc = new DOMParser().parseFromString(xmlFile, 'text/xml')
+
+console.log(xmlDoc);
+
+
+process.exit()
 //console.log(xmlFile.toString())
 
 xml2js(xmlFile, function (err, jsonObj) {
@@ -15,7 +22,6 @@ xml2js(xmlFile, function (err, jsonObj) {
 
 //console.log(jsObj);
 
-const { DOMParser, XMLSerializer } = require('@xmldom/xmldom')
 
 cdfGAttributes = {};
 

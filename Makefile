@@ -1,4 +1,4 @@
-IDREGEX=^AC_AT
+IDREGEX=^AC_OR
 AUTOPLOT=http://autoplot.org/devel/autoplot.jar
 
 .PHONY: all bw jf nl bh compare-meta
@@ -16,11 +16,21 @@ all: node_modules
 	@echo "\n-----compare-meta------\n"
 	make compare-meta
 
+CDAS="https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/"
+inventory:
+	curl "$(CDAS)dataviews/sp_phys/datasets/AC_H2_MFI/inventory/19970829T000000Z,19970928T100010Z"
+	# Returns
+	# <Start>1997-09-02T00:00:00.000Z</Start><End>1997-09-28T23:00:00.000Z</End>
+
 compare-meta:
 	cd compare && mkdir -p meta && node compare-meta.js
 
+#cp cache/bw/all.json all/all-bw.json
 bw:
 	node CDAS2HAPIall.js --idregex '$(IDREGEX)'
+
+bwm:
+	node MASTERS2HAPIall.js --idregex '$(IDREGEX)'
 
 # Nand's Lal's (nl) production HAPI server
 nl:
@@ -60,6 +70,11 @@ clean-bw:
 	@rm -f all/all-bw-full.json
 	@rm -rf cache/bw/
 
+clean-bwm:
+	@rm -f all/all-bwm.json
+	@rm -f all/all-bwm-full.json
+	@rm -rf cache/bwm/
+
 clean-jf:
 	@rm -f all/all-jf.json
 	@rm -rf cache/jf/
@@ -78,6 +93,7 @@ clean-bh:
 
 clean:
 	make clean-bw
+	make clean-bwm
 	make clean-bh
 	make clean-nl
 	make clean-nljf
