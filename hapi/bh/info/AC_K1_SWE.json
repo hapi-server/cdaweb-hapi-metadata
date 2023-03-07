@@ -1,0 +1,90 @@
+{
+  "HAPI": "3.1",
+  "creationDate": "2023-03-05T14:38:11.47Z",
+  "x_SPDF_CAVEAT": "This is a prototype implementation which may change or be eliminated at any time. The metadata returned by info and data may be different. The metadata values returned by a data request are more accurate. The two data JSON formats do not conform to the HAPI specification.  The official cdaweb HAPI server is available at https://cdaweb.gsfc.nasa.gov/hapi",
+  "description": "ACE Solar Wind Electron Proton Alpha Monitor (SWEPAM), Key Parameter, K1, Browse Data is designed for monitoring large scale particle and field behavior and for selecting interesting time periods. The data is automatically generated from the spacecraft data stream using simple algorithms provided by the instrument teams. It is not routinely checked for accuracy and is subject to revision. Use this data at your own risk, and consult with the appropriate instrument teams about citing it. SWEPAM browse data is not validated by the experimenters and should not be used except for preliminary examination prior to detailed Studies. See: https://izw1.caltech.edu/ACE/.",
+  "startDate": "2017-01-01T00:00:00",
+  "stopDate": "2023-02-26T14:38:11.47Z",
+  "time": "Epoch",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/cgi-bin/eval2.cgi?dataset=AC_K1_SWE&index=sp_phys",
+  "resourceID": "spase://NASA/NumericalData/ACE/SWEPAM/KeyParameter/K1/PT1H",
+  "x_SPDF_ID": "AC_K1_SWE",
+  "x_SPDF_DOI": "https://doi.org/10.48322/0n2v-es49",
+  "cadence": "PT1H",
+  "contact": "David.J.McComas",
+  "contactID": "spase://SMWG/Person/David.J.McComas",
+  "parameters": [
+    {
+      "name": "Np",
+      "description": "SWEPAM, Solar Wind Proton Number Density, Scalar, Preliminary Values, Browse use only",
+      "type": "unknown",
+      "units": "cm^-3",
+      "label": "SW H Num Density",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Vp",
+      "description": "SWEPAM, Solar Wind Bulk Speed, Preliminary Values, Browse use only",
+      "type": "unknown",
+      "units": "km/s",
+      "label": "SW Bulk Speed",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "He_ratio",
+      "description": "SWEPAM, Percentage of Helium++ Ions to Protons, He++/H+, Preliminary Values, Browse use only",
+      "type": "unknown",
+      "units": null,
+      "label": "He++/H+",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Tpr",
+      "description": "SWEPAM, Radial Component of the Proton Temperature, Preliminary Values, Browse use only",
+      "type": "unknown",
+      "units": "°K",
+      "label": "H Temp, radical",
+      "x_SPDF_VALIDMIN": "1000.0",
+      "x_SPDF_VALIDMAX": "1.0e+06",
+      "fill": "-1.0e+31"
+    }
+  ],
+  "additionalMetadata": [
+    {
+      "name": "ISTP",
+      "contentURL": "https://cdaweb.gsfc.nasa.gov/pub/software/cdawlib/0JSONS/ac_k1_swe_00000000_v01.json",
+      "aboutURL": "https://spdf.gsfc.nasa.gov/sp_use_of_cdf.html"
+    },
+    {
+      "name": "SPASE",
+      "contentURL": "https://cdaweb.gsfc.nasa.gov/registry/hdp/Spase.xql?id=spase://NASA/NumericalData/ACE/SWEPAM/KeyParameter/K1/PT1H",
+      "aboutURL": "https://spase-group.org/"
+    }
+  ],
+  "x_SPDF_INVENTORY": {
+    "intervals": [
+      {
+        "begin": "2017-07-01T00:00:00.000Z",
+        "end": "2018-03-03T17:00:00.000Z"
+      },
+      {
+        "begin": "2018-03-04T10:00:00.000Z",
+        "end": "2018-03-04T13:00:00.000Z"
+      },
+      {
+        "begin": "2018-03-05T09:00:00.000Z",
+        "end": "2019-11-30T23:00:00.000Z"
+      },
+      {
+        "begin": "2019-12-02T00:00:00.000Z",
+        "end": "2023-02-25T23:00:00.000Z"
+      }
+    ]
+  }
+}

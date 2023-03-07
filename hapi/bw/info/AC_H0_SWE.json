@@ -1,0 +1,143 @@
+{
+  "id": "AC_H0_SWE",
+  "title": "ACE/SWEPAM Solar Wind Experiment 64-Second Level 2 Data - D. J. McComas (SWRI)",
+  "info": {
+    "startDate": "1998-02-04T00:00:31Z",
+    "stopDate": "2021-03-12T23:59:38Z",
+    "sampleStartDate": "1998-02-04T00:00:31.000Z",
+    "sampleStopDate": "1998-02-05T01:37:35.000Z",
+    "x_sampleRecords": 1442,
+    "cadence": "PT64S",
+    "contact": "D. J. McComas @ SWRI",
+    "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_H0_SWE",
+    "resourceID": "spase://NASA/NumericalData/ACE/SWEPAM/L2/PT64S",
+    "x_creationDate": "2003-03-26",
+    "x_datasetCitation": "Please acknowledge the Principal Investigator, D. J. McComas of Southwest Research Institute",
+    "x_datasetTermsOfUse": "See the rules of use available from the ACE Science Center at: http://www.srl.caltech.edu/ACE/ASC/level2/policy_lvl2.html",
+    "parameters": [
+      {
+        "name": "Time",
+        "type": "isotime",
+        "units": "UTC",
+        "length": 24,
+        "fill": "0000-01-01T00:00:00.000Z"
+      },
+      {
+        "name": "Np",
+        "description": "Solar Wind Proton Number Density, scalar",
+        "type": "double",
+        "x_labelTitle": "Proton No. density",
+        "label": "H_Density",
+        "units": "#/cc",
+        "fill": "-1.0E31"
+      },
+      {
+        "name": "Vp",
+        "description": "Solar Wind Bulk Speed",
+        "type": "double",
+        "x_labelTitle": "Solar Wind Proton Speed",
+        "label": "SW_H_Speed",
+        "units": "km/s",
+        "fill": "-1.0E31"
+      },
+      {
+        "name": "Tpr",
+        "description": "radial component of the proton temperature",
+        "type": "double",
+        "x_labelTitle": "Proton Temperature",
+        "label": "H_Temp_radial",
+        "units": "Kelvin",
+        "fill": "-1.0E31"
+      },
+      {
+        "name": "alpha_ratio",
+        "description": "alpha to proton density ratio",
+        "type": "double",
+        "x_labelTitle": "alpha/proton ratio",
+        "label": "Na/Np",
+        "units": "ratio",
+        "fill": "-1.0E31"
+      },
+      {
+        "name": "V_GSE",
+        "description": "Solar Wind Velocity in GSE coord., 3 components",
+        "type": "double",
+        "x_labelTitle": "Solar Wind Velocity (GSE)",
+        "units": "km/s",
+        "fill": "-1.0E31",
+        "size": [
+          3
+        ],
+        "label": [
+          "VX(GSE)",
+          "VY(GSE)",
+          "VZ(GSE)"
+        ]
+      },
+      {
+        "name": "V_RTN",
+        "description": "Solar Wind Velocity in RTN coord., 3 components",
+        "type": "double",
+        "x_labelTitle": "Solar Wind Velocity (RTN)",
+        "units": "km/s",
+        "fill": "-1.0E31",
+        "size": [
+          3
+        ],
+        "label": [
+          "VR(RTN)",
+          "VT(RTN)",
+          "VN(RTN)"
+        ]
+      },
+      {
+        "name": "V_GSM",
+        "description": "Solar Wind Velocity in GSM coord., 3 comp.",
+        "type": "double",
+        "x_labelTitle": "Solar Wind Velocity (GSM)",
+        "units": "km/s",
+        "fill": "-1.0E31",
+        "size": [
+          3
+        ],
+        "label": [
+          "VX(GSM)",
+          "VY(GSM)",
+          "VZ(GSM)"
+        ]
+      },
+      {
+        "name": "SC_pos_GSE",
+        "description": "ACE s/c position, 3 comp. in GSE coord.",
+        "type": "double",
+        "x_labelTitle": "S/C position in GSE",
+        "units": "km",
+        "fill": "-1.0E31",
+        "size": [
+          3
+        ],
+        "label": [
+          "ACEX-GSE",
+          "ACEY-GSE",
+          "ACEZ-GSE"
+        ]
+      },
+      {
+        "name": "SC_pos_GSM",
+        "description": "ACE s/c position, 3 comp. in GSM coord.",
+        "type": "double",
+        "x_labelTitle": "S/C position in GSM",
+        "units": "km",
+        "fill": "-1.0E31",
+        "size": [
+          3
+        ],
+        "label": [
+          "ACEX(GSM)",
+          "ACEY(GSM)",
+          "ACEZ(GSM)"
+        ]
+      }
+    ]
+  }
+}

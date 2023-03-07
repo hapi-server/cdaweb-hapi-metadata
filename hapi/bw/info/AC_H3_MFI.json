@@ -1,0 +1,102 @@
+{
+  "id": "AC_H3_MFI",
+  "title": "H3 - ACE Magnetic Field 1-Second Level 2 Data - N. Ness (Bartol Research Institute)",
+  "info": {
+    "startDate": "1998-01-01T00:00:00Z",
+    "stopDate": "2022-12-20T23:59:59Z",
+    "sampleStartDate": "1998-01-01T00:00:00.210Z",
+    "sampleStopDate": "1998-01-01T00:23:59.208Z",
+    "x_sampleRecords": 1440,
+    "cadence": "PT1S",
+    "contact": "N. Ness @ Bartol Research Institute",
+    "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_H3_MFI",
+    "resourceID": "spase://NASA/NumericalData/ACE/MAG/L2/PT1S",
+    "x_creationDate": "2010-04-07",
+    "x_datasetCitation": "Please acknowledge the Principal Investigator, N. Ness of Bartol Research Institute",
+    "x_datasetTermsOfUse": "See the rules of use available from the ACE Science Center at: http://www.srl.caltech.edu/ACE/ASC/level2/policy_lvl2.html",
+    "parameters": [
+      {
+        "name": "Time",
+        "type": "isotime",
+        "units": "UTC",
+        "length": 24,
+        "fill": "0000-01-01T00:00:00.000Z"
+      },
+      {
+        "name": "Magnitude",
+        "description": "B-field magnitude",
+        "type": "double",
+        "x_labelTitle": "B-field magnitude",
+        "units": "nT",
+        "fill": "-1.0E31",
+        "label": "<|B|>"
+      },
+      {
+        "name": "BRTN",
+        "description": "Magnetic Field Vector in RTN coordinates (1 sec)",
+        "type": "double",
+        "x_labelTitle": "Mag Field vector, RTN coord",
+        "units": "nT",
+        "fill": "-1.0E31",
+        "size": [
+          3
+        ],
+        "vectorComponents": [
+          "x",
+          "y",
+          "z"
+        ],
+        "coordinateSystemName": "RTN",
+        "label": [
+          "BrRTN",
+          "BtRTN",
+          "BnRTN"
+        ]
+      },
+      {
+        "name": "BGSEc",
+        "description": "Magnetic Field Vector in GSE Cartesian coordinates (1 sec)",
+        "type": "double",
+        "x_labelTitle": "Mag Field vector, GSE coord",
+        "units": "nT",
+        "fill": "-1.0E31",
+        "size": [
+          3
+        ],
+        "vectorComponents": [
+          "x",
+          "y",
+          "z"
+        ],
+        "coordinateSystemName": "GSE",
+        "label": [
+          "BxGSE",
+          "ByGSE",
+          "BzGSE"
+        ]
+      },
+      {
+        "name": "BGSM",
+        "description": "Magnetic field vector in GSM coordinates (1 sec)",
+        "type": "double",
+        "x_labelTitle": "Mag field vector, GSM coord",
+        "units": "nT",
+        "fill": "-1.0E31",
+        "size": [
+          3
+        ],
+        "vectorComponents": [
+          "x",
+          "y",
+          "z"
+        ],
+        "coordinateSystemName": "GSM",
+        "label": [
+          "Bx(GSM)",
+          "By(GSM)",
+          "Bz(GSM)"
+        ]
+      }
+    ]
+  }
+}

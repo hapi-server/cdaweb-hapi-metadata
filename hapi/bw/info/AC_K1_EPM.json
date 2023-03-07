@@ -1,0 +1,90 @@
+{
+  "id": "AC_K1_EPM",
+  "title": "K1 - ACE EPAM 1-Hour Key Parameters - R. Gold (JHU Applied Physics Laboratory)",
+  "info": {
+    "startDate": "2017-07-01T00:00:00Z",
+    "stopDate": "2023-02-16T23:00:00Z",
+    "sampleStartDate": "2017-07-01T00:00:00.000Z",
+    "sampleStopDate": "2017-08-30T01:00:00.000Z",
+    "x_sampleRecords": 1442,
+    "cadence": "PT1H",
+    "contact": "R. Gold @ JHU Applied Physics Laboratory",
+    "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_K1_EPM",
+    "resourceID": "spase://NASA/NumericalData/ACE/EPAM/KeyParameter/PT1H",
+    "x_creationDate": "2017-07-06",
+    "x_datasetCitation": "Please acknowledge the Principal Investigator, R. Gold of JHU Applied Physics Laboratory",
+    "x_datasetTermsOfUse": "See the rules of use available from the ACE Science Center at: http://www.srl.caltech.edu/ACE/",
+    "parameters": [
+      {
+        "name": "Time",
+        "type": "isotime",
+        "units": "UTC",
+        "length": 24,
+        "fill": "0000-01-01T00:00:00.000Z"
+      },
+      {
+        "name": "H_lo",
+        "description": "Proton Flux (0.48-0.97 MeV)",
+        "type": "double",
+        "x_labelTitle": "H lo Flux",
+        "units": "1/(cm2 s ster MeV)",
+        "fill": "-1.0E31",
+        "label": "H (0.48-0.97 MeV)"
+      },
+      {
+        "name": "Ion_very_lo",
+        "description": "Ion Flux (47-65 keV)",
+        "type": "double",
+        "x_labelTitle": "Ion very lo Flux",
+        "units": "1/(cm2 s ster MeV)",
+        "fill": "-1.0E31",
+        "label": "Ion (47-65 keV)"
+      },
+      {
+        "name": "Ion_lo",
+        "description": "Ion Flux (112-187 keV)",
+        "type": "double",
+        "x_labelTitle": "Ion lo Flux",
+        "units": "1/(cm2 s ster MeV)",
+        "fill": "-1.0E31",
+        "label": "Ion (112-187 keV)"
+      },
+      {
+        "name": "Ion_mid",
+        "description": "Ion Flux (310-580 keV)",
+        "type": "double",
+        "x_labelTitle": "Ion mid Flux",
+        "units": "1/(cm2 s ster MeV)",
+        "fill": "-1.0E31",
+        "label": "Ion (310-580 keV)"
+      },
+      {
+        "name": "Ion_hi",
+        "description": "Ion Flux (1060-1910 keV)",
+        "type": "double",
+        "x_labelTitle": "Ion hi Flux",
+        "units": "1/(cm2 s ster MeV)",
+        "fill": "-1.0E31",
+        "label": "Ion (1060-1910 keV)"
+      },
+      {
+        "name": "Electron_lo",
+        "description": "Electron Flux (38-53 keV)",
+        "type": "double",
+        "x_labelTitle": "Electron lo Flux",
+        "units": "1/(cm2 s ster MeV)",
+        "fill": "-1.0E31",
+        "label": "Electron (38-53 keV)"
+      },
+      {
+        "name": "Electron_hi",
+        "description": "Electron Flux (175-315 keV)",
+        "type": "double",
+        "x_labelTitle": "Electron hi Flux",
+        "units": "1/(cm2 s ster MeV)",
+        "fill": "-1.0E31",
+        "label": "Electron (175-315 keV)"
+      }
+    ]
+  }
+}

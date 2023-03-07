@@ -1,0 +1,77 @@
+{
+  "HAPI": "3.1",
+  "creationDate": "2023-03-05T14:38:01.02Z",
+  "x_SPDF_CAVEAT": "This is a prototype implementation which may change or be eliminated at any time. The metadata returned by info and data may be different. The metadata values returned by a data request are more accurate. The two data JSON formats do not conform to the HAPI specification.  The official cdaweb HAPI server is available at https://cdaweb.gsfc.nasa.gov/hapi",
+  "description": "This Data Product contains Measurements from the ACE Magnetic Field Instrument (MAG). The Quality of ACE Level 2 Data is such that it is suitable for serious Scientific Study. However, to avoid Confusion and Misunderstanding, it is recommended that Users consult with the appropriate ACE Team Members before publishing Work derived from the Data. The ACE Team has worked hard to ensure that the Level 2 Data are free from Errors, but the Team cannot accept Responsibility for erroneous Data, or for Misunderstandings about how the Data may be used. This is especially true if the appropriate ACE Team Members are not consulted before Publication. At the very least, Preprints should be forwarded to the ACE Team before Publication. MAG References: http://www.srl.caltech.edu/ACE/. ACE Browse Data is designed for monitoring large-scale Particle and Field Behavior and for selecting interesting Time Periods. The Data are automatically generated from the Spacecraft Data Stream using simple Algorithms provided by the Instrument Teams. The Data are not routinely checked for Accuracy and is subject to Revision. Use this Data at your own Risk, and consult with the appropriate Instrument Teams about citing it. The Magnetometer Browse Data is not validated by the Experimenters and should not be used except for preliminary Examination prior to detailed Studies.",
+  "startDate": "2017-01-01T00:00:00.000",
+  "stopDate": "2023-02-26T14:38:01.02Z",
+  "time": "Epoch",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/cgi-bin/eval2.cgi?dataset=AC_K2_MFI&index=sp_phys",
+  "resourceID": "spase://NASA/NumericalData/ACE/MAG/KeyParameter/PT1H",
+  "x_SPDF_ID": "AC_K2_MFI",
+  "x_SPDF_DOI": "https://doi.org/10.48322/pf44-ys65",
+  "cadence": "PT1H",
+  "contact": "Norman.F.Ness",
+  "contactID": "spase://SMWG/Person/Norman.F.Ness",
+  "parameters": [
+    {
+      "name": "Magnitude",
+      "description": "Magnetic Field Magnitude",
+      "type": "unknown",
+      "units": "nT",
+      "label": "< B",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "BGSEc",
+      "description": "Magnetic Field Vector, Geocentric Solar Ecliptic, GSE, Cartesian Coordinates",
+      "type": "unknown",
+      "size": [
+        3
+      ],
+      "units": "nT",
+      "label": [
+        "x",
+        "y",
+        "z"
+      ],
+      "x_SPDF_VALIDMIN": "-100.0",
+      "x_SPDF_VALIDMAX": "100.0",
+      "fill": "-1.0e+31"
+    }
+  ],
+  "additionalMetadata": [
+    {
+      "name": "ISTP",
+      "contentURL": "https://cdaweb.gsfc.nasa.gov/pub/software/cdawlib/0JSONS/ac_k2_mfi_00000000_v01.json",
+      "aboutURL": "https://spdf.gsfc.nasa.gov/sp_use_of_cdf.html"
+    },
+    {
+      "name": "SPASE",
+      "contentURL": "https://cdaweb.gsfc.nasa.gov/registry/hdp/Spase.xql?id=spase://NASA/NumericalData/ACE/MAG/KeyParameter/PT1H",
+      "aboutURL": "https://spase-group.org/"
+    }
+  ],
+  "x_SPDF_INVENTORY": {
+    "intervals": [
+      {
+        "begin": "2017-07-01T00:00:00.000Z",
+        "end": "2018-03-03T17:00:00.000Z"
+      },
+      {
+        "begin": "2018-03-04T10:00:00.000Z",
+        "end": "2018-03-04T13:00:00.000Z"
+      },
+      {
+        "begin": "2018-03-05T09:00:00.000Z",
+        "end": "2019-11-30T23:00:00.000Z"
+      },
+      {
+        "begin": "2019-12-02T00:00:00.000Z",
+        "end": "2023-02-25T23:00:00.000Z"
+      }
+    ]
+  }
+}

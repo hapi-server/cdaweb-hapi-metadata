@@ -1,0 +1,63 @@
+{
+  "id": "AC_H6_SWI",
+  "title": "ACE/SWICS Solar Wind Protons 12-min Level 2 Data - G. Gloeckler (University of Maryland)",
+  "info": {
+    "startDate": "1998-01-29T00:07:03Z",
+    "stopDate": "2020-12-31T23:53:57Z",
+    "sampleStartDate": "1998-01-29T00:07:03.000Z",
+    "sampleStopDate": "1998-02-10T03:11:57.000Z",
+    "x_sampleRecords": 1442,
+    "cadence": "PT12M",
+    "contact": "G. Gloeckler @ University of Maryland",
+    "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_H6_SWI",
+    "resourceID": "spase://NASA/NumericalData/ACE/SWICS/L2/PT12M",
+    "x_creationDate": "2018-06-14",
+    "x_datasetCitation": "Please acknowledge the Principal Investigator, G. Gloeckler of University of Maryland",
+    "x_datasetTermsOfUse": "See the rules of use available from the ACE Science Center at: http://www.srl.caltech.edu/ACE/ASC/level2/policy_lvl2.html",
+    "parameters": [
+      {
+        "name": "Time",
+        "type": "isotime",
+        "units": "UTC",
+        "length": 24,
+        "fill": "0000-01-01T00:00:00.000Z"
+      },
+      {
+        "name": "nH",
+        "description": "Solar Wind Proton Number Density, scalar",
+        "type": "double",
+        "x_labelTitle": "Proton density",
+        "label": "Proton_density",
+        "units": "#/cm^3",
+        "fill": "-1.0E31"
+      },
+      {
+        "name": "nH_err",
+        "description": "Proton Number Density statistical uncertainty",
+        "type": "double",
+        "x_labelTitle": "Proton density_err",
+        "label": "Proton_density_err",
+        "units": "#/cm^3",
+        "fill": "-1.0E31"
+      },
+      {
+        "name": "vH",
+        "description": "Solar Wind Proton speed, scalar",
+        "type": "double",
+        "x_labelTitle": "Solar Wind Proton Speed",
+        "label": "Proton_Speed",
+        "units": "km/s",
+        "fill": "-1.0E31"
+      },
+      {
+        "name": "vthH",
+        "description": "Solar Wind Proton Thermal speed, scalar",
+        "type": "double",
+        "x_labelTitle": "Solar Wind Proton Thermal speed",
+        "label": "Proton_Thermal_Speed",
+        "units": "km/s",
+        "fill": "-1.0E31"
+      }
+    ]
+  }
+}

@@ -1,0 +1,307 @@
+{
+  "pass": false,
+  "warns": [
+    {
+      "description": "is.CIdentifier(): Prefer dataset id to match c identifier regex '[_a-zA-Z][_a-zA-Z0-9]{1,30}'.",
+      "error": true,
+      "got": "1616 datasets ids that are not c identfiers:\n\nAEROCUBE-6-A_DOSIMETER_L2\nAEROCUBE-6-B_DOSIMETER_L2\nAMPTECCE_H0_MEPA@0\nAMPTECCE_H0_MEPA@1\nAMPTECCE_H0_MEPA@2\nAMPTECCE_H0_MEPA@3\nAMPTECCE_H0_MEPA@4\nCSSWE_REPTILE_6SEC-COUNTS-L1\nCSSWE_REPTILE_6SEC-FLUX-L2\nDE1_PWI_LFC-SPECTRA\n\n ... (1606) more.",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/catalog"
+    },
+    {
+      "description": "is.StatusInformative(): Want HTTP status message to contain the string 'HAPI error 1406: unknown dataset id' (default HAPI error message). <a href='https://github.com/hapi-server/verifier-nodejs/wiki#status-informative'>(Explanation.)</a>",
+      "error": true,
+      "got": "'400'",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/info?id=a_test_of_an_invalid_id_by_verifier-nodejs"
+    },
+    {
+      "description": "is.StatusInformative(): Want HAPI status message in JSON response to contain the string 'HAPI error 1406: unknown dataset id' (default HAPI error message). <a href='https://github.com/hapi-server/verifier-nodejs/wiki#status-informative'>(Explanation.)</a>",
+      "error": true,
+      "got": "'Bad request - unknown dataset id'",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/info?id=a_test_of_an_invalid_id_by_verifier-nodejs"
+    },
+    {
+      "description": "is.CadenceGiven(): Expect the nominal cadence to be given (see <a href='https://github.com/hapi-server/data-specification/blob/master/hapi-dev/HAPI-data-access-spec-dev.md'>the HAPI spec for definition</a>). A nominal cadence is useful for clients and obviates the need for it to be inferred programatically.",
+      "error": true,
+      "got": "no cadence",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/info?id=A1_K0_MPA"
+    },
+    {
+      "description": "Not enough information to compute time.max to use for data tests. Using time.min = startDate and time.max = startDate + P1D.",
+      "error": true,
+      "got": "No cadence and no sampleStartDate and sampleStopDate.",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/info?id=A1_K0_MPA"
+    },
+    {
+      "description": "is.CompressionAvailable(): Expect HTTP Accept-Encoding to match /gzip/. (Note, only compression tested for is gzip.)",
+      "error": true,
+      "got": "No gzip in Content-Encoding header. Compression will usually speed up transfer of data.",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HeaderSame(): Expect header in info response to match header in data response when 'include=header' requested.",
+      "error": true,
+      "got": "Differences:\n[\n  {\n    \"kind\": \"D\",\n    \"path\": [\n      \"startDate\"\n    ],\n    \"lhs\": \"2001-08-31T00:03:18Z\"\n  },\n  {\n    \"kind\": \"D\",\n    \"path\": [\n      \"stopDate\"\n    ],\n    \"lhs\": \"2008-01-03T01:31:56Z\"\n  },\n  {\n    \"kind\": \"D\",\n    \"path\": [\n      \"resourceURL\"\n    ],\n    \"lhs\": \"https://cdaweb.gsfc.nasa.gov/misc/NotesA.html#A1_K0_MPA\"\n  },\n  {\n    \"kind\": \"D\",\n    \"path\": [\n      \"contact\"\n    ],\n    \"lhs\": \"Mike Henderson @ LANL\"\n  }\n]",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z&include=header"
+    },
+    {
+      "description": "is.CompressionAvailable(): Expect HTTP Accept-Encoding to match /gzip/. (Note, only compression tested for is gzip.)",
+      "error": true,
+      "got": "No gzip in Content-Encoding header. Compression will usually speed up transfer of data.",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=sc_pos_syngci&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.CIdentifier(): Prefer dataset id to match c identifier regex '[_a-zA-Z][_a-zA-Z0-9]{1,30}'.",
+      "error": true,
+      "got": "1616 datasets ids that are not c identfiers:\n\nAEROCUBE-6-A_DOSIMETER_L2\nAEROCUBE-6-B_DOSIMETER_L2\nAMPTECCE_H0_MEPA@0\nAMPTECCE_H0_MEPA@1\nAMPTECCE_H0_MEPA@2\nAMPTECCE_H0_MEPA@3\nAMPTECCE_H0_MEPA@4\nCSSWE_REPTILE_6SEC-COUNTS-L1\nCSSWE_REPTILE_6SEC-FLUX-L2\nDE1_PWI_LFC-SPECTRA\n\n ... (1606) more.",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/catalog"
+    },
+    {
+      "description": "is.StatusInformative(): Want HTTP status message to contain the string 'HAPI error 1406: unknown dataset id' (default HAPI error message). <a href='https://github.com/hapi-server/verifier-nodejs/wiki#status-informative'>(Explanation.)</a>",
+      "error": true,
+      "got": "'400'",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/info?id=a_test_of_an_invalid_id_by_verifier-nodejs"
+    },
+    {
+      "description": "is.StatusInformative(): Want HAPI status message in JSON response to contain the string 'HAPI error 1406: unknown dataset id' (default HAPI error message). <a href='https://github.com/hapi-server/verifier-nodejs/wiki#status-informative'>(Explanation.)</a>",
+      "error": true,
+      "got": "'Bad request - unknown dataset id'",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/info?id=a_test_of_an_invalid_id_by_verifier-nodejs"
+    },
+    {
+      "description": "is.CadenceGiven(): Expect the nominal cadence to be given (see <a href='https://github.com/hapi-server/data-specification/blob/master/hapi-dev/HAPI-data-access-spec-dev.md'>the HAPI spec for definition</a>). A nominal cadence is useful for clients and obviates the need for it to be inferred programatically.",
+      "error": true,
+      "got": "no cadence",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/info?id=A1_K0_MPA"
+    },
+    {
+      "description": "Not enough information to compute time.max to use for data tests. Using time.min = startDate and time.max = startDate + P1D.",
+      "error": true,
+      "got": "No cadence and no sampleStartDate and sampleStopDate.",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/info?id=A1_K0_MPA"
+    },
+    {
+      "description": "is.CompressionAvailable(): Expect HTTP Accept-Encoding to match /gzip/. (Note, only compression tested for is gzip.)",
+      "error": true,
+      "got": "No gzip in Content-Encoding header. Compression will usually speed up transfer of data.",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HeaderSame(): Expect header in info response to match header in data response when 'include=header' requested.",
+      "error": true,
+      "got": "Differences:\n[\n  {\n    \"kind\": \"D\",\n    \"path\": [\n      \"startDate\"\n    ],\n    \"lhs\": \"2001-08-31T00:03:18Z\"\n  },\n  {\n    \"kind\": \"D\",\n    \"path\": [\n      \"stopDate\"\n    ],\n    \"lhs\": \"2008-01-03T01:31:56Z\"\n  },\n  {\n    \"kind\": \"D\",\n    \"path\": [\n      \"resourceURL\"\n    ],\n    \"lhs\": \"https://cdaweb.gsfc.nasa.gov/misc/NotesA.html#A1_K0_MPA\"\n  },\n  {\n    \"kind\": \"D\",\n    \"path\": [\n      \"contact\"\n    ],\n    \"lhs\": \"Mike Henderson @ LANL\"\n  }\n]",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z&include=header"
+    },
+    {
+      "description": "is.CompressionAvailable(): Expect HTTP Accept-Encoding to match /gzip/. (Note, only compression tested for is gzip.)",
+      "error": true,
+      "got": "No gzip in Content-Encoding header. Compression will usually speed up transfer of data.",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=sc_pos_syngci&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    }
+  ],
+  "fails": [
+    {
+      "description": "is.ErrorCorrect(): Expect HTTP code in JSON to be 404",
+      "error": true,
+      "got": 400,
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/info?id=a_test_of_an_invalid_id_by_verifier-nodejs"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=Time&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=dens_lop&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=vel_lop&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=dens_hip&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=temp_hip&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=theta_phi_hip&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=tratio_hip&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=dens_e&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=temp_e&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=theta_phi_e&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=tratio_e&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=sc_pot&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=bkgd&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=sc_pos_geo&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=sc_pos_mag&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.FileContentSame(): Expect number of rows from one parameter request to match data from all parameter request.",
+      "error": true,
+      "got": " # rows in single parameter request = 481 # in all parameter request = 260",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=sc_pos_syngci&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.ErrorCorrect(): Expect HTTP code in JSON to be 404",
+      "error": true,
+      "got": 400,
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/info?id=a_test_of_an_invalid_id_by_verifier-nodejs"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=Time&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=dens_lop&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=vel_lop&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=dens_hip&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=temp_hip&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=theta_phi_hip&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=tratio_hip&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=dens_e&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=temp_e&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=theta_phi_e&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=tratio_e&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=sc_pot&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=bkgd&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=sc_pos_geo&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.HTTP200(): Expect HTTP status code to be 200",
+      "error": true,
+      "got": "HTTP status 500",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=sc_pos_mag&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    },
+    {
+      "description": "is.FileContentSame(): Expect number of rows from one parameter request to match data from all parameter request.",
+      "error": true,
+      "got": " # rows in single parameter request = 481 # in all parameter request = 260",
+      "url": "https://cdaweb.gsfc.nasa.gov/hapi/data?id=A1_K0_MPA&parameters=sc_pos_syngci&time.min=2001-08-31T00:03:18Z&time.max=2001-09-01T00:03:18.000Z"
+    }
+  ]
+}

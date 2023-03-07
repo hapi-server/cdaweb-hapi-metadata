@@ -23,7 +23,7 @@ function finished(err, n) {
 let jobs = [];
 function job(n) {
 
-  function func(callback) {
+  return function (callback) {
     console.log("Starting #" + n);
      setTimeout(
       function() {
@@ -37,17 +37,6 @@ function job(n) {
         }
         , 1000)
   }
-
-  return function(callback) {
-            async
-              .retry(
-                {
-                  times: 10,
-                  interval: 200
-                },
-                (callback) => func(callback)
-              )
-          }
 }
 
 for (let j = 0; j < N; j++) {
@@ -55,8 +44,7 @@ for (let j = 0; j < N; j++) {
   jobs.push(job(j));
 }
 
-async
-  .parallel(jobs)
-  .catch(err => {
-    console.log(err);
-  });
+async.parallel(jobs, 
+  function(err, results) {
+    console.log(results);
+});

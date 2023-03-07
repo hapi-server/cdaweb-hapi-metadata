@@ -1,0 +1,120 @@
+{
+  "HAPI": "3.1",
+  "creationDate": "2023-03-05T14:38:20.263Z",
+  "x_SPDF_CAVEAT": "This is a prototype implementation which may change or be eliminated at any time. The metadata returned by info and data may be different. The metadata values returned by a data request are more accurate. The two data JSON formats do not conform to the HAPI specification.  The official cdaweb HAPI server is available at https://cdaweb.gsfc.nasa.gov/hapi",
+  "description": "ACE Browse Data are designed for monitoring large-scale Particle and Field Behavior and for selecting interesting Time Periods. The Data are automatically generated from the Spacecraft Data Stream using simple Algorithms provided by the Instrument Teams. It is not routinely checked for Accuracy and is subject to Revision. Use this Data at your own Risk, and consult with the appropriate Instrument Teams about citing it. EPAM Browse Data are not validated by the Experimenters and should not be used except for Preliminary Examination prior to detailed Studies. ACE Electron, Proton, and Alpha Monitor (EPAM) References: http://www.srl.caltech.edu/ACE/.",
+  "startDate": "2017-01-01T00:00:00.000",
+  "stopDate": "2023-02-26T14:38:20.263Z",
+  "time": "Epoch",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/cgi-bin/eval2.cgi?dataset=AC_K1_EPM&index=sp_phys",
+  "resourceID": "spase://NASA/NumericalData/ACE/EPAM/KeyParameter/PT1H",
+  "x_SPDF_ID": "AC_K1_EPM",
+  "x_SPDF_DOI": "https://doi.org/10.48322/qgh8-2q85",
+  "cadence": "PT1H",
+  "contact": "Robert.E.Gold",
+  "contactID": "spase://SMWG/Person/Robert.E.Gold",
+  "parameters": [
+    {
+      "name": "H_lo",
+      "description": "Proton Flux Intensity, 0.48 KeV to 0.97 MeV",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV)^-1",
+      "label": "H (0.48-0.97 MeV)",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "10000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Ion_very_lo",
+      "description": "Ion Flux Intensity, 47 KeV to 65 keV",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV)^-1",
+      "label": "Ion (47-65 keV)",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Ion_lo",
+      "description": "Ion Flux Intensity, 112 KeV to 187 keV",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV)^-1",
+      "label": "Ion (112-187 keV)",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Ion_mid",
+      "description": "Ion Flux Intensity, 310 KeV to 580 keV",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV)^-1",
+      "label": "Ion (310-580 keV)",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "10000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Ion_hi",
+      "description": "Ion Flux Intensity, 1060 KeV to 1910 keV",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV)^-1",
+      "label": "Ion (1060-1910 keV)",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "10000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Electron_lo",
+      "description": "Electron Flux Intensity, 38 KeV to 53 keV",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV)^-1",
+      "label": "Electron (38-53 keV)",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+07",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Electron_hi",
+      "description": "Electron Flux Intensity, 175 KeV to 315 keV",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV)^-1",
+      "label": "Electron (175-315 keV)",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+06",
+      "fill": "-1.0e+31"
+    }
+  ],
+  "additionalMetadata": [
+    {
+      "name": "ISTP",
+      "contentURL": "https://cdaweb.gsfc.nasa.gov/pub/software/cdawlib/0JSONS/ac_k1_epm_00000000_v01.json",
+      "aboutURL": "https://spdf.gsfc.nasa.gov/sp_use_of_cdf.html"
+    },
+    {
+      "name": "SPASE",
+      "contentURL": "https://cdaweb.gsfc.nasa.gov/registry/hdp/Spase.xql?id=spase://NASA/NumericalData/ACE/EPAM/KeyParameter/PT1H",
+      "aboutURL": "https://spase-group.org/"
+    }
+  ],
+  "x_SPDF_INVENTORY": {
+    "intervals": [
+      {
+        "begin": "2017-07-01T00:00:00.000Z",
+        "end": "2018-03-03T17:00:00.000Z"
+      },
+      {
+        "begin": "2018-03-04T10:00:00.000Z",
+        "end": "2018-03-04T13:00:00.000Z"
+      },
+      {
+        "begin": "2018-03-05T09:00:00.000Z",
+        "end": "2019-11-30T23:00:00.000Z"
+      },
+      {
+        "begin": "2019-12-02T00:00:00.000Z",
+        "end": "2023-02-25T23:00:00.000Z"
+      }
+    ]
+  }
+}

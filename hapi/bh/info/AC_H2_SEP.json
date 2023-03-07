@@ -1,0 +1,998 @@
+{
+  "HAPI": "3.1",
+  "creationDate": "2023-03-05T14:38:06.565Z",
+  "x_SPDF_CAVEAT": "This is a prototype implementation which may change or be eliminated at any time. The metadata returned by info and data may be different. The metadata values returned by a data request are more accurate. The two data JSON formats do not conform to the HAPI specification.  The official cdaweb HAPI server is available at https://cdaweb.gsfc.nasa.gov/hapi",
+  "description": "This Data Product contains Measurements from the ACE Solar Energetic Particle Ionic Charge Analyzer (SEPICA) Instrument. SEPICA is used to determine the Charge State Distribution of Energetic Particle Distributions. SEPICA is designed to measure the Ionic Charge State, Q, the Kinetic Energy, E, and the Nuclear Charge, Z, of Energetic Ions above 0.2 MeV/n. This includes Ions accelerated in Solar Flares as well as in Interplanetary Space during Energetic Storm Particle (ESP) Events and Co-rotating Interaction Region (CIR) Events. For low Mass Numbers, SEPICA also separates Isotopes such as 3He and 4He. The Quality of the ACE Level 2 Data are such that it is suitable for serious Scientific Study. However, to avoid Confusion and Misunderstanding, it is recommended that Users consult with the appropriate ACE Team Members before publishing Work derived from the Data. The ACE Team has worked hard to ensure that the Level 2 Data are free from Errors, but the Team cannot accept Responsibility for erroneous Data, or for Misunderstandings about how the Data may be used. This is especially true if the appropriate ACE Team Members are not consulted before Publication. At the very least, Preprints should be forwarded to the ACE Team before Publication.",
+  "startDate": "1997-10-08T00:00:00.000",
+  "stopDate": "2023-02-19T14:38:06.565Z",
+  "time": "Epoch",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/cgi-bin/eval2.cgi?dataset=AC_H2_SEP&index=sp_phys",
+  "resourceID": "spase://NASA/NumericalData/ACE/SEPICA/L2/PT1H",
+  "x_SPDF_ID": "AC_H2_SEP",
+  "x_SPDF_DOI": "https://doi.org/10.48322/3086-yq22",
+  "cadence": "PT1H",
+  "contact": "Eberhard.S.Moebius",
+  "contactID": "spase://SMWG/Person/Eberhard.S.Moebius",
+  "parameters": [
+    {
+      "name": "H1",
+      "description": "Hydrogen Flux Intensity, Channel H1, 0.65 MeV/n to 0.86 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "H_0.65-0.86 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+06",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "H2",
+      "description": "Hydrogen Flux Intensity, Channel H2, 0.86 MeV/n to 1.94 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "H_0.86-1.94 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+06",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "H3",
+      "description": "Hydrogen Flux Intensity, Channel H3, 1.94 MeV/n to 3.07 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "H_1.94-3.07 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+06",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_H1",
+      "description": "Hydrogen Flux Intensity, Channel H1, 0.65 MeV/n to 0.86 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_H_0.65-0.86 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_H2",
+      "description": "Hydrogen Flux Intensity, Channel H2, 0.86 MeV/n to 1.94 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_H_0.86-1.94 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_H3",
+      "description": "Hydrogen Flux Intensity, Channel H3, 1.94 MeV/n to 3.07 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_H_1.94-3.07 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "He1",
+      "description": "Helium Flux Intensity, Channel He1, 0.40 MeV/n to 0.64 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "He_0.40-0.64 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+06",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "He2",
+      "description": "Helium Flux Intensity, Channel He2, 0.64 MeV/n to 0.88 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "He_0.64-0.88 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+06",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "He3",
+      "description": "Helium Flux Intensity, Channel He3, 0.88 MeV/n to 1.19 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "He_0.88-1.19 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+06",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "He4cal",
+      "description": "Helium Flux Intensity, Channel He4cal, 1.19 MeV/n to 1.49 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "He4cal_1.19-1.49 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+06",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "He5",
+      "description": "Helium Flux Intensity, Channel He5, 1.49 MeV/n to 1.92 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "He_1.49-1.92 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+06",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "He6",
+      "description": "Helium Flux Intensity, Channel He6, 1.92 MeV/n to 3.06 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "He_1.92-3.06 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+06",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "He7",
+      "description": "Helium Flux Intensity, Channel He7, 3.06 MeV/n to 6.00 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "He_3.06-6.00 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+06",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "He8",
+      "description": "Helium Flux Intensity, Channel He8, 0.88 MeV/n to 1.92 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "He_0.88-1.92 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+06",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "HeCAck",
+      "description": "Helium Flux Intensity, Channel HeCAck, 1.15 MeV/n to 1.50 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "HeCAck_1.15-1.50 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+06",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_He1",
+      "description": "Helium Flux Intensity, Channel He1, 0.40 MeV/n to 0.64 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_He_0.40-0.64 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_He2",
+      "description": "Helium Flux Intensity, Channel He2, 0.64 MeV/n to 0.88 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_He_0.64-0.88 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_He3",
+      "description": "Helium Flux Intensity, Channel He3, 0.88 MeV/n to 1.19 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_He_0.88-1.19 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_He4cal",
+      "description": "Helium Flux Intensity, Channel He4cal, 1.19 MeV/n to 1.49 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_He4cal_1.19-1.49 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_He5",
+      "description": "Helium Flux Intensity, Channel He5, 1.49 MeV/n to 1.92 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_He_1.49-1.92 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_He6",
+      "description": "Helium Flux Intensity, Channel He6, 1.92 MeV/n to 3.06 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_He_1.92-3.06 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_He7",
+      "description": "Helium Flux Intensity, Channel He7, 3.06 MeV/n to 6.00 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_He_3.06-6.00 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_He8",
+      "description": "Helium Flux Intensity, Channel He8, 0.88 MeV/n to 1.92 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_He_0.88-1.92 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_HeCAck",
+      "description": "Helium Flux Intensity, Channel HeCAck, 1.15 MeV/n to 1.50 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_HeCAck_1.15-1.50 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "ClowE",
+      "description": "Carbon Flux Intensity, Channel ClowE, 0.33 MeV/n to 0.44 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Clo_0.33-0.44 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+08",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "C1",
+      "description": "Carbon Flux Intensity, Channel C1, 0.45 MeV/n to 0.64 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "C_0.45-0.64 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+08",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "C2",
+      "description": "Carbon Flux Intensity, Channel C2, 0.64 MeV/n to 0.86 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "C_0.64-0.86 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+08",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "C3",
+      "description": "Carbon Flux Intensity, Channel C3, 0.86 MeV/n to 1.93 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "C_0.86-1.93 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+08",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "C4",
+      "description": "Carbon Flux Intensity, Channel C4, 1.93 MeV/n to 3.06 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "C_1.93-3.06 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+08",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "C5",
+      "description": "Carbon Flux Intensity, Channel C5, 3.10 MeV/n to 7.15 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "C_3.10-7.15 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+08",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "C6",
+      "description": "Carbon Flux Intensity, Channel C6, 7.15 MeV/n to 11.75 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "C_7.15-11.75 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+08",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_ClowE",
+      "description": "Carbon Flux Intensity, Channel ClowE, 0.33 MeV/n to 0.44 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Clo_0.33-0.44 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_C1",
+      "description": "Carbon Flux Intensity, Channel C1, 0.45 MeV/n to 0.64 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_C_0.45-0.64 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_C2",
+      "description": "Carbon Flux Intensity, Channel C2, 0.64 MeV/n to 0.86 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_C_0.64-0.86 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_C3",
+      "description": "Carbon Flux Intensity, Channel C3, 0.86 MeV/n to 1.93 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_C_0.86-1.93 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_C4",
+      "description": "Carbon Flux Intensity, Channel C4, 1.93 MeV/n to 3.06 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_C_1.93-3.06 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_C5",
+      "description": "Carbon Flux Intensity, Channel C5, 3.10 MeV/n to 7.15 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_C_3.10-7.15 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_C6",
+      "description": "Carbon Flux Intensity, Channel C6, 7.15 MeV/n to 11.75 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_C_7.15-11.75 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "N1",
+      "description": "Nitrogen Flux Intensity, Channel N1, 0.36 MeV/n to 0.49 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "N_0.36-0.49 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "N2",
+      "description": "Nitrogen Flux Intensity, Channel N2, 0.49 MeV/n to 1.74 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "N_0.49-1.74 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "N3",
+      "description": "Nitrogen Flux Intensity, Channel N3, 1.74 MeV/n to 2.60 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "N_1.74-2.60 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "N4",
+      "description": "Nitrogen Flux Intensity, Channel N4, 2.60 MeV/n to 3.46 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "N_2.6-3.46 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "N5",
+      "description": "Nitrogen Flux Intensity, Channel N5, 3.46 MeV/n to 7.73 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "N_3.46-7.73 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "N6",
+      "description": "Nitrogen Flux Intensity, Channel N6, 7.73 MeV/n to 12.28 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "N_7.73-12.28 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_N1",
+      "description": "Nitrogen Flux Intensity, Channel N1, 0.36 MeV/n to 0.49 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_N_0.36-0.49 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0001",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_N2",
+      "description": "Nitrogen Flux Intensity, Channel N2, 0.49 MeV/n to 1.74 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_N_0.49-1.74 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0001",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_N3",
+      "description": "Nitrogen Flux Intensity, Channel N3, 1.74 MeV/n to 2.60 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_N_1.74-2.60 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0001",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_N4",
+      "description": "Nitrogen Flux Intensity, Channel N4, 2.60 MeV/n to 3.46 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_N_2.6-3.46 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0001",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_N5",
+      "description": "Nitrogen Flux Intensity, Channel N5, 3.46 MeV/n to 7.73 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_N_3.46-7.73 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0001",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_N6",
+      "description": "Nitrogen Flux Intensity, Channel N6, 7.73 MeV/n to 12.28 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_N_7.73-12.28 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0001",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "OlowE",
+      "description": "Oxygen Flux Intensity, Channel OlowE, 0.05 MeV/n to 0.43 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Olo_0.05-0.43 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+07",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "O1",
+      "description": "Oxygen Flux Intensity, Channel O1, 0.43 MeV/n to 0.65 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "O_0.43-0.65 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+07",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "O2",
+      "description": "Oxygen Flux Intensity, Channel O2, 0.65 MeV/n to 0.86 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "O_0.65-0.86 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+07",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "O3",
+      "description": "Oxygen Flux Intensity, Channel O3, 0.86 MeV/n to 1.93 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "O_0.86-1.93 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+07",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "O4",
+      "description": "Oxygen Flux Intensity, Channel O4, 1.93 MeV/n to 3.07 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "O_1.93-3.07 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+07",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "O5",
+      "description": "Oxygen Flux Intensity, Channel O5, 3.08 MeV/n to 7.19 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "O_3.08-7.19 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+07",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_OlowE",
+      "description": "Oxygen Flux Intensity, Channel OlowE, 0.05 MeV/n to 0.43 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Olo_0.05-0.43 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_O1",
+      "description": "Oxygen Flux Intensity, Channel O1, 0.43 MeV/n to 0.65 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_O_0.43-0.65 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_O2",
+      "description": "Oxygen Flux Intensity, Channel O2, 0.65 MeV/n to 0.86 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_O_0.65-0.86 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_O3",
+      "description": "Oxygen Flux Intensity, Channel O3, 0.86 MeV/n to 1.93 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_O_0.86-1.93 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_O4",
+      "description": "Oxygen Flux Intensity, Channel O4, 1.93 MeV/n to 3.07 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_O_1.93-3.07 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_O5",
+      "description": "Oxygen Flux Intensity, Channel O5, 3.08 MeV/n to 7.19 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_O_3.08-7.19 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Ne1",
+      "description": "Neon Flux Intensity, Channel Ne1, 0.64 MeV/n to 0.86 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Ne_0.64-0.86 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Ne2",
+      "description": "Neon Flux Intensity, Channel Ne2, 0.86 MeV/n to 1.94 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Ne_0.86-1.94 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Ne3",
+      "description": "Neon Flux Intensity, Channel Ne3, 1.94 MeV/n to 3.07 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Ne_1.94-3.07 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Ne4",
+      "description": "Neon Flux Intensity, Channel Ne4, 3.07 MeV/n to 7.19 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Ne_3.07-7.19 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_Ne1",
+      "description": "Neon Flux Intensity, Channel Ne1, 0.64 MeV/n to 0.86 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Ne_0.64-0.86 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0001",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_Ne2",
+      "description": "Neon Flux Intensity, Channel Ne2, 0.86 MeV/n to 1.94 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Ne_0.86-1.94 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0001",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_Ne3",
+      "description": "Neon Flux Intensity, Channel Ne3, 1.94 MeV/n to 3.07 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Ne_1.94-3.07 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0001",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_Ne4",
+      "description": "Neon Flux Intensity, Channel Ne4, 3.07 MeV/n to 7.19 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Ne_3.07-7.19 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0001",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Mg1",
+      "description": "Magnesium Flux Intensity, Channel Mg1, 0.81 MeV/n to 0.90 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Mg_0.81-0.90 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Mg2",
+      "description": "Magnesium Flux Intensity, Channel Mg2, 0.90 MeV/n to 1.92 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Mg_0.90-1.92 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Mg3",
+      "description": "Magnesium Flux Intensity, Channel Mg3, 1.92 MeV/n to 3.07 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Mg_1.92-3.07 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Mg4",
+      "description": "Magnesium Flux Intensity, Channel Mg4, 3.07 MeV/n to 6.02 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Mg_3.07-6.02 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_Mg1",
+      "description": "Magnesium Flux Intensity, Channel Mg1, 0.81 MeV/n to 0.90 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Mg_0.81-0.90 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0001",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_Mg2",
+      "description": "Magnesium Flux Intensity, Channel Mg2, 0.90 MeV/n to 1.92 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Mg_0.90-1.92 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0001",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_Mg3",
+      "description": "Magnesium Flux Intensity, Channel Mg3, 1.92 MeV/n to 3.07 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Mg_1.92-3.07 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0001",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_Mg4",
+      "description": "Magnesium Flux Intensity, Channel Mg4, 3.07 MeV/n to 6.02 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Mg_3.07-6.02 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0001",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Si1",
+      "description": "Silicon Flux Intensity, Channel Si1, 0.76 MeV/n to 0.89 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Si_0.76-0.89 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Si2",
+      "description": "Silicon Flux Intensity, Channel Si2, 0.89 MeV/n to 1.93 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Si_0.89-1.93 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Si3",
+      "description": "Silicon Flux Intensity, Channel Si3, 1.93 MeV/n to 3.07 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Si_1.93-3.07 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Si4",
+      "description": "Silicon Flux Intensity, Channel Si4, 3.07 MeV/n to 5.24 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Si_3.07-5.24 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "100000.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_Si1",
+      "description": "Silicon Flux Intensity, Channel Si1, 0.76 MeV/n to 0.89 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Si_0.76-0.89 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0001",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_Si2",
+      "description": "Silicon Flux Intensity, Channel Si2, 0.89 MeV/n to 1.93 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Si_0.89-1.93 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0001",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_Si3",
+      "description": "Silicon Flux Intensity, Channel Si3, 1.93 MeV/n to 3.07 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Si_1.93-3.07 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0001",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_Si4",
+      "description": "Silicon Flux Intensity, Channel Si4, 3.07 MeV/n to 5.24 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Si_3.07-5.24 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0001",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "FeloE",
+      "description": "Iron Flux Intensity, Channel FeloE, 0.12 MeV/n to 0.43 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Felo_0.12-0.43 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+07",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Fe1",
+      "description": "Iron Flux Intensity, Channel Fe1, 0.43 MeV/n to 0.64 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Fe_0.43-0.64 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+07",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Fe2",
+      "description": "Iron Flux Intensity, Channel Fe2, 0.65 MeV/n to 0.86 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Fe_0.65-0.86 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+07",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Fe3",
+      "description": "Iron Flux Intensity, Channel Fe3, 0.86 MeV/n to 1.93 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Fe_0.86-1.93 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+07",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "Fe4",
+      "description": "Iron Flux Intensity, Channel Fe4, 1.93 MeV/n to 3.07 MeV/n",
+      "type": "unknown",
+      "units": "(cm^2 s sr MeV/n)^-1",
+      "label": "Fe_1.93-3.07 MeV/n",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "1.0e+07",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_FeloE",
+      "description": "Iron Flux Intensity, Channel FeloE, 0.12 MeV/n to 0.43 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Felo_0.12-0.43 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_Fe1",
+      "description": "Iron Flux Intensity, Channel Fe1, 0.43 MeV/n to 0.64 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Fe_0.43-0.64 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_Fe2",
+      "description": "Iron Flux Intensity, Channel Fe2, 0.65 MeV/n to 0.86 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Fe_0.65-0.86 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_Fe3",
+      "description": "Iron Flux Intensity, Channel Fe3, 0.86 MeV/n to 1.93 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Fe_0.86-1.93 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    },
+    {
+      "name": "unc_Fe4",
+      "description": "Iron Flux Intensity, Channel Fe4, 1.93 MeV/n to 3.07 MeV/n, Fractional Uncertainty",
+      "type": "unknown",
+      "units": null,
+      "label": "unc_Fe_1.93-3.07 MeV/n",
+      "x_SPDF_VALIDMIN": "1.0e-5",
+      "x_SPDF_VALIDMAX": "1.0",
+      "fill": "-1.0e+31"
+    }
+  ],
+  "additionalMetadata": [
+    {
+      "name": "ISTP",
+      "contentURL": "https://cdaweb.gsfc.nasa.gov/pub/software/cdawlib/0JSONS/ac_h2_sep_00000000_v01.json",
+      "aboutURL": "https://spdf.gsfc.nasa.gov/sp_use_of_cdf.html"
+    },
+    {
+      "name": "SPASE",
+      "contentURL": "https://cdaweb.gsfc.nasa.gov/registry/hdp/Spase.xql?id=spase://NASA/NumericalData/ACE/SEPICA/L2/PT1H",
+      "aboutURL": "https://spase-group.org/"
+    }
+  ],
+  "x_SPDF_INVENTORY": {
+    "intervals": [
+      {
+        "begin": "1997-10-08T00:00:00.000Z",
+        "end": "2005-02-04T23:00:00.000Z"
+      }
+    ]
+  }
+}

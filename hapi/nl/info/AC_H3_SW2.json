@@ -1,0 +1,142 @@
+{
+  "HAPI": "2.0",
+  "parameters": [
+    {
+      "name": "Time",
+      "type": "isotime",
+      "units": "UTC",
+      "length": 24,
+      "fill": null
+    },
+    {
+      "name": "vHe2",
+      "type": "double",
+      "units": "km/s",
+      "fill": "-1.0E31",
+      "description": "Solar Wind He++ speed, scalar"
+    },
+    {
+      "name": "vthHe2",
+      "type": "double",
+      "units": "km/s",
+      "fill": "-1.0E31",
+      "description": "Solar Wind He++ Thermal speed, scalar"
+    },
+    {
+      "name": "He_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality flag for the He++ speed data"
+    },
+    {
+      "name": "C6to5",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "C+6/C+5 Solar Wind charge_state Ratio"
+    },
+    {
+      "name": "C6to5_err",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "C+6/C+5 Statistical Uncertainty"
+    },
+    {
+      "name": "C6to5_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality flag for C+6/C+5 Solar Wind charge_state Ratio"
+    },
+    {
+      "name": "O7to6",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "O+7/O+6 Solar Wind charge_state Ratio"
+    },
+    {
+      "name": "O7to6_err",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "O+7/O+6 Statistical Uncertainty"
+    },
+    {
+      "name": "O7to6_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality flag for O+7/O+6 Solar Wind charge_state Ratio"
+    },
+    {
+      "name": "O8to6",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "O+8/O+6 Solar Wind charge_state Ratio"
+    },
+    {
+      "name": "O8to6_err",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "O+8/O+6 Statistical Uncertainty"
+    },
+    {
+      "name": "O8to6_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality flag for O+8/O+6 Solar Wind charge_state Ratio"
+    },
+    {
+      "name": "avqFe",
+      "type": "double",
+      "units": "ionic charge",
+      "fill": "-1.0E31",
+      "description": "Fe Solar Wind average charge state"
+    },
+    {
+      "name": "avqFe_err",
+      "type": "double",
+      "units": "ionic charge",
+      "fill": "-1.0E31",
+      "description": "Fe average charge state Statistical Uncertainty"
+    },
+    {
+      "name": "avqFe_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality flag for Fe Solar Wind average charge state"
+    },
+    {
+      "name": "FetoO",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "Fe/O Solar Wind elemental abundance ratio"
+    },
+    {
+      "name": "FetoO_err",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "Fe/O statistical uncertainty"
+    },
+    {
+      "name": "FetoO_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality Flag for Fe/O Solar Wind elemental abundance ratio"
+    }
+  ],
+  "startDate": "2012-06-01T00:40:44Z",
+  "stopDate": "2022-06-18T23:16:17Z",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/NotesA.html#AC_H3_SW2",
+  "contact": "G. Gloeckler @ University of Maryland"
+}

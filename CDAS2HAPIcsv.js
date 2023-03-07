@@ -1,5 +1,7 @@
 // Call the SPDF/CDAWeb API and respond with HAPI CSV.
 // Or, pass through CDAS cdf or text responses un-altered.
+// Test using defaults using
+//    node CDAS2HAPIcsv.js
 const fs      = require('fs');
 const request = require('request');
 const moment  = require('moment');
@@ -9,7 +11,7 @@ const argv    = require('yargs')
                         'id': 'AC_H2_MFI',
                         'parameters': 'Magnitude',
                         'start': '2009-06-01T00:00:00.000000000Z',
-                        'stop': '2009-06-01T00:00:01.000000000Z',
+                        'stop':  '2009-06-01T12:00:00.000000000Z',
                         'format': 'csv',
                         'encoding': 'gzip',
                         'debug': false,
@@ -60,10 +62,11 @@ function extractData(body) {
                 // .xxx.yyyy to .xxxyyy.
                 // Last replaces whitespace with comma (this assumes data are
                 // never strings with spaces).
+                // TODO: Remove last time value if equal to requested stop.
                 return line
                         .replace(/^([0-9]{2})-([0-9]{2})-([0-9]{4}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]{3})\.([0-9]{3})/, "$3-$2-$1T$4.$5$6Z")
                         .replace(/^([0-9]{2})-([0-9]{2})-([0-9]{4}) ([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3})\s/, "$3-$2-$1T$4Z ")
-                        .replace(/\s+/g,",")
+                        .replace(/\s+/g,",");
               } else {
                 return "";
               }
@@ -98,16 +101,9 @@ function extractURL(body) {
 
 function makeRequest(url, data, cb) {
 
-  if (DEBUG) {
-    console.error("Requesting: \n  " + url);
-  }
+  if (DEBUG) {console.error("Requesting: \n  " + url)}
 
-  let opts =
-              {
-                url: url,
-                strictSSL: false,
-                gzip: ENCODING
-              };
+  let opts = {"url": url, "strictSSL": false, "gzip": ENCODING};
 
   if (data == true && FORMAT !== 'csv') {
     // Pass through.
@@ -126,9 +122,7 @@ function makeRequest(url, data, cb) {
         console.error("Non-200 HTTP status code: " + response.statusCode);
         process.exit(1);
       }
-      if (DEBUG) {
-        console.error("Finished request:\n  " + url);
-      }
+      if (DEBUG) {console.error("Finished request:\n  " + url)}
       cb(body);
   })
 }

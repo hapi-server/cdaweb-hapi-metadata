@@ -1,0 +1,63 @@
+{
+  "HAPI": "2.0",
+  "parameters": [
+    {
+      "name": "Time",
+      "type": "isotime",
+      "units": "UTC",
+      "length": 24,
+      "fill": null
+    },
+    {
+      "name": "Magnitude",
+      "type": "double",
+      "units": "nT",
+      "fill": "-1.0E31",
+      "description": "B-field magnitude"
+    },
+    {
+      "name": "BGSEc",
+      "type": "double",
+      "units": "nT",
+      "fill": "-1.0E31",
+      "description": "Magnetic Field Vector in GSE Cartesian coordinates (4 min)",
+      "size": [
+        3
+      ]
+    },
+    {
+      "name": "BGSM",
+      "type": "double",
+      "units": "nT",
+      "fill": "-1.0E31",
+      "description": "Magnetic field vector in GSM coordinates (4 min)",
+      "size": [
+        3
+      ]
+    },
+    {
+      "name": "SC_pos_GSE",
+      "type": "double",
+      "units": "km",
+      "fill": "-1.0E31",
+      "description": "ACE s/c position, 3 comp. in GSE coord.",
+      "size": [
+        3
+      ]
+    },
+    {
+      "name": "SC_pos_GSM",
+      "type": "double",
+      "units": "km",
+      "fill": "-1.0E31",
+      "description": "ACE s/c position, 3 comp. in GSM coord.",
+      "size": [
+        3
+      ]
+    }
+  ],
+  "startDate": "1997-09-02T00:00:00Z",
+  "stopDate": "2022-12-20T23:56:00Z",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/NotesA.html#AC_H1_MFI",
+  "contact": "N. Ness @ Bartol Research Institute"
+}

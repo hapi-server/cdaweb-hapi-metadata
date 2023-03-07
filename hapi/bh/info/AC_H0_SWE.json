@@ -1,0 +1,124 @@
+{
+  "HAPI": "3.1",
+  "creationDate": "2023-03-05T14:38:07.492Z",
+  "x_SPDF_CAVEAT": "This is a prototype implementation which may change or be eliminated at any time. The metadata returned by info and data may be different. The metadata values returned by a data request are more accurate. The two data JSON formats do not conform to the HAPI specification.  The official cdaweb HAPI server is available at https://cdaweb.gsfc.nasa.gov/hapi",
+  "description": "Solar Wind Ion parameters from ACE/SWEPAM. Level 2 data, 64-second averages. Parameters include proton density, temperature (radial component) and flow speed, flow velocity vector in GSE, GSM and RTN coordinates, and alpha to proton density ratio. ACE position vectors in GSE and GSM are included. The data are accessible via ftp in HDF and CDF from the ACE Science Center and CDAWeb, respectively, and in ASCII format from the value-added interfaces at those sites. Hourly averaged L2 plasma parameters are also available from these access paths. The \"parameter keys\" given below are as used by CDAWeb.",
+  "startDate": "1998-02-04T00:00:12Z",
+  "stopDate": "2023-01-05T14:38:07.492Z",
+  "time": "Epoch",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/cgi-bin/eval2.cgi?dataset=AC_H0_SWE&index=sp_phys",
+  "resourceID": "spase://NASA/NumericalData/ACE/SWEPAM/L2/PT64S",
+  "x_SPDF_ID": "AC_H0_SWE",
+  "x_SPDF_DOI": "https://doi.org/10.48322/tsfn-6v47",
+  "cadence": "PT1M4S",
+  "contact": "Ruth.Skoug",
+  "contactID": "spase://SMWG/Person/Ruth.Skoug",
+  "parameters": [
+    {
+      "name": "Np",
+      "description": "Solar Wind Proton Number Density, scalar",
+      "type": "unknown",
+      "units": "cm^-3",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "200.0",
+      "fill": "-1.0E31"
+    },
+    {
+      "name": "Vp",
+      "description": "Solar Wind Bulk Speed",
+      "type": "unknown",
+      "units": "km/s",
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "2500.0",
+      "fill": "-1.0E31"
+    },
+    {
+      "name": "Tpr",
+      "description": "radial component of the proton temperature",
+      "type": "unknown",
+      "units": "Kelvin",
+      "x_SPDF_VALIDMIN": "1000.0",
+      "x_SPDF_VALIDMAX": "1100000.0",
+      "fill": "-1.0E31"
+    },
+    {
+      "name": "alpha_ratio",
+      "description": "alpha to proton density ratio",
+      "type": "unknown",
+      "units": null,
+      "x_SPDF_VALIDMIN": "0.0",
+      "x_SPDF_VALIDMAX": "10.0",
+      "fill": "-1.0E31"
+    },
+    {
+      "name": "V_GSE",
+      "description": "Solar Wind Velocity in GSE cartesian coordinates, 64-second average",
+      "type": "unknown",
+      "size": [
+        3
+      ],
+      "units": "km/s",
+      "fill": null
+    },
+    {
+      "name": "V_RTN",
+      "description": "Solar Wind Velocity in RTN cartesian coordinates, 64-second average",
+      "type": "unknown",
+      "size": [
+        3
+      ],
+      "units": "km/s",
+      "fill": null
+    },
+    {
+      "name": "V_GSM",
+      "description": "Solar Wind Velocity in GSM cartesian coordinates, 64-second average",
+      "type": "unknown",
+      "size": [
+        3
+      ],
+      "units": "km/s",
+      "fill": null
+    },
+    {
+      "name": "SC_pos_GSE",
+      "description": "ACE s/c position in GSE coordinates",
+      "type": "unknown",
+      "size": [
+        3
+      ],
+      "units": "km",
+      "fill": null
+    },
+    {
+      "name": "SC_pos_GSM",
+      "description": "ACE s/c position in GSM coordinates",
+      "type": "unknown",
+      "size": [
+        3
+      ],
+      "units": "km",
+      "fill": null
+    }
+  ],
+  "additionalMetadata": [
+    {
+      "name": "ISTP",
+      "contentURL": "https://cdaweb.gsfc.nasa.gov/pub/software/cdawlib/0JSONS/ac_h0_swe_00000000_v01.json",
+      "aboutURL": "https://spdf.gsfc.nasa.gov/sp_use_of_cdf.html"
+    },
+    {
+      "name": "SPASE",
+      "contentURL": "https://cdaweb.gsfc.nasa.gov/registry/hdp/Spase.xql?id=spase://NASA/NumericalData/ACE/SWEPAM/L2/PT64S",
+      "aboutURL": "https://spase-group.org/"
+    }
+  ],
+  "x_SPDF_INVENTORY": {
+    "intervals": [
+      {
+        "begin": "1998-02-04T00:00:31.000Z",
+        "end": "2021-03-12T23:59:38.000Z"
+      }
+    ]
+  }
+}

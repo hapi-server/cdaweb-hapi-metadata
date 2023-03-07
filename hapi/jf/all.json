@@ -1,0 +1,147 @@
+[
+  {
+    "id": "AC_OR_DEF",
+    "info": {
+      "HAPI": "2.0",
+      "modificationDate": "2023-03-05T14:44:22.716Z",
+      "parameters": [
+        {
+          "fill": null,
+          "length": 24,
+          "name": "Time",
+          "type": "isotime",
+          "units": "UTC"
+        },
+        {
+          "description": "AC/DEF  ACE s/c position, 3 comp. in GSE coord.",
+          "fill": "-1.0E31",
+          "name": "X_GSE",
+          "type": "double",
+          "units": "km"
+        },
+        {
+          "description": "AC/DEF  ACE s/c position, 3 comp. in GSE coord.",
+          "fill": "-1.0E31",
+          "name": "Y_GSE",
+          "type": "double",
+          "units": "km"
+        },
+        {
+          "description": "AC/DEF  ACE s/c position, 3 comp. in GSE coord.",
+          "fill": "-1.0E31",
+          "name": "Z_GSE",
+          "type": "double",
+          "units": "km"
+        },
+        {
+          "description": "AC/DEF  ACE s/c position, 3 comp. in J2000GCI coord.",
+          "fill": "-1.0E31",
+          "name": "X_GCI",
+          "type": "double",
+          "units": "km"
+        },
+        {
+          "description": "AC/DEF  ACE s/c position, 3 comp. in J2000GCI coord.",
+          "fill": "-1.0E31",
+          "name": "Y_GCI",
+          "type": "double",
+          "units": "km"
+        },
+        {
+          "description": "AC/DEF  ACE s/c position, 3 comp. in J2000GCI coord.",
+          "fill": "-1.0E31",
+          "name": "Z_GCI",
+          "type": "double",
+          "units": "km"
+        }
+      ],
+      "sampleStartDate": "1997-08-26T00:00:00.000Z",
+      "sampleStopDate": "2023-03-01T00:00:00.000Z",
+      "startDate": "1997-08-26T00:00:00.000Z",
+      "stopDate": "2023-03-01T00:00:00.000Z"
+    }
+  },
+  {
+    "id": "AC_OR_SSC",
+    "info": {
+      "HAPI": "2.0",
+      "modificationDate": "2023-03-05T14:44:22.355Z",
+      "parameters": [
+        {
+          "fill": null,
+          "length": 24,
+          "name": "Time",
+          "type": "isotime",
+          "units": "UTC"
+        },
+        {
+          "description": "SSC  ACE X/Y/Z GSE coordinates (time-series)",
+          "fill": "-1.0E31",
+          "name": "x",
+          "type": "double",
+          "units": "km"
+        },
+        {
+          "description": "SSC  ACE X/Y/Z GSE coordinates (time-series)",
+          "fill": "-1.0E31",
+          "name": "y",
+          "type": "double",
+          "units": "km"
+        },
+        {
+          "description": "SSC  ACE X/Y/Z GSE coordinates (time-series)",
+          "fill": "-1.0E31",
+          "name": "z",
+          "type": "double",
+          "units": "km"
+        },
+        {
+          "description": "SSC",
+          "fill": "-9.999999848243207E30",
+          "name": "x",
+          "type": "double",
+          "units": "KM"
+        },
+        {
+          "description": "SSC",
+          "fill": "-9.999999848243207E30",
+          "name": "y",
+          "type": "double",
+          "units": "KM"
+        },
+        {
+          "description": "SSC",
+          "fill": "-9.999999848243207E30",
+          "name": "z",
+          "type": "double",
+          "units": "KM"
+        },
+        {
+          "description": "SSC  ACE GSE latitude",
+          "fill": "-1.0E31",
+          "name": "GSE_LAT",
+          "type": "double",
+          "units": "Deg"
+        },
+        {
+          "description": "SSC  ACE GSE longitude",
+          "fill": "-1.0E31",
+          "name": "GSE_LON",
+          "type": "double",
+          "units": "Deg"
+        },
+        {
+          "description": "SSC  ACE distance from Earth (km)",
+          "fill": "-1.0E31",
+          "name": "RADIUS",
+          "type": "double",
+          "units": "KM"
+        }
+      ],
+      "sampleStartDate": "1997-08-25T17:48:00.000Z",
+      "sampleStopDate": "2023-04-24T23:48:00.000Z",
+      "startDate": "1997-08-25T17:48:00.000Z",
+      "stopDate": "2023-04-24T23:48:00.000Z"
+    }
+  }
+]

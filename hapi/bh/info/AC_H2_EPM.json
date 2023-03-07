@@ -1,0 +1,882 @@
+{
+  "HAPI": "3.1",
+  "creationDate": "2023-03-05T14:38:17.982Z",
+  "x_SPDF_CAVEAT": "This is a prototype implementation which may change or be eliminated at any time. The metadata returned by info and data may be different. The metadata values returned by a data request are more accurate. The two data JSON formats do not conform to the HAPI specification.  The official cdaweb HAPI server is available at https://cdaweb.gsfc.nasa.gov/hapi",
+  "description": "ACE Electron Proton Alpha Monitor (EPAM) Level 2 intensities at 1-hour time resolution. Calibrated science quality data. The data are accessible via ftp in HDF and CDF from the ACE Science Center and CDAWeb, respectively, and in ASCII format from the value-added interfaces at those sites. The \"parameter keys\" given below are as used by CDAWeb. Daily and 27-day averages are also available via the ASC paths given below.",
+  "startDate": "1997-08-29T00:00:00Z",
+  "stopDate": "2023-01-05T14:38:17.982Z",
+  "time": "Epoch",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/cgi-bin/eval2.cgi?dataset=AC_H2_EPM&index=sp_phys",
+  "resourceID": "spase://NASA/NumericalData/ACE/EPAM/L2/PT1H",
+  "x_SPDF_ID": "AC_H2_EPM",
+  "x_SPDF_DOI": "https://doi.org/10.48322/pn1t-zx03",
+  "cadence": "PT1H",
+  "contact": "Dennis.Haggerty",
+  "contactID": "spase://SMWG/Person/Dennis.Haggerty",
+  "parameters": [
+    {
+      "name": "P1",
+      "description": "LEMS30 0.047-0.065 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "P2",
+      "description": "LEMS30 0.065-0.112 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "P3",
+      "description": "LEMS30 0.112-0.187 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "P4",
+      "description": "LEMS30 0.187-0.310 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "P5",
+      "description": "LEMS30 0.310-0.580 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "P6",
+      "description": "LEMS30 0.580-1.06 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "P7",
+      "description": "LEMS30 1.06-1.91 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "P8",
+      "description": "LEMS30 1.91-4.75 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "unc_P1",
+      "description": "Fractional uncertainty (statistical) in the P1 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_P2",
+      "description": "Fractional uncertainty (statistical) in the P2 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_P3",
+      "description": "Fractional uncertainty (statistical) in the P3 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_P4",
+      "description": "Fractional uncertainty (statistical) in the P4 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_P5",
+      "description": "Fractional uncertainty (statistical) in the P5 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_P6",
+      "description": "Fractional uncertainty (statistical) in the P6 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_P7",
+      "description": "Fractional uncertainty (statistical) in the P7 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_P8",
+      "description": "Fractional uncertainty (statistical) in the P8 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "DE1",
+      "description": "DE 0.038-0.053 MeV Electron Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "DE2",
+      "description": "DE 0.053-0.103 MeV Electron Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "DE3",
+      "description": "DE 0.103-0.175 MeV Electron Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "DE4",
+      "description": "DE 0.175-0.315 MeV Electron Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "unc_DE1",
+      "description": "Fractional uncertainty (statistical) in the DE1 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_DE2",
+      "description": "Fractional uncertainty (statistical) in the DE2 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_DE3",
+      "description": "Fractional uncertainty (statistical) in the DE3 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_DE4",
+      "description": "Fractional uncertainty (statistical) in the DE4 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "W3",
+      "description": "CA60 0.389-1.28 MeV/nuc. He Flux)",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV/nuc.)",
+      "fill": null
+    },
+    {
+      "name": "W4",
+      "description": "CA60 1.28-6.98 MeV/nuc. He Flux)",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV/nuc.)",
+      "fill": null
+    },
+    {
+      "name": "W5",
+      "description": "CA60 0.465-1.71 MeV/nuc. CNO Flux)",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV/nuc.)",
+      "fill": null
+    },
+    {
+      "name": "W6",
+      "description": "CA60 1.71-19.1 MeV/nuc. CNO Flux)",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV/nuc.)",
+      "fill": null
+    },
+    {
+      "name": "W7",
+      "description": "CA60 0.239-0.840 MeV/nuc. Fe (9 lt Z lt 29) Flux)",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV/nuc.)",
+      "fill": null
+    },
+    {
+      "name": "W8",
+      "description": "CA60 0.840-92.7 MeV/nuc. Fe (9 lt Z lt 29) Flux)",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV/nuc.)",
+      "fill": null
+    },
+    {
+      "name": "unc_W3",
+      "description": "Fractional uncertainty (statistical) in the W3 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_W4",
+      "description": "Fractional uncertainty (statistical) in the W4 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_W5",
+      "description": "Fractional uncertainty (statistical) in the W5 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_W6",
+      "description": "Fractional uncertainty (statistical) in the W6 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_W7",
+      "description": "Fractional uncertainty (statistical) in the W7 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_W8",
+      "description": "Fractional uncertainty (statistical) in the W8 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "E1p",
+      "description": "LEFS60 0.045-0.062 MeV Electron Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "E2p",
+      "description": "LEFS60 0.062-0.103 MeV Electron Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "E3p",
+      "description": "LEFS60 0.103-0.175 MeV Electron Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "E4p",
+      "description": "LEFS60 0.175-0.312 MeV Electron Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "FP5p",
+      "description": "LEFS60 0.546-0.761 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "FP6p",
+      "description": "LEFS60 0.761-1.22 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "FP7p",
+      "description": "LEFS60 1.22-4.97 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "unc_E1p",
+      "description": "Fractional uncertainty (statistical) in the E1p flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_E2p",
+      "description": "Fractional uncertainty (statistical) in the E2p flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_E3p",
+      "description": "Fractional uncertainty (statistical) in the E3p flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_E4p",
+      "description": "Fractional uncertainty (statistical) in the E4p flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_FP5p",
+      "description": "Fractional uncertainty (statistical) in the FP5p flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_FP6p",
+      "description": "Fractional uncertainty (statistical) in the FP6p flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_FP7p",
+      "description": "Fractional uncertainty (statistical) in the FP7p flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "Z2",
+      "description": "WARTD Z>1 E>0.7 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2-s-sr)",
+      "fill": null
+    },
+    {
+      "name": "Z2A",
+      "description": "WARTD Z>7 E>7.5 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2-s-sr)",
+      "fill": null
+    },
+    {
+      "name": "Z3",
+      "description": "WARTD Z>5 E>2.5 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2-s-sr)",
+      "fill": null
+    },
+    {
+      "name": "Z4",
+      "description": "WARTD Z>10 E>9.0 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2-s-sr)",
+      "fill": null
+    },
+    {
+      "name": "unc_Z2",
+      "description": "Fractional uncertainty (statistical) in the Z2 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_Z2A",
+      "description": "Fractional uncertainty (statistical) in the Z2A flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_Z3",
+      "description": "Fractional uncertainty (statistical) in the Z3 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_Z4",
+      "description": "Fractional uncertainty (statistical) in the Z4 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "P1p",
+      "description": "LEMS120 0.047-0.066 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "P2p",
+      "description": "LEMS120 0.066-0.114 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "P3p",
+      "description": "LEMS120 0.114-0.190 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "P4p",
+      "description": "LEMS120 0.190-0.310 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "P5p",
+      "description": "LEMS120 0.310-0.580 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "P6p",
+      "description": "LEMS120 0.580-1.05 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "P7p",
+      "description": "LEMS120 1.05-1.89 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "P8p",
+      "description": "LEMS120 1.89-4.75 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "unc_P1p",
+      "description": "Fractional uncertainty (statistical) in the P1p flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_P2p",
+      "description": "Fractional Uncertainty (statistical) in the P2p flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_P3p",
+      "description": "Fractional uncertainty (statistical) in the P3p flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_P4p",
+      "description": "Fractional uncertainty (statistical) in the P4p flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_P5p",
+      "description": "Fractional uncertainty (statistical) in the P5p flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_P6p",
+      "description": "Fractional uncertainty (statistical) in the P6p flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_P7p",
+      "description": "Fractional uncertainty (statistical) in the P7p flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_P8p",
+      "description": "Fractional uncertainty (statistical) in the P8p flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "E1",
+      "description": "LEFS150 0.045-0.062 MeV Electron Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "E2",
+      "description": "LEFS150 0.062-0.102 MeV Electron Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "E3",
+      "description": "LEFS150 0.102-0.175 MeV Electron Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "E4",
+      "description": "LEFS150 0.175-0.312 MeV Electron Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "FP5",
+      "description": "LEFS150 0.540-0.765 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "FP6",
+      "description": "LEFS150 0.765-1.22 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "FP7",
+      "description": "LEFS150 1.22-4.94 MeV Ion Flux",
+      "type": "unknown",
+      "units": "1/(cm^2 s sr MeV)",
+      "fill": null
+    },
+    {
+      "name": "unc_E1",
+      "description": "Fractional uncertainty (statistical) in the E1 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_E2",
+      "description": "Fractional uncertainty (statistical) in the E2 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_E3",
+      "description": "Fractional uncertainty (statistical) in the E3 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_E4",
+      "description": "Fractional uncertainty (statistical) in the E4 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_FP5",
+      "description": "Fractional uncertainty (statistical) in the FP5 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_FP6",
+      "description": "Fractional uncertainty (statistical) in the FP6 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    },
+    {
+      "name": "unc_FP7",
+      "description": "Fractional uncertainty (statistical) in the FP7 flux",
+      "type": "unknown",
+      "units": "Ratio",
+      "fill": null
+    }
+  ],
+  "additionalMetadata": [
+    {
+      "name": "ISTP",
+      "contentURL": "https://cdaweb.gsfc.nasa.gov/pub/software/cdawlib/0JSONS/ac_h2_epm_00000000_v01.json",
+      "aboutURL": "https://spdf.gsfc.nasa.gov/sp_use_of_cdf.html"
+    },
+    {
+      "name": "SPASE",
+      "contentURL": "https://cdaweb.gsfc.nasa.gov/registry/hdp/Spase.xql?id=spase://NASA/NumericalData/ACE/EPAM/L2/PT1H",
+      "aboutURL": "https://spase-group.org/"
+    }
+  ],
+  "x_SPDF_INVENTORY": {
+    "intervals": [
+      {
+        "begin": "1997-08-30T17:00:00.000Z",
+        "end": "1997-09-13T22:59:00.000Z"
+      },
+      {
+        "begin": "1997-09-14T00:00:00.000Z",
+        "end": "1997-09-14T22:59:00.000Z"
+      },
+      {
+        "begin": "1997-09-15T00:00:00.000Z",
+        "end": "1997-09-26T22:59:00.000Z"
+      },
+      {
+        "begin": "1997-09-27T00:00:00.000Z",
+        "end": "1997-12-08T22:59:00.000Z"
+      },
+      {
+        "begin": "1997-12-09T00:00:00.000Z",
+        "end": "1997-12-09T22:59:00.000Z"
+      },
+      {
+        "begin": "1997-12-10T00:00:00.000Z",
+        "end": "1997-12-10T22:59:00.000Z"
+      },
+      {
+        "begin": "1997-12-11T00:00:00.000Z",
+        "end": "1997-12-11T22:59:00.000Z"
+      },
+      {
+        "begin": "1997-12-12T00:00:00.000Z",
+        "end": "1997-12-12T22:59:00.000Z"
+      },
+      {
+        "begin": "1997-12-13T00:00:00.000Z",
+        "end": "1997-12-13T22:59:00.000Z"
+      },
+      {
+        "begin": "1997-12-14T00:00:00.000Z",
+        "end": "1997-12-15T22:59:00.000Z"
+      },
+      {
+        "begin": "1997-12-16T00:00:00.000Z",
+        "end": "1997-12-31T23:00:00.000Z"
+      },
+      {
+        "begin": "1998-01-01T01:00:00.000Z",
+        "end": "1998-06-06T22:59:00.000Z"
+      },
+      {
+        "begin": "1998-06-07T00:00:00.000Z",
+        "end": "1998-06-07T22:59:00.000Z"
+      },
+      {
+        "begin": "1998-06-08T00:00:00.000Z",
+        "end": "1998-06-08T22:59:00.000Z"
+      },
+      {
+        "begin": "1998-06-09T00:00:00.000Z",
+        "end": "1998-06-09T22:59:00.000Z"
+      },
+      {
+        "begin": "1998-06-10T00:00:00.000Z",
+        "end": "1998-06-10T22:59:00.000Z"
+      },
+      {
+        "begin": "1998-06-11T00:00:00.000Z",
+        "end": "1998-06-11T22:59:00.000Z"
+      },
+      {
+        "begin": "1998-06-12T00:00:00.000Z",
+        "end": "1998-11-15T22:59:00.000Z"
+      },
+      {
+        "begin": "1998-11-16T00:00:00.000Z",
+        "end": "1998-11-18T22:59:00.000Z"
+      },
+      {
+        "begin": "1998-11-19T00:00:00.000Z",
+        "end": "1998-12-31T23:00:00.000Z"
+      },
+      {
+        "begin": "1999-01-01T01:00:00.000Z",
+        "end": "1999-12-31T23:00:00.000Z"
+      },
+      {
+        "begin": "2000-01-01T01:00:00.000Z",
+        "end": "2000-05-12T23:00:00.000Z"
+      },
+      {
+        "begin": "2000-05-13T00:01:00.000Z",
+        "end": "2000-12-31T23:00:00.000Z"
+      },
+      {
+        "begin": "2001-01-01T01:00:00.000Z",
+        "end": "2001-12-31T23:00:00.000Z"
+      },
+      {
+        "begin": "2002-01-01T01:00:00.000Z",
+        "end": "2002-12-31T23:00:00.000Z"
+      },
+      {
+        "begin": "2003-01-01T01:00:00.000Z",
+        "end": "2003-12-31T23:00:00.000Z"
+      },
+      {
+        "begin": "2004-01-01T01:00:00.000Z",
+        "end": "2004-12-31T23:00:00.000Z"
+      },
+      {
+        "begin": "2005-01-01T01:00:00.000Z",
+        "end": "2005-12-31T23:00:00.000Z"
+      },
+      {
+        "begin": "2006-01-01T01:00:00.000Z",
+        "end": "2006-12-31T23:00:00.000Z"
+      },
+      {
+        "begin": "2007-01-01T01:00:00.000Z",
+        "end": "2007-12-31T23:00:00.000Z"
+      },
+      {
+        "begin": "2008-01-01T01:00:00.000Z",
+        "end": "2008-12-31T23:00:00.000Z"
+      },
+      {
+        "begin": "2009-01-01T01:00:00.000Z",
+        "end": "2009-04-23T22:59:00.000Z"
+      },
+      {
+        "begin": "2009-04-24T00:00:00.000Z",
+        "end": "2009-05-13T22:59:00.000Z"
+      },
+      {
+        "begin": "2009-05-14T00:00:00.000Z",
+        "end": "2009-12-12T22:59:00.000Z"
+      },
+      {
+        "begin": "2009-12-13T00:00:00.000Z",
+        "end": "2009-12-31T23:00:00.000Z"
+      },
+      {
+        "begin": "2010-01-01T01:00:00.000Z",
+        "end": "2010-06-17T22:59:00.000Z"
+      },
+      {
+        "begin": "2010-06-18T00:00:00.000Z",
+        "end": "2010-12-31T23:00:00.000Z"
+      },
+      {
+        "begin": "2011-01-01T01:00:00.000Z",
+        "end": "2011-12-31T23:00:00.000Z"
+      },
+      {
+        "begin": "2012-01-01T01:00:00.000Z",
+        "end": "2012-01-17T22:59:00.000Z"
+      },
+      {
+        "begin": "2012-01-18T00:00:00.000Z",
+        "end": "2012-12-31T23:00:00.000Z"
+      },
+      {
+        "begin": "2013-01-01T01:00:00.000Z",
+        "end": "2013-05-16T22:59:00.000Z"
+      },
+      {
+        "begin": "2013-05-17T00:00:00.000Z",
+        "end": "2013-09-19T22:59:00.000Z"
+      },
+      {
+        "begin": "2013-09-20T00:00:00.000Z",
+        "end": "2013-09-23T22:59:00.000Z"
+      },
+      {
+        "begin": "2013-09-24T00:00:00.000Z",
+        "end": "2013-09-27T22:59:00.000Z"
+      },
+      {
+        "begin": "2013-09-28T00:00:00.000Z",
+        "end": "2013-09-28T22:59:00.000Z"
+      },
+      {
+        "begin": "2013-09-29T00:00:00.000Z",
+        "end": "2013-09-29T22:59:00.000Z"
+      },
+      {
+        "begin": "2013-09-30T00:00:00.000Z",
+        "end": "2013-10-25T22:59:00.000Z"
+      },
+      {
+        "begin": "2013-10-26T00:00:00.000Z",
+        "end": "2013-12-31T23:00:00.000Z"
+      },
+      {
+        "begin": "2014-01-01T01:00:00.000Z",
+        "end": "2014-12-31T23:00:00.000Z"
+      },
+      {
+        "begin": "2015-01-01T01:00:00.000Z",
+        "end": "2015-05-31T22:59:00.000Z"
+      },
+      {
+        "begin": "2015-06-01T00:00:00.000Z",
+        "end": "2015-06-02T22:59:00.000Z"
+      },
+      {
+        "begin": "2015-06-03T00:00:00.000Z",
+        "end": "2015-06-10T22:59:00.000Z"
+      },
+      {
+        "begin": "2015-06-11T00:00:00.000Z",
+        "end": "2015-09-09T22:59:00.000Z"
+      },
+      {
+        "begin": "2015-09-10T00:00:00.000Z",
+        "end": "2018-03-03T22:59:00.000Z"
+      },
+      {
+        "begin": "2018-03-04T00:00:00.000Z",
+        "end": "2018-03-04T22:59:00.000Z"
+      },
+      {
+        "begin": "2018-03-05T00:00:00.000Z",
+        "end": "2019-04-10T22:59:00.000Z"
+      },
+      {
+        "begin": "2019-04-11T00:00:00.000Z",
+        "end": "2019-04-19T23:00:00.000Z"
+      },
+      {
+        "begin": "2019-04-21T00:00:00.000Z",
+        "end": "2022-11-17T23:00:00.000Z"
+      }
+    ]
+  }
+}

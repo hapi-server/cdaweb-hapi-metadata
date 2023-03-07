@@ -1,0 +1,67 @@
+{
+  "id": "AC_K1_MFI",
+  "title": "ACE Magnetic Field 16-Second Key Parameters [PRELIM] - N. Ness (Bartol Research Institute)",
+  "info": {
+    "startDate": "2017-07-01T00:00:00Z",
+    "stopDate": "2023-02-16T23:59:48Z",
+    "sampleStartDate": "2017-07-01T00:00:11.000Z",
+    "sampleStopDate": "2017-07-01T06:24:10.000Z",
+    "x_sampleRecords": 1441,
+    "cadence": "PT16S",
+    "contact": "N. Ness @ Bartol Research Institute",
+    "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_K1_MFI",
+    "resourceID": "spase://NASA/NumericalData/ACE/MAG/KeyParameter/PT16S",
+    "x_creationDate": "2017-03-12",
+    "x_datasetCitation": "Please acknowledge the Principal Investigator, N. Ness of Bartol Research Institute",
+    "x_datasetTermsOfUse": "See the rules of use available from the ACE Science Center at: http://www.srl.caltech.edu/ACE/",
+    "parameters": [
+      {
+        "name": "Time",
+        "type": "isotime",
+        "units": "UTC",
+        "length": 24,
+        "fill": "0000-01-01T00:00:00.000Z"
+      },
+      {
+        "name": "dBrms",
+        "description": "[PRELIMINARY VALUES - BROWSE USE ONLY] RMS of Magnetic Field (16 sec period)",
+        "type": "double",
+        "x_labelTitle": "RMS of B (16 sec)",
+        "units": "nT",
+        "fill": "-1.0E31",
+        "label": "[PRELIM] dBrms"
+      },
+      {
+        "name": "Magnitude",
+        "description": "[PRELIMINARY VALUES - BROWSE USE ONLY] B-field magnitude",
+        "type": "double",
+        "x_labelTitle": "B-field magnitude",
+        "units": "nT",
+        "fill": "-1.0E31",
+        "label": "[PRELIM] <|B|>"
+      },
+      {
+        "name": "BGSEc",
+        "description": "[PRELIMINARY VALUES - BROWSE USE ONLY] Magnetic Field, Cartesian GSE coord",
+        "type": "double",
+        "x_labelTitle": "Mag Field, Cartesian GSE coord",
+        "units": "nT",
+        "fill": "-1.0E31",
+        "size": [
+          3
+        ],
+        "vectorComponents": [
+          "x",
+          "y",
+          "z"
+        ],
+        "coordinateSystemName": "GSE",
+        "label": [
+          "[PRELIM]BxGSE",
+          "[PRELIM]ByGSE",
+          "[PRELIM]BzGSE"
+        ]
+      }
+    ]
+  }
+}

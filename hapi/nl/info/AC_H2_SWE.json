@@ -1,0 +1,94 @@
+{
+  "HAPI": "2.0",
+  "parameters": [
+    {
+      "name": "Time",
+      "type": "isotime",
+      "units": "UTC",
+      "length": 24,
+      "fill": null
+    },
+    {
+      "name": "Np",
+      "type": "double",
+      "units": "#/cc",
+      "fill": "-1.0E31",
+      "description": "Solar Wind Proton Number Density, scalar"
+    },
+    {
+      "name": "Vp",
+      "type": "double",
+      "units": "km/s",
+      "fill": "-1.0E31",
+      "description": "Solar Wind Bulk Speed"
+    },
+    {
+      "name": "Tpr",
+      "type": "double",
+      "units": "Kelvin",
+      "fill": "-1.0E31",
+      "description": "radial component of the proton temperature"
+    },
+    {
+      "name": "alpha_ratio",
+      "type": "double",
+      "units": "ratio",
+      "fill": "-1.0E31",
+      "description": "alpha to proton density ratio"
+    },
+    {
+      "name": "V_GSE",
+      "type": "double",
+      "units": "km/s",
+      "fill": "-1.0E31",
+      "description": "Solar Wind Velocity in GSE coord., 3 components",
+      "size": [
+        3
+      ]
+    },
+    {
+      "name": "V_RTN",
+      "type": "double",
+      "units": "km/s",
+      "fill": "-1.0E31",
+      "description": "Solar Wind Velocity in RTN coord., 3 components",
+      "size": [
+        3
+      ]
+    },
+    {
+      "name": "V_GSM",
+      "type": "double",
+      "units": "km/s",
+      "fill": "-1.0E31",
+      "description": "Solar Wind Velocity in GSM coord., 3 comp.",
+      "size": [
+        3
+      ]
+    },
+    {
+      "name": "SC_pos_GSE",
+      "type": "double",
+      "units": "km",
+      "fill": "-1.0E31",
+      "description": "ACE s/c position, 3 comp. in GSE coord.",
+      "size": [
+        3
+      ]
+    },
+    {
+      "name": "SC_pos_GSM",
+      "type": "double",
+      "units": "km",
+      "fill": "-1.0E31",
+      "description": "ACE s/c position, 3 comp. in GSM coord.",
+      "size": [
+        3
+      ]
+    }
+  ],
+  "startDate": "1998-02-04T00:00:00Z",
+  "stopDate": "2021-03-12T23:00:00Z",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/NotesA.html#AC_H2_SWE",
+  "contact": "D. J. McComas @ SWRI"
+}

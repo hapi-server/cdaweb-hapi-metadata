@@ -23,23 +23,21 @@ inventory:
 	# <Start>1997-09-02T00:00:00.000Z</Start><End>1997-09-28T23:00:00.000Z</End>
 
 rsync:
-	rsync -avz  --delete cache weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata
-	rsync -avz  --delete all weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata
+	rsync -avz --delete cache weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata
+	rsync -avz --delete hapi weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata
+	rsync -avz --delete bin weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata
 
 compare-meta:
 	cd compare && mkdir -p meta && node compare-meta.js
 
-#cp cache/bw/all.json all/all-bw.json
 bw:
 	node CDAS2HAPIall.js --idregex '$(IDREGEX)'
-
-bwm:
-	node MASTERS2HAPIall.js --idregex '$(IDREGEX)'
 
 # Nand's Lal's (nl) production HAPI server
 nl:
 	node HAPI2HAPIall.js --version 'nl' --idregex '$(IDREGEX)'
 
+# Jeremy Faden's (jf) test version of nl's server
 nljf:
 	node HAPI2HAPIall.js --maxsockets 5 --version 'nljf' --idregex '$(IDREGEX)' --hapiurl 'https://jfaden.net/server/cdaweb/hapi'
 
@@ -67,37 +65,30 @@ distclean:
 	@make clean
 	@rm -rf node_modules/
 	@rm -rf bin/
-	@rm -rf all/
+	@rm -rf hapi/
 
 clean-bw:
-	@rm -f all/all-bw.json
-	@rm -f all/all-bw-full.json
+	@rm -rf hapi/bw/
 	@rm -rf cache/bw/
 
-clean-bwm:
-	@rm -f all/all-bwm.json
-	@rm -f all/all-bwm-full.json
-	@rm -rf cache/bwm/
-
 clean-jf:
-	@rm -f all/all-jf.json
+	@rm -rf hapi/jf/
 	@rm -rf cache/jf/
 
 clean-nl:
-	@rm -f all/all-nl.json
-	@rm -rf cache/nl
+	@rm -rf hapi/nl/
+	@rm -rf cache/nl/
 
 clean-nljf:
-	@rm -f all/all-nljf.json
-	@rm -rf cache/nljf
+	@rm -rf hapi/nljf/
+	@rm -rf cache/nljf/
 
 clean-bh:
-	@rm -f all/all-bh.json
-	@rm -rf cache/bh
+	@rm -rf hapi/bh/
+	@rm -rf cache/bh/
 
 clean:
 	make clean-bw
-	make clean-bwm
 	make clean-bh
 	make clean-nl
 	make clean-nljf

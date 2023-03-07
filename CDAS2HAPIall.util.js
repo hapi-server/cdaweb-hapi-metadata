@@ -1,53 +1,70 @@
 const fs = require('fs');
+
 module.exports.util = {
   "get": get,
   "execSync": require('child_process').execSync,
   "existsSync": fs.existsSync,
-  "mkdirSync": mkdirSync,
   "rmSync": rmSync,
-  "writeSync": fs.writeFileSync,
-  "writeAsync": fs.writeFile,
+  "writeSync": writeSync,
   "readSync": fs.readFileSync,
   "appendSync": appendSync,
+  "copy": function (obj) {return JSON.parse(JSON.stringify(obj))},
   "log": log,
   "warning": warning,
   "error": error,
   "obj2json": obj2json,
   "xml2js": xml2js,
+  "baseDir": baseDir,
   "incrementTime": incrementTime,
   "str2ISODateTime": str2ISODateTime,
   "str2ISODuration": str2ISODuration
 }
-
 util = module.exports.util;
 
-function mkdirSync(dir) {
+function rmSync(fname) {
+  {if (fs.existsSync(fname)) {fs.unlinkSync(fname)}}  
+}
+function appendSync(fname, data) {
+  const path = require('path');
+  let dir = path.dirname(fname);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, {recursive: true});
   }
-}
-function rmSync(dir) {
-  if (fs.existsSync(dir)) {
-    fs.rmSync(dir);
-  }  
-}
-function appendSync(fname, data) {
-  fs.appendFileSync(fname, data, {flags: "a+"});
+  fs.appendFileSync(fname, data, {flags: "a+"})
 }
 
+function writeSync(fname, data, opts) {
+  const path = require('path');
+  let dir = path.dirname(fname);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, {recursive: true});
+  }
+  //util.log('Writing: ' + fname);
+  fs.writeFileSync(fname, data, opts);
+}
 
+function baseDir(id) {
+  return util.argv.cachedir + '/' + id.split('_')[0] + '/' + id;
+}
+
+// pool should be set in outer-most scope. See
+// https://www.npmjs.com/package/request#requestoptions-callback
+let http = require('http');
+let pool = new http.Agent();
 function get(opts, cb) {
 
-  opts['pool'] = util.argv.pool;
+  const path = require("path");
   const request = require('request');
+
+  opts['pool'] = pool;
+  pool['maxSockets'] = util.argv.maxsockets;
 
   let outFile = opts['outFile'];
   let outFileHeaders = outFile +  ".httpheader";
-  const path = require("path");
   let outDir = path.dirname(outFile);
-  mkdirSync(outDir);
+
   let hrs = Infinity;
-  if (fs.existsSync(outFileHeaders)) {
+  if (fs.existsSync(outFileHeaders) && fs.existsSync(outFile)) {
     log.debug(`Stating: ${outFileHeaders}`);
     let stat = fs.statSync(outFileHeaders);
     hrs = (new Date().getTime() - stat['mtimeMs'])/3600000;
@@ -60,10 +77,10 @@ function get(opts, cb) {
   }
 
   if (hrs < util.argv.maxage && !opts['ignoreCache'] && fs.existsSync(outFileHeaders)) {
+
     opts.method = "HEAD";
     log("Requesting (HEAD): " + opts.uri);
     request(opts, function (err, res, body) {
-
       if (err) {
         error(null, [opts.uri, err], true);
         cb(err, null);
@@ -91,11 +108,13 @@ function get(opts, cb) {
   log("Requesting: " + opts.uri);
   opts.method = "GET";
   request(opts, function (err,res,body) {
+
     if (res && res.statusCode !== 200) {
       error(null, [opts.uri, "Status code " + res.statusCode], false);
       cb(null, null);
-      return;      
+      return;
     }
+
     if (err) {
       error(null, [opts.uri, err], false);
       cb(err, null);
@@ -105,7 +124,7 @@ function get(opts, cb) {
     }
 
     log("Writing: " + outFileHeaders);
-    fs.writeFileSync(outFileHeaders, obj2json(res.headers), 'utf-8');
+    util.writeSync(outFileHeaders, obj2json(res.headers), 'utf-8');
 
     parse(outFile, body, res.headers, cb);
   });
@@ -122,18 +141,29 @@ function get(opts, cb) {
   function parse(outFile, body, headers, cb) {
 
     if (body === null) {
+      // Cached local file
       if (outFile.endsWith(".cdf") === false) {
+        // If CDF file, processing is done from command line
+        // call, so don't need to ready.
         log("Reading: " + outFile);
         body = fs.readFileSync(outFile);
       }
     } else {
       log("Writing: " + outFile);
-      fs.writeFileSync(outFile, body, encoding(headers));
+      util.writeSync(outFile, body, encoding(headers));
+    }
+
+    if (opts["parse"] === false) {
+      // This option is used when we only want to download the file.
+      cb(null, body);
+      return;
     }
 
     if (/application\/json/.test(headers['content-type'])) {
       cb(null, JSON.parse(body));
     } else if (/text\/xml/.test(headers['content-type'])) {
+      xml2js(body, (err, obj) => cb(err, obj));
+    } else if (/application\/xml/.test(headers['content-type'])) {
       xml2js(body, (err, obj) => cb(err, obj));
     } else if (/application\/x-cdf/.test(headers['content-type'])) {
       cdf2json(outFile, (err, obj) => cb(err, obj));
@@ -163,7 +193,7 @@ function cdf2json(fnameCDF, cb) {
     util.log("Executing: " + cmd);
     cdfxml = util.execSync(cmd, {maxBuffer: 8*1024*1024});
   } catch (err) {
-    cb(err, null)
+    cb(err, null);
     return;
   }
 
@@ -172,15 +202,15 @@ function cdf2json(fnameCDF, cb) {
   util.writeSync(fnameXML, cdfxml, 'utf8');
 
   util.log("Converting " + fnameXML + " to JSON.");
-  util.xml2js(cdfxml, function (err, obj) {
-    util.log("Writing: " + fnameJSON);
-    util.writeSync(fnameJSON, obj2json(obj), 'utf8');
-    cb(err, {"json": obj, "xml": cdfxml});
+  util.xml2js(cdfxml,
+    function (err, obj) {
+      util.log("Writing: " + fnameJSON);
+      util.writeSync(fnameJSON, obj2json(obj), 'utf8');
+      cb(err, {"json": obj, "xml": cdfxml});
   });
 }
 
 function xml2js(body, cb) {
-  // Async xml2js function (used once).
   const _xml2js = require('xml2js').parseString;
   _xml2js(body, function (err, obj) {
     cb(null, {"json": obj, "xml": body.toString()});
@@ -191,22 +221,11 @@ function obj2json(obj) {
   return JSON.stringify(obj, null, 2);
 }
 
-log.debug = function (msg) {
-  if (util.argv.debug) {
-    if (typeof(msg) === "string") {
-      console.log("[debug] " + msg);        
-    } else {
-      console.log(msg);
-    }
-  }
-}
-
 function log(msg, color) {
 
-  mkdirSync(util.argv.cachedir);
   let fname = util.argv.cachedir + "/log.txt";
   if (!log.fname) {
-    fs.rmSync(fname, { recursive: true, force: true });
+    util.rmSync(fname, { recursive: true, force: true });
     log.fname = fname;
   }
   appendSync(fname, msg + "\n");
@@ -217,10 +236,19 @@ function log(msg, color) {
     console.log(msg);
   }
 }
+log.debug = function (msg) {
+  if (util.argv.debug) {
+    if (typeof(msg) === "string") {
+      console.log("[debug] " + msg);        
+    } else {
+      console.log(msg);
+    }
+  }
+}
 
 function warning(dsid, msg) {
-  let warnDir = util.argv.cachedir + "/" + dsid.split("_")[0];
-  mkdirSync(warnDir);
+
+  let warnDir = baseDir(dsid);
   let fname = warnDir + "/" + dsid + ".warning.txt";
   msgf = "  Warning: " + msg;
   if (!warning.fname) {
@@ -234,14 +262,14 @@ function warning(dsid, msg) {
 }
 
 function error(dsid, msg, exit) {
+
   let errorDir = util.argv.cachedir;
   if (dsid) {
     errorDir = util.argv.cachedir + "/" + dsid.split("_")[0];
   }
-  mkdirSync(errorDir);
-  let fname = errorDir + "/" + dsid + ".error.txt";
+  let fname = errorDir + "/" + dsid + "/" + ".error.txt";
   if (!error.fname) {
-    fs.rmSync(fname, { recursive: true, force: true });
+    fs.rmSync(fname, {"recursive": true, "force": true});
     error.fname = fname;
   }
   if (Array.isArray(msg)) {
@@ -254,16 +282,15 @@ function error(dsid, msg, exit) {
   const chalk = require("chalk");
   msg = chalk.red.bold("Error: ") + msg;
   if (dsid) {
-    msg = chalk.red.bold(dsid) + "\n" + msg;    
+    msg = chalk.red.bold(dsid) + "\n" + msg;
   }
   log(msg, msgf);
   if (exit === undefined || exit == true) {
     process.exit(1);
   }
 }
-// End convenience functions
-/////////////////////////////////////////////////////////////////////////////
 
+/////////////////////////////////////////////////////////////////////////////
 // Start time-related functions
 const moment  = require('moment');
 function incrementTime(timestr, incr, unit) {
@@ -274,13 +301,14 @@ function sameDateTime(a, b) {
 }
 function str2ISODateTime(stro) {
 
-  str = stro.trim();
+  let str = stro.trim();
 
   // e.g., 201707006
   str = str.replace(/^([0-9]{4})([0-9]{3})([0-9]{2})$/,"$1$2");
   if (str.length === 7) {    
     let y_doy = str.replace(/^([0-9]{4})([0-9]{3})$/,"$1-$2").split("-");
-    str = new Date(new Date(y_doy[0]+'-01-01Z').getTime() + parseInt(y_doy[1])*86400000).toISOString().slice(0,10);
+    str = new Date(new Date(y_doy[0]+'-01-01Z').getTime() 
+                  + parseInt(y_doy[1])*86400000).toISOString().slice(0,10);
   } else {
     str = str.replace(/([0-9]{4})([0-9]{2})([0-9]{2})/,"$1-$2-$3");
     str = str.replace(/([0-9]{4})-([0-9]{2})-([0-9]{2})/,"$1-$2-$3Z");
@@ -302,6 +330,7 @@ function str2ISODateTime(stro) {
   }  
 }
 function str2ISODuration(cadenceStr) {
+
   let cadence;
   if (cadenceStr.match(/day/)) {
     cadence = "P" + cadenceStr.replace(/\s.*days?/,'D');

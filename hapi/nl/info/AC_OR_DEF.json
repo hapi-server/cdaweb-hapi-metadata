@@ -1,0 +1,36 @@
+{
+  "HAPI": "2.0",
+  "parameters": [
+    {
+      "name": "Time",
+      "type": "isotime",
+      "units": "UTC",
+      "length": 24,
+      "fill": null
+    },
+    {
+      "name": "GSE_POS",
+      "type": "double",
+      "units": "km",
+      "fill": "-1.0E31",
+      "description": "ACE s/c position, 3 comp. in GSE coord.",
+      "size": [
+        3
+      ]
+    },
+    {
+      "name": "GCI_POS",
+      "type": "double",
+      "units": "km",
+      "fill": "-1.0E31",
+      "description": "ACE s/c position, 3 comp. in J2000GCI coord.",
+      "size": [
+        3
+      ]
+    }
+  ],
+  "startDate": "1997-08-26T00:00:00Z",
+  "stopDate": "2023-03-01T00:00:00Z",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/NotesA.html#AC_OR_DEF",
+  "contact": "E. C. Stone @ California Institute of Technology"
+}

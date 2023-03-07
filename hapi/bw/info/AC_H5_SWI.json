@@ -1,0 +1,375 @@
+{
+  "id": "AC_H5_SWI",
+  "title": "ACE/SWICS 1.1 Solar Wind 2-Hour Level 2 Q-state distributions - G. Gloeckler (University of Maryland)",
+  "info": {
+    "startDate": "1998-02-04T00:09:16Z",
+    "stopDate": "2011-08-21T21:40:53Z",
+    "sampleStartDate": "1998-02-04T00:09:16.000Z",
+    "sampleStopDate": "1998-06-05T04:31:16.000Z",
+    "x_sampleRecords": 1451,
+    "cadence": "PT2H",
+    "contact": "G. Gloeckler @ University of Maryland",
+    "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_H5_SWI",
+    "resourceID": "spase://NASA/NumericalData/ACE/SWICS_SWIMS/L2/ChargeState/PT2H",
+    "x_creationDate": "2015-11-18",
+    "x_datasetCitation": "Please acknowledge the Principal Investigator, G. Gloeckler of University of Maryland",
+    "x_datasetTermsOfUse": "See the rules of use available from the ACE Science Center at: http://www.srl.caltech.edu/ACE/ASC/level2/policy_lvl2.html",
+    "parameters": [
+      {
+        "name": "Time",
+        "type": "isotime",
+        "units": "UTC",
+        "length": 24,
+        "fill": "0000-01-01T00:00:00.000Z"
+      },
+      {
+        "name": "qdistC",
+        "description": "Carbon Solar Wind charge state distribution",
+        "type": "double",
+        "x_labelTitle": "Q_i(C), i=4...6",
+        "fill": "-1.0E31",
+        "label": [
+          "Q_4(C)",
+          "Q_5(C)",
+          "Q_6(C)"
+        ],
+        "size": [
+          3
+        ],
+        "units": null
+      },
+      {
+        "name": "qdistC_err",
+        "description": "Carbon Solar Wind charge state distribution statistical uncrtainty",
+        "type": "double",
+        "x_labelTitle": "Q_i(C)_err, i=4...6",
+        "fill": "-1.0E31",
+        "label": [
+          "Q_4(C)_err",
+          "Q_5(C)_err",
+          "Q_6(C)_err"
+        ],
+        "size": [
+          3
+        ],
+        "units": null
+      },
+      {
+        "name": "qflagsC",
+        "description": "Quality Flags for Carbon charge state distribution",
+        "type": "integer",
+        "x_labelTitle": "Qflag_i(C), i=4...6",
+        "fill": "-1",
+        "label": [
+          "Qflag_4(C)",
+          "Qflag_5(C)",
+          "Qflag_6(C)"
+        ],
+        "size": [
+          3
+        ],
+        "units": null
+      },
+      {
+        "name": "qdistO",
+        "description": "Oxygen Solar Wind charge state distribution",
+        "type": "double",
+        "x_labelTitle": "Q_i(O), i=5...8",
+        "fill": "-1.0E31",
+        "label": [
+          "Q_5(O)",
+          "Q_6(O)",
+          "Q_7(O)",
+          "Q_8(O)"
+        ],
+        "size": [
+          4
+        ],
+        "units": null
+      },
+      {
+        "name": "qdistO_err",
+        "description": "Oxygen Solar Wind charge state distribution statistical uncertainty",
+        "type": "double",
+        "x_labelTitle": "Q_i(O)_err, i=5...8",
+        "fill": "-1.0E31",
+        "label": [
+          "Q_5(O)_err",
+          "Q_6(O)_err",
+          "Q_7(O)_err",
+          "Q_8(O)_err"
+        ],
+        "size": [
+          4
+        ],
+        "units": null
+      },
+      {
+        "name": "qflagsO",
+        "description": "Quality Flags for Oxygen charge state distribution",
+        "type": "integer",
+        "x_labelTitle": "Qflag_i(O), i=5...8",
+        "fill": "-1",
+        "label": [
+          "Qflag_5(O)",
+          "Qflag_6(O)",
+          "Qflag_7(O)",
+          "Qflag_8(O)"
+        ],
+        "size": [
+          4
+        ],
+        "units": null
+      },
+      {
+        "name": "qdistNe",
+        "description": "Neon Solar Wind charge state distribution",
+        "type": "double",
+        "x_labelTitle": "Q_i(Ne), i=6...9",
+        "fill": "-1.0E31",
+        "label": [
+          "Q_8(Ne)",
+          "Q_9(Ne)"
+        ],
+        "size": [
+          2
+        ],
+        "units": null
+      },
+      {
+        "name": "qdistNe_err",
+        "description": "Neon Solar Wind charge state distribution statistical uncertainty",
+        "type": "double",
+        "x_labelTitle": "Q_i(Ne)_err, i=6...9",
+        "fill": "-1.0E31",
+        "label": [
+          "Q_8(Ne)_err",
+          "Q_9(Ne)_err"
+        ],
+        "size": [
+          2
+        ],
+        "units": null
+      },
+      {
+        "name": "qflagsNe",
+        "description": "Quality Flags for Neon charge state distribution",
+        "type": "integer",
+        "x_labelTitle": "Qflag_i(Ne), i=6...9",
+        "fill": "-1",
+        "label": [
+          "Qflag_8(Ne)",
+          "Qflag_9(Ne)"
+        ],
+        "size": [
+          2
+        ],
+        "units": null
+      },
+      {
+        "name": "qdistMg",
+        "description": "Magnesium Solar Wind charge state distribution",
+        "type": "double",
+        "x_labelTitle": "Q_i(Mg), i=6...12",
+        "fill": "-1.0E31",
+        "label": [
+          "Q_6(Mg)",
+          "Q_7(Mg)",
+          "Q_8(Mg)",
+          "Q_9(Mg)",
+          "Q_10(Mg)",
+          "Q_11(Mg)",
+          "Q_12(Mg)"
+        ],
+        "size": [
+          7
+        ],
+        "units": null
+      },
+      {
+        "name": "qdistMg_err",
+        "description": "Magnesium Solar Wind charge state distribution statistical uncertainty",
+        "type": "double",
+        "x_labelTitle": "Q_i(Mg)_err, i=6...12",
+        "fill": "-1.0E31",
+        "label": [
+          "Q_6(Mg)_err",
+          "Q_7(Mg)_err",
+          "Q_8(Mg)_err",
+          "Q_9(Mg)_err",
+          "Q_10(Mg)_err",
+          "Q_11(Mg)_err",
+          "Q_12(Mg)_err"
+        ],
+        "size": [
+          7
+        ],
+        "units": null
+      },
+      {
+        "name": "qflagsMg",
+        "description": "Quality Flags for Magnesium charge state distribution",
+        "type": "integer",
+        "x_labelTitle": "Qflag_i(Mg), i=6...12",
+        "fill": "-1",
+        "label": [
+          "Qflag_6(Mg)",
+          "Qflag_7(Mg)",
+          "Qflag_8(Mg)",
+          "Qflag_9(Mg)",
+          "Qflag_10(Mg)",
+          "Qflag_11(Mg)",
+          "Qflag_12(Mg)"
+        ],
+        "size": [
+          7
+        ],
+        "units": null
+      },
+      {
+        "name": "qdistSi",
+        "description": "Silicon Solar Wind charge state distribution",
+        "type": "double",
+        "x_labelTitle": "Q_i(Si), i=6...12",
+        "fill": "-1.0E31",
+        "label": [
+          "Q_6(Si)",
+          "Q_7(Si)",
+          "Q_8(Si)",
+          "Q_9(Si)",
+          "Q_10(Si)",
+          "Q_11(Si)",
+          "Q_12(Si)"
+        ],
+        "size": [
+          7
+        ],
+        "units": null
+      },
+      {
+        "name": "qdistSi_err",
+        "description": "Silicon Solar Wind charge state distribution statistical uncertainty",
+        "type": "double",
+        "x_labelTitle": "Q_i(Si)_err, i=6...12",
+        "fill": "-1.0E31",
+        "label": [
+          "Q_6(Si)_err",
+          "Q_7(Si)_err",
+          "Q_8(Si)_err",
+          "Q_9(Si)_err",
+          "Q_10(Si)_err",
+          "Q_11(Si)_err",
+          "Q_12(Si)_err"
+        ],
+        "size": [
+          7
+        ],
+        "units": null
+      },
+      {
+        "name": "qflagsSi",
+        "description": "Quality Flags for Silicon charge state distribution",
+        "type": "integer",
+        "x_labelTitle": "Qflag_i(Si), i=6...12",
+        "fill": "-1",
+        "label": [
+          "Qflag_6(Si)",
+          "Qflag_7(Si)",
+          "Qflag_8(Si)",
+          "Qflag_9(Si)",
+          "Qflag_10(Si)",
+          "Qflag_11(Si)",
+          "Qflag_12(Si)"
+        ],
+        "size": [
+          7
+        ],
+        "units": null
+      },
+      {
+        "name": "qdistFe",
+        "description": "Iron Solar Wind charge state distribution",
+        "type": "double",
+        "x_labelTitle": "Q_i(Fe), i=6...20",
+        "fill": "-1.0E31",
+        "label": [
+          "Q_6(Fe)",
+          "Q_7(Fe)",
+          "Q_8(Fe)",
+          "Q_9(Fe)",
+          "Q_10(Fe)",
+          "Q_11(Fe)",
+          "Q_12(Fe)",
+          "Q_13(Fe)",
+          "Q_14(Fe)",
+          "Q_15(Fe)",
+          "Q_16(Fe)",
+          "Q_17(Fe)",
+          "Q_18(Fe)",
+          "Q_19(Fe)",
+          "Q_20(Fe)"
+        ],
+        "size": [
+          15
+        ],
+        "units": null
+      },
+      {
+        "name": "qdistFe_err",
+        "description": "Iron Solar Wind charge state distribution statistical uncertainty",
+        "type": "double",
+        "x_labelTitle": "Q_i(Fe)_err, i=6...20",
+        "fill": "-1.0E31",
+        "label": [
+          "Q_6(Fe)_err",
+          "Q_7(Fe)_err",
+          "Q_8(Fe)_err",
+          "Q_9(Fe)_err",
+          "Q_10(Fe)_err",
+          "Q_11(Fe)_err",
+          "Q_12(Fe)_err",
+          "Q_13(Fe)_err",
+          "Q_14(Fe)_err",
+          "Q_15(Fe)_err",
+          "Q_16(Fe)_err",
+          "Q_17(Fe)_err",
+          "Q_18(Fe)_err",
+          "Q_19(Fe)_err",
+          "Q_20(Fe)_err"
+        ],
+        "size": [
+          15
+        ],
+        "units": null
+      },
+      {
+        "name": "qflagsFe",
+        "description": "Quality Flags for Iron charge state distribution",
+        "type": "integer",
+        "x_labelTitle": "Qflag_i(Fe), i=6...20",
+        "fill": "-1",
+        "label": [
+          "Qflag_6(Fe)",
+          "Qflag_7(Fe)",
+          "Qflag_8(Fe)",
+          "Qflag_9(Fe)",
+          "Qflag_10(Fe)",
+          "Qflag_11(Fe)",
+          "Qflag_12(Fe)",
+          "Qflag_13(Fe)",
+          "Qflag_14(Fe)",
+          "Qflag_15(Fe)",
+          "Qflag_16(Fe)",
+          "Qflag_17(Fe)",
+          "Qflag_18(Fe)",
+          "Qflag_19(Fe)",
+          "Qflag_20(Fe)"
+        ],
+        "size": [
+          15
+        ],
+        "units": null
+      }
+    ]
+  }
+}

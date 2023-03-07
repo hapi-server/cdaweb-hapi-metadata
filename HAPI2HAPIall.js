@@ -38,10 +38,11 @@ if (hapiURL === '') {
   }
 }
 
-let outDir   = "cache/" + argv.version;
-let fnameAll = "all/all-" + argv.version + ".json";
+let cacheDir = "cache/" + argv.version;
+let outDir   = "hapi/" + argv.version;
 
-if (!fs.existsSync(outDir)) {fs.mkdirSync(outDir, {recursive: true})}
+if (!fs.existsSync(cacheDir + "/info")) {fs.mkdirSync(cacheDir + "/info", {recursive: true})}
+if (!fs.existsSync(outDir + "/info")) {fs.mkdirSync(outDir + "/info", {recursive: true})}
 
 let CATALOG = {};
 
@@ -82,7 +83,7 @@ function catalog(cb) {
       ids.push(dataset['id']);
     }
 
-    let fnameIds = outDir + "/ids.txt";
+    let fnameIds = cacheDir + "/ids.txt";
     console.log("Writing: " + fnameIds);
     fs.writeFileSync(fnameIds, ids.join("\n"));
 
@@ -116,7 +117,8 @@ function info(CATALOG) {
     if (argv.version === 'bh') {
       idf = CATALOG[ididx]['x_SPDF_ID'];
     }
-    let fname = outDir + "/" + idf + ".json";
+    let fname = outDir + '/info/' + idf + '.json';
+    //let fname = cacheDir + "/" + idf + ".json";
     if (fs.existsSync(fname)) {
       console.log("Reading: " + fname);
       let body = fs.readFileSync(fname, 'utf-8');
@@ -143,9 +145,9 @@ function info(CATALOG) {
     }
 
     if (finished.N == CATALOG.length) {
+      let fnameAll = outDir + "/all.json";
       if (argv.version === 'bh') {
-
-        let fnameAllFull = fnameAll.replace('.json','-full.json');
+        let fnameAllFull = cacheDir + "/all-full.json";
         console.log("Writing: " + fnameAllFull);
         fs.writeFileSync(fnameAllFull, JSON.stringify(CATALOG, null, 2), 'utf-8');        
 

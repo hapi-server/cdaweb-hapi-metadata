@@ -1,0 +1,44 @@
+{
+  "HAPI": "2.0",
+  "parameters": [
+    {
+      "name": "Time",
+      "type": "isotime",
+      "units": "UTC",
+      "length": 24,
+      "fill": null
+    },
+    {
+      "name": "nH",
+      "type": "double",
+      "units": "#/cm^3",
+      "fill": "-1.0E31",
+      "description": "Solar Wind Proton Number Density, scalar"
+    },
+    {
+      "name": "nH_err",
+      "type": "double",
+      "units": "#/cm^3",
+      "fill": "-1.0E31",
+      "description": "Proton Number Density statistical uncertainty"
+    },
+    {
+      "name": "vH",
+      "type": "double",
+      "units": "km/s",
+      "fill": "-1.0E31",
+      "description": "Solar Wind Proton speed, scalar"
+    },
+    {
+      "name": "vthH",
+      "type": "double",
+      "units": "km/s",
+      "fill": "-1.0E31",
+      "description": "Solar Wind Proton Thermal speed, scalar"
+    }
+  ],
+  "startDate": "1998-01-29T00:07:03Z",
+  "stopDate": "2020-12-31T23:53:57Z",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/NotesA.html#AC_H6_SWI",
+  "contact": "G. Gloeckler @ University of Maryland"
+}

@@ -6,7 +6,7 @@ Three developers have written software to produce HAPI metadata using different 
 
 This repository contains
 
-* scripts for a fourth method that uses the [CDAS REST service](https://cdaweb.gsfc.nasa.gov/WebServices/REST/). The script that generates metadata is `CDAS2HAPIall.js` ($\sim$1000 lines). The script that transforms `CDAS` data responses to HAPI data responses is `CDAS2HAPIcsv.js` ($\sim$100 lines);
+* scripts for a fourth method that uses the [CDAS REST service](https://cdaweb.gsfc.nasa.gov/WebServices/REST/). The script that generates metadata is `CDAS2HAPIinfo.js` ($\sim$1000 lines). The script that transforms `CDAS` data responses to HAPI data responses is `CDAS2HAPIcsv.js` ($\sim$200 lines);
 
 * scripts that are used to create HAPI `all.json` files for each method (see `Makefile`). A HAPI `all.json` file is array of datasets from the `/catalog` endpoint with an additional `info` node for each dataset that contains the response to `/info` for that dataset; and
 
@@ -14,15 +14,28 @@ This repository contains
 
 The four methods are
 
-1. `bw`, which uses the new in this repository that uses https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml
+1. `bw`, which uses the new code in this repository that 
 
-   and queries for JSON [CDFML](https://cdf.gsfc.nasa.gov/html/cdfml.html) to
+   1. Extracts dataset ids and their start and stop dates from https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml
 
-   https://cdaweb.gsfc.nasa.gov/WebServices/REST/.
+   2. For each dataset, makes a `/variables` request to https://cdaweb.gsfc.nasa.gov/WebServices/REST/ to get the list of variable in the dataset that is needed for the next step
 
-2. `nl`, which uses an approach similar to the above for datasets with virtual variables. Otherwise, it uses raw CDF files.
+   3. Makes a `/data` request to https://cdaweb.gsfc.nasa.gov/WebServices/REST/
+   to obtain a sample data file with the final needed pieces of metadata. Note that often several requests are needed because the web service will not return if the time range of the request is such that there are no data. In addition, if the time range of the request is too large, the request is rejected.
+
+   `CDAS2HAPIinfo.js` starts with a 1-minute timespan starting at the start date given in CDAWeb's `all.xml` and increases this timespan by a factor of $10^n$ for up to $n=4$. If the timespan is to large, it decreases the timespan by $1/10^n$. Ideally this trial-and-error approach would not be required and there would be an endpoint where parameter-level metadata was returned without the need to form a data request that works.
+
+   4. After step 3., all of the metadata needed to form a HAPI response is available. The final step is to generate HAPI `/info` responses for each dataset. There is one complication. HAPI mandates that all variables in a dataset have the same time tags. Some CDAWeb datasets have datasets with variables with different time tags. So prior to creating `/info` responses, new HAPI datasets are formed. These new datasets have ids that match the CDAWeb ids but have an "@0", "@1", ... appended, where the number indicates the time tag variable index in the original dataset.
+
+   The initial generation of the the HAPI `all-info.json` file using `CDAS2HAPIinfo.js` can take up to 30 minutes, which is similar to the update time required daily by the `nl` server. In contrast, subsequent updates using `CDAS2HAPIinfo.js` takes less than a second; on a daily basis, only the `startDate` and `stopDate` must be updated, which requires reading `all.xml` and updating `all-info.json`. When CDAWeb adds datasets or the master CDF changes, the process outlined above is only required for those dataset; this process typically takes less than 10 seconds per dataset.
+
+2. `nl`, which uses an approach similar to the above for datasets with virtual variables.
 
    [This code](https://git.mysmce.com/spdf/hapi-nand) is used for the [production CDAWeb HAPI server](https://cdaweb.gsfc.nasa.gov/hapi).
+
+   This production HAPI server has many datasets for which the metadata or data responses are not valid. It appears the [HAPI verifier](https://hapi-server.org/verify) was never run on all datasets.
+
+   The production HAPI server becomes responsive at 9 am daily due to a similar update that appears to block the meain thread. However, in general, a full update is only needed when content other than the `startDate` and `stopDate` changes. 
 
 3. `bh`, which uses [SPASE](https://spase-group.org/) records. 
 
@@ -38,45 +51,50 @@ Requires [`Node.js`](https://nodejs.org/en/).
 
 In reference to the above four options, to create metadata for all CDAWeb IDs that start with `"A"`, use
 
-1. `node CDAS2HAPIall.js --idregex '^A'`, which creates 
+1. `node CDAS2HAPIinfo.js --idregex '^A'`, which creates 
 
-   `all/all-bw.json` and `all-bw-full.json`.
+   `all/all-info-bw.json` and `all-info-full-bw.json`.
 
-   The `full` file contains extra master CDF metadata in an `additionalMetadata` node.
-2. `node HAPI2HAPIall.js --version 'nl' --idregex '^A'`, which creates
+   The `full` file contains metadata from CDAWeb's `all.xml`, the master CDF for each datasets, the CDAS `/variables` and `/data` requests, and a JSON version of the associated SPASE record (if available).
 
-   `all/all-nl.json`
+2. `node HAPI2HAPIinfo.js --version 'nl' --idregex '^A'`, which creates
 
-3. `node HAPI2HAPIall.js --version 'bh' --idregex '^A'`, which creates
+   `all/all-info-nl.json`
 
-   `all/all-bh.json` and `all-bh-full.json`.
+3. `node HAPI2HAPIinfo.js --version 'bh' --idregex '^A'`, which creates
+
+   `all/all-info-bh.json` and `all-info-full-bh.json`.
 
    The `full` file contains extra SPASE and SPDF metadata as values of `x_` keys.
 
-4. `node HAPI2HAPIall.js --version 'jf' --idregex '^A'`, which creates
+4. `node HAPI2HAPIinfo.js --version 'jf' --idregex '^A'`, which creates
 
-   `all/all-jf.json` and `all-bh-full.json`.
+   `all/all-info-jf.json`
 
 After these files are created, the program `compare/compare-meta.js` can be executed to generate the file `compare/meta/compare-meta.json` that shows the metadata created by the four approaches in a single file.
 
 See also `compare/Makefile` for commands that can be used to compare data responses from CDAS with the production HAPI server.
 
+# CDAS Rest Server Comments
+
+The output of the CDAS Rest server is straightforward to transform into HAPI CSV responses.
+
+# SPASE Comments
+
+* Both the production server and `CDAS2HAPIinfo.js` use a similar process for generating HAPI metadata. The process is complex. If CDAWeb had a complete set of _validated_ SPASE records _that were continously updated_, we would not have needed to write the code for this process. In fact, much of the code in `CDAS2HAPIinfo.js` duplicates functionality in the code used to generate CDAWeb SPASE Numerical data records.
+
+* Ideally, CDAWeb would publish `all-SPASE.xml`, which contained all of the SPASE Numerical data records. The transformation from this to HAPI metadata is then trivial.
+
+* Validation
+
+* Continuously updated. If this were done, the actual stop dates would need to be used instead of relative stop dates (the relative stop date is approximate).
+
+
+
+* The code used to generate CDAWeb SPASE records is not publicly available.
+
+
 # Comments and Notes
-
-all.xml has
-https://cdaweb.gsfc.nasa.gov/pub/data/ace/orbit/level_2_cdaweb/def_or/
-with stop of 2023, but only 1997 dir.
-
-all.xml has
-https://cdaweb.gsfc.nasa.gov/pub/data/ace/orbit/level_2_cdaweb/or_ssc
-which gives 301 to
-https://cdaweb.gsfc.nasa.gov/pub/data/ace/orbit/level_2_cdaweb/or_ssc/
-
-* The production HAPI server https://cdaweb.gsfc.nasa.gov/hapi has many datasets in its list for which the metadata or data responses are not valid. It appears the [HAPI verifier](https://hapi-server.org/verify) was never run on all datasets. The code `CDAS2HAPIall.js` catches many of the problem datasets, logs them, and omits them from the HAPI `all.json` file.
-
-* The initial generation of the the HAPI `all.json` using `CDAS2HAPIall.js` can take up to 30 minutes. The production HAPI server becomes responsive at 9 am daily due to a similar update that appears to block the meain thread. However, in general, a full update is only needed when content other than the `startDate` and `stopDate` changes. Updating the `startDate` and `stopDate` only requires one call to the [CDASR web service](https://cdaweb.gsfc.nasa.gov/WebServices/REST/) and takes less than one second. This can be done using `node CDAS2HAPIall.js --fastupdate`.
-
-* To obtain the parameter-level detail from [CDASR](https://cdaweb.gsfc.nasa.gov/WebServices/REST/), a data request must be made for which there are data. `CDAS2HAPIall.js` starts with a 1-minute timespan starting at the start date given in CDAWeb's `all.xml` and increases this timespan by a factor of $10^n$ for up to $n=4$. If the timespan is to large, it decreases the timespan by $1/10^n$. Ideally this trial-and-error approach would not be required and there would be an endpoint where parameter-level metadata was returned without the need to form a data request that works.
 
 # To Do
 

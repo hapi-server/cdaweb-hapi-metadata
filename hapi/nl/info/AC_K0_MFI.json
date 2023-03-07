@@ -1,0 +1,33 @@
+{
+  "HAPI": "2.0",
+  "parameters": [
+    {
+      "name": "Time",
+      "type": "isotime",
+      "units": "UTC",
+      "length": 24,
+      "fill": null
+    },
+    {
+      "name": "Magnitude",
+      "type": "double",
+      "units": "nT",
+      "fill": "-1.0E31",
+      "description": "[PRELIMINARY VALUES - BROWSE USE ONLY] B-field magnitude"
+    },
+    {
+      "name": "BGSEc",
+      "type": "double",
+      "units": "nT",
+      "fill": "-1.0E31",
+      "description": "[PRELIMINARY VALUES - BROWSE USE ONLY] Magnetic Field, Cartesian GSE coord",
+      "size": [
+        3
+      ]
+    }
+  ],
+  "startDate": "2017-07-01T00:00:00Z",
+  "stopDate": "2023-02-25T23:55:00Z",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/NotesA.html#AC_K0_MFI",
+  "contact": "N. Ness @ Bartol Research Institute"
+}

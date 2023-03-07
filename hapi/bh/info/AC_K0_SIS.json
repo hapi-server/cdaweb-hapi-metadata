@@ -1,0 +1,95 @@
+{
+  "HAPI": "3.1",
+  "creationDate": "2023-03-05T14:38:01.657Z",
+  "x_SPDF_CAVEAT": "This is a prototype implementation which may change or be eliminated at any time. The metadata returned by info and data may be different. The metadata values returned by a data request are more accurate. The two data JSON formats do not conform to the HAPI specification.  The official cdaweb HAPI server is available at https://cdaweb.gsfc.nasa.gov/hapi",
+  "description": "ACE Solar Isotope Spectrometer (SIS) hourly intensities and count rates, for each of 14 elements (He,C,N,O,Ne,Na,Mg,Al,Si,S,Ar,Ca,Fe,Ni).in each of 8 energy bins. Overall energy ranges covered go from 3.4-41 MeV/n for helium to 10.5-168 MeV/n for iron. These are calibrated science quality data. The data are accessible via ftp in HDF and CDF from the ACE Science Center and CDAWeb, respectively, and in ASCII format from the value-added interfaces at those sites. The \"parameter keys\" given below are as used by CDAWeb.",
+  "startDate": "1997-08-29T00:00:00Z",
+  "stopDate": "2023-01-05T14:38:01.657Z",
+  "time": "Epoch",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/cgi-bin/eval2.cgi?dataset=AC_K0_SIS&index=sp_phys",
+  "resourceID": "spase://NASA/NumericalData/ACE/SIS/L2/KP/PT1H",
+  "x_SPDF_ID": "AC_K0_SIS",
+  "x_SPDF_DOI": "https://doi.org/10.48322/1fgf-zm82",
+  "cadence": "PT1H",
+  "contact": "C.M.S.Cohen",
+  "contactID": "spase://SMWG/Person/C.M.S.Cohen",
+  "parameters": [
+    {
+      "name": "H_lo",
+      "description": "H Particle Flux (>10 MeV)",
+      "type": "unknown",
+      "units": "1/(cm2 s ster MeV)",
+      "x_SPDF_VALIDMIN": "0",
+      "x_SPDF_VALIDMAX": "10000",
+      "fill": "-1e31"
+    },
+    {
+      "name": "H_hi",
+      "description": "H Particle Flux (>30 MeV)",
+      "type": "unknown",
+      "units": "1/(cm2 s ster MeV)",
+      "x_SPDF_VALIDMIN": "0",
+      "x_SPDF_VALIDMAX": "10000",
+      "fill": "-1e31"
+    },
+    {
+      "name": "CNO_lo",
+      "description": "C, N, O Particle Flux (7-10 MeV/n)",
+      "type": "unknown",
+      "units": "1/(cm2 s ster MeV/n)",
+      "x_SPDF_VALIDMIN": "0",
+      "x_SPDF_VALIDMAX": "10000",
+      "fill": "-1e31"
+    },
+    {
+      "name": "CNO_hi",
+      "description": "C, N, O Particle Flux (10-15 MeV/n)",
+      "type": "unknown",
+      "units": "1/(cm2 s ster MeV/n)",
+      "x_SPDF_VALIDMIN": "0",
+      "x_SPDF_VALIDMAX": "10000",
+      "fill": "-1e31"
+    },
+    {
+      "name": "Z_ge_10",
+      "description": "Z>=10 (9-21 MeV/n)",
+      "type": "unknown",
+      "units": "1/(cm2 s ster MeV/n)",
+      "x_SPDF_VALIDMIN": "0",
+      "x_SPDF_VALIDMAX": "10000",
+      "fill": "-1e31"
+    }
+  ],
+  "additionalMetadata": [
+    {
+      "name": "ISTP",
+      "contentURL": "https://cdaweb.gsfc.nasa.gov/pub/software/cdawlib/0JSONS/ac_k0_sis_00000000_v01.json",
+      "aboutURL": "https://spdf.gsfc.nasa.gov/sp_use_of_cdf.html"
+    },
+    {
+      "name": "SPASE",
+      "contentURL": "https://cdaweb.gsfc.nasa.gov/registry/hdp/Spase.xql?id=spase://NASA/NumericalData/ACE/SIS/L2/KP/PT1H",
+      "aboutURL": "https://spase-group.org/"
+    }
+  ],
+  "x_SPDF_INVENTORY": {
+    "intervals": [
+      {
+        "begin": "2017-07-01T00:00:00.000Z",
+        "end": "2018-03-03T17:00:00.000Z"
+      },
+      {
+        "begin": "2018-03-04T10:00:00.000Z",
+        "end": "2018-03-04T13:00:00.000Z"
+      },
+      {
+        "begin": "2018-03-05T09:00:00.000Z",
+        "end": "2019-11-30T23:00:00.000Z"
+      },
+      {
+        "begin": "2019-12-02T00:00:00.000Z",
+        "end": "2023-02-25T23:00:00.000Z"
+      }
+    ]
+  }
+}

@@ -1,0 +1,373 @@
+{
+  "HAPI": "2.0",
+  "parameters": [
+    {
+      "name": "Time",
+      "type": "isotime",
+      "units": "UTC",
+      "length": 24,
+      "fill": null
+    },
+    {
+      "name": "nHe2",
+      "type": "double",
+      "units": "#/cm^3",
+      "fill": "-1.0E31",
+      "description": "Solar Wind He++ Number Density, scalar"
+    },
+    {
+      "name": "nHe2_err",
+      "type": "double",
+      "units": "#/cm^3",
+      "fill": "-1.0E31",
+      "description": "He++ Number Density statistical uncertainty"
+    },
+    {
+      "name": "He_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality flag for the helium density data"
+    },
+    {
+      "name": "C6to4",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "C+6/C+4 Solar Wind charge_state Ratio"
+    },
+    {
+      "name": "C6to4_err",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "C+6/C+4 Statistical Uncertainty"
+    },
+    {
+      "name": "C6to4_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality flag for C+6/C+4 Solar Wind charge_state Ratio"
+    },
+    {
+      "name": "C6to5",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "C+6/C+5 Solar Wind charge_state Ratio"
+    },
+    {
+      "name": "C6to5_err",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "C+6/C+5 Statistical Uncertainty"
+    },
+    {
+      "name": "C6to5_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality flag for C+6/C+5 Solar Wind charge_state Ratio"
+    },
+    {
+      "name": "O7to6",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "O+7/O+6 Solar Wind charge_state Ratio"
+    },
+    {
+      "name": "O7to6_err",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "O+7/O+6 Statistical Uncertainty"
+    },
+    {
+      "name": "O7to6_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality flag for O+7/O+6 Solar Wind charge_state Ratio"
+    },
+    {
+      "name": "avqC",
+      "type": "double",
+      "units": "ionic charge",
+      "fill": "-1.0E31",
+      "description": "Carbon Solar Wind average charge state"
+    },
+    {
+      "name": "avqC_err",
+      "type": "double",
+      "units": "ionic charge",
+      "fill": "-1.0E31",
+      "description": "Carbon average charge state Statistical Uncertainty"
+    },
+    {
+      "name": "avqC_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality flag for Carbon Solar Wind average charge state"
+    },
+    {
+      "name": "avqO",
+      "type": "double",
+      "units": "ionic charge",
+      "fill": "-1.0E31",
+      "description": "Oxygen Solar Wind average charge state"
+    },
+    {
+      "name": "avqO_err",
+      "type": "double",
+      "units": "ionic charge",
+      "fill": "-1.0E31",
+      "description": "Oxygen average charge state Statistical Uncertainty"
+    },
+    {
+      "name": "avqO_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality flag for Oxygen Solar Wind average charge state"
+    },
+    {
+      "name": "avqMg",
+      "type": "double",
+      "units": "ionic charge",
+      "fill": "-1.0E31",
+      "description": "Magnesium Solar Wind average charge state"
+    },
+    {
+      "name": "avqMg_err",
+      "type": "double",
+      "units": "ionic charge",
+      "fill": "-1.0E31",
+      "description": "Magnesium average charge state Statistical Uncertainty"
+    },
+    {
+      "name": "avqMg_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality flag for Magnesium Solar Wind average charge state"
+    },
+    {
+      "name": "avqSi",
+      "type": "double",
+      "units": "ionic charge",
+      "fill": "-1.0E31",
+      "description": "Silicon Solar Wind average charge state"
+    },
+    {
+      "name": "avqSi_err",
+      "type": "double",
+      "units": "ionic charge",
+      "fill": "-1.0E31",
+      "description": "Silicon average charge state Statistical Uncertainty"
+    },
+    {
+      "name": "avqSi_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality flag for Silicon Solar Wind average charge state"
+    },
+    {
+      "name": "avqFe",
+      "type": "double",
+      "units": "ionic charge",
+      "fill": "-1.0E31",
+      "description": "Iron Solar Wind average charge state"
+    },
+    {
+      "name": "avqFe_err",
+      "type": "double",
+      "units": "ionic charge",
+      "fill": "-1.0E31",
+      "description": "Iron average charge state Statistical Uncertainty"
+    },
+    {
+      "name": "avqFe_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality flag for Iron Solar Wind average charge state"
+    },
+    {
+      "name": "HetoO",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "He/O Solar Wind elemental abundance ratio"
+    },
+    {
+      "name": "HetoO_err",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "He/O statistical uncertainty"
+    },
+    {
+      "name": "HetoO_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality Flag for He/O Solar Wind elemental abundance ratio"
+    },
+    {
+      "name": "CtoO",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "C/O Solar Wind elemental abundance ratio"
+    },
+    {
+      "name": "CtoO_err",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "C/O statistical uncertainty"
+    },
+    {
+      "name": "CtoO_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality Flag for C/O Solar Wind elemental abundance ratio"
+    },
+    {
+      "name": "NtoO",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "N/O Solar Wind elemental abundance ratio"
+    },
+    {
+      "name": "NtoO_err",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "N/O statistical uncertainty"
+    },
+    {
+      "name": "NtoO_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality Flag for N/O Solar Wind elemental abundance ratio"
+    },
+    {
+      "name": "NetoO",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "Ne/O Solar Wind elemental abundance ratio"
+    },
+    {
+      "name": "NetoO_err",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "Ne/O statistical uncertainty"
+    },
+    {
+      "name": "NetoO_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality Flag for Ne/O Solar Wind elemental abundance ratio"
+    },
+    {
+      "name": "MgtoO",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "Mg/O Solar Wind elemental abundance ratio"
+    },
+    {
+      "name": "MgtoO_err",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "Mg/O statistical uncertainty"
+    },
+    {
+      "name": "MgtoO_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality Flag for Mg/O Solar Wind elemental abundance ratio"
+    },
+    {
+      "name": "SitoO",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "Si/O Solar Wind elemental abundance ratio"
+    },
+    {
+      "name": "SitoO_err",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "Si/O statistical uncertainty"
+    },
+    {
+      "name": "SitoO_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality Flag for Si/O Solar Wind elemental abundance ratio"
+    },
+    {
+      "name": "StoO",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "S/O Solar Wind elemental abundance ratio"
+    },
+    {
+      "name": "StoO_err",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "S/O statistical uncertainty"
+    },
+    {
+      "name": "StoO_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality Flag for S/O Solar Wind elemental abundance ratio"
+    },
+    {
+      "name": "FetoO",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "Fe/O Solar Wind elemental abundance ratio"
+    },
+    {
+      "name": "FetoO_err",
+      "type": "double",
+      "units": " ",
+      "fill": "-1.0E31",
+      "description": "Fe/O statistical uncertainty"
+    },
+    {
+      "name": "FetoO_qual",
+      "type": "integer",
+      "units": " ",
+      "fill": "-1",
+      "description": "Quality Flag for Fe/O Solar Wind elemental abundance ratio"
+    }
+  ],
+  "startDate": "1998-02-04T00:09:16Z",
+  "stopDate": "2011-08-21T02:28:39Z",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/NotesA.html#AC_H4_SWI",
+  "contact": "G. Gloeckler @ University of Maryland"
+}
