@@ -1,6 +1,8 @@
+tmp/
 all/
 bin/
 cache/
+verify/data
 compare/data
 compare/meta
 node_modules/

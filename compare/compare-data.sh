@@ -32,7 +32,7 @@ url="$base/${ID//@*/}/data/$START_STR,$STOP_STR/$PARAMETERS?format=text"
 mkdir -p $OUTDIR
 
 cmd="node ../CDAS2HAPIcsv.js \
---id ${ID//@*/} --parameters $PARAMETERS --start $START --stop $STOP \
+--id $ID --parameters $PARAMETERS --start $START --stop $STOP \
 --format csv --encoding $CDASENCODING --debug"
 echo -e "\n"
 echo "---- HAPI CSV via transform of CDAS text response ----"
@@ -42,7 +42,7 @@ head -3 $OUTDIR/$ID.cdas.csv
 
 
 cmd="node ../CDAS2HAPIcsv.js \
---id ${ID//@*/} --parameters $PARAMETERS --start $START --stop $STOP \
+--id $ID --parameters $PARAMETERS --start $START --stop $STOP \
 --format text --encoding $CDASENCODING --debug"
 echo -e "\n"
 echo "---- CDAS text unaltered ----"
@@ -53,7 +53,7 @@ grep $OUTDIR/$ID.cdas.text -e "^[0-9]" | head -3
 
 
 cmd="node ../CDAS2HAPIcsv.js \
---id ${ID//@*/} --parameters $PARAMETERS --start $START --stop $STOP \
+--id $ID --parameters $PARAMETERS --start $START --stop $STOP \
 --format cdf --encoding $CDASENCODING"
 echo -e "\n"
 echo "---- CDAS CDF unaltered ----"

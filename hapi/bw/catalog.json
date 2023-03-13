@@ -1,6 +1,34 @@
 [
   {
-    "id": "AC_OR_SSC",
-    "title": "ACE GSE Positions @ 12 min resolution  - SSC/SSCWeb ( NASA's GSFC)"
+    "id": "AC_H2_CRIS",
+    "title": "ACE/CRIS Cosmic Ray Isotope Spectrometer 1-Hour Level 2 Data - E. C. Stone (California Institute of Technology)"
+  },
+  {
+    "id": "AC_H2_MFI",
+    "title": "H2 - ACE Magnetic Field 1-Hour Level 2 Data - N. Ness (Bartol Research Institute)"
+  },
+  {
+    "id": "AC_H2_SEP",
+    "title": "ACE/SEPICA Solar Energetic Particle 1-Hour Level 2 Data - Eberhard Moebius (University of New Hampshire)"
+  },
+  {
+    "id": "AC_H2_SWE",
+    "title": "ACE/SWEPAM Solar Wind Experiment 1-Hour Level 2 Data - D. J. McComas (SWRI)"
+  },
+  {
+    "id": "AC_H2_SWI",
+    "title": "ACE/SWICS 1.1 Solar Wind 1-Hour Level 2 Data - G. Gloeckler (University of Maryland)"
+  },
+  {
+    "id": "AC_H2_EPM",
+    "title": "ACE/EPAM Solar Energetic Particle 1-Hour Level 2 Data - R. Gold (JHU/APL)"
+  },
+  {
+    "id": "AC_H2_SIS",
+    "title": "ACE/SIS Solar Isotope Spectrometer 1-Hour Level 2 Data - E. C. Stone (California Institute of Technology)"
+  },
+  {
+    "id": "AC_H2_ULE",
+    "title": "ACE/ULEIS Solar Suprathermal and Energetic Particle Intensities 1-Hour Level 2 Data - G. Mason (University of Maryland)"
   }
 ]

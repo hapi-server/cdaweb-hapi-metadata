@@ -1,124 +1,121 @@
 {
-  "id": "AC_H2_MFI",
-  "title": "H2 - ACE Magnetic Field 1-Hour Level 2 Data - N. Ness (Bartol Research Institute)",
-  "info": {
-    "startDate": "1997-09-02T00:00:00Z",
-    "stopDate": "2022-12-20T23:00:00Z",
-    "sampleStartDate": "1997-09-02T00:00:00.000Z",
-    "sampleStopDate": "1997-11-01T01:00:00.000Z",
-    "x_sampleRecords": 1442,
-    "cadence": "PT1H",
-    "contact": "N. Ness @ Bartol Research Institute",
-    "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_H2_MFI",
-    "resourceID": "spase://NASA/NumericalData/ACE/MAG/L2/PT1H",
-    "x_creationDate": "2004-10-28",
-    "x_datasetCitation": "Please acknowledge the Principal Investigator, N. Ness of Bartol Research Institute",
-    "x_datasetTermsOfUse": "See the rules of use available from the ACE Science Center at: http://www.srl.caltech.edu/ACE/ASC/level2/policy_lvl2.html",
-    "parameters": [
-      {
-        "name": "Time",
-        "type": "isotime",
-        "units": "UTC",
-        "length": 24,
-        "fill": "0000-01-01T00:00:00.000Z"
-      },
-      {
-        "name": "Magnitude",
-        "description": "B-field magnitude",
-        "type": "double",
-        "x_labelTitle": "B-field magnitude",
-        "units": "nT",
-        "fill": "-1.0E31",
-        "label": "<|B|>"
-      },
-      {
-        "name": "BGSEc",
-        "description": "Magnetic Field Vector in GSE Cartesian coordinates (1 hr)",
-        "type": "double",
-        "x_labelTitle": "Mag Field vector, GSE coord",
-        "units": "nT",
-        "fill": "-1.0E31",
-        "size": [
-          3
-        ],
-        "vectorComponents": [
-          "x",
-          "y",
-          "z"
-        ],
-        "coordinateSystemName": "GSE",
-        "label": [
-          "BxGSE",
-          "ByGSE",
-          "BzGSE"
-        ]
-      },
-      {
-        "name": "BGSM",
-        "description": "Magnetic field vector in GSM coordinates (1 hr)",
-        "type": "double",
-        "x_labelTitle": "Mag field vector, GSM coord",
-        "units": "nT",
-        "fill": "-1.0E31",
-        "size": [
-          3
-        ],
-        "vectorComponents": [
-          "x",
-          "y",
-          "z"
-        ],
-        "coordinateSystemName": "GSM",
-        "label": [
-          "Bx(GSM)",
-          "By(GSM)",
-          "Bz(GSM)"
-        ]
-      },
-      {
-        "name": "SC_pos_GSE",
-        "description": "ACE s/c position, 3 comp. in GSE coord.",
-        "type": "double",
-        "x_labelTitle": "S/C position in GSE",
-        "units": "km",
-        "fill": "-1.0E31",
-        "size": [
-          3
-        ],
-        "vectorComponents": [
-          "x",
-          "y",
-          "z"
-        ],
-        "coordinateSystemName": "GSE",
-        "label": [
-          "ACEX-GSE",
-          "ACEY-GSE",
-          "ACEZ-GSE"
-        ]
-      },
-      {
-        "name": "SC_pos_GSM",
-        "description": "ACE s/c position, 3 comp. in GSM coord.",
-        "type": "double",
-        "x_labelTitle": "S/C position in GSM",
-        "units": "km",
-        "fill": "-1.0E31",
-        "size": [
-          3
-        ],
-        "vectorComponents": [
-          "x",
-          "y",
-          "z"
-        ],
-        "coordinateSystemName": "GSM",
-        "label": [
-          "ACEX-GSM",
-          "ACEY-GSM",
-          "ACEZ-GSM"
-        ]
-      }
-    ]
-  }
+  "startDate": "1997-09-02T00:00:00Z",
+  "stopDate": "2022-12-20T23:00:00Z",
+  "sampleStartDate": "1997-09-02T00:00:00.000Z",
+  "sampleStopDate": "1997-09-02T09:00:00.000Z",
+  "x_sampleRecords": 1442,
+  "cadence": "PT1H",
+  "contact": "N. Ness @ Bartol Research Institute",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_H2_MFI",
+  "resourceID": "spase://NASA/NumericalData/ACE/MAG/L2/PT1H",
+  "x_creationDate": "2004-10-28",
+  "x_datasetCitation": "Please acknowledge the Principal Investigator, N. Ness of Bartol Research Institute",
+  "x_datasetTermsOfUse": "See the rules of use available from the ACE Science Center at: http://www.srl.caltech.edu/ACE/ASC/level2/policy_lvl2.html",
+  "parameters": [
+    {
+      "name": "Time",
+      "type": "isotime",
+      "units": "UTC",
+      "length": 24,
+      "fill": null
+    },
+    {
+      "name": "Magnitude",
+      "description": "B-field magnitude",
+      "type": "double",
+      "x_labelTitle": "B-field magnitude",
+      "units": "nT",
+      "fill": "-1.0E31",
+      "label": "<|B|>"
+    },
+    {
+      "name": "BGSEc",
+      "description": "Magnetic Field Vector in GSE Cartesian coordinates (1 hr)",
+      "type": "double",
+      "x_labelTitle": "Mag Field vector, GSE coord",
+      "units": "nT",
+      "fill": "-1.0E31",
+      "size": [
+        3
+      ],
+      "vectorComponents": [
+        "x",
+        "y",
+        "z"
+      ],
+      "coordinateSystemName": "GSE",
+      "label": [
+        "BxGSE",
+        "ByGSE",
+        "BzGSE"
+      ]
+    },
+    {
+      "name": "BGSM",
+      "description": "Magnetic field vector in GSM coordinates (1 hr)",
+      "type": "double",
+      "x_labelTitle": "Mag field vector, GSM coord",
+      "units": "nT",
+      "fill": "-1.0E31",
+      "size": [
+        3
+      ],
+      "vectorComponents": [
+        "x",
+        "y",
+        "z"
+      ],
+      "coordinateSystemName": "GSM",
+      "label": [
+        "Bx(GSM)",
+        "By(GSM)",
+        "Bz(GSM)"
+      ]
+    },
+    {
+      "name": "SC_pos_GSE",
+      "description": "ACE s/c position, 3 comp. in GSE coord.",
+      "type": "double",
+      "x_labelTitle": "S/C position in GSE",
+      "units": "km",
+      "fill": "-1.0E31",
+      "size": [
+        3
+      ],
+      "vectorComponents": [
+        "x",
+        "y",
+        "z"
+      ],
+      "coordinateSystemName": "GSE",
+      "label": [
+        "ACEX-GSE",
+        "ACEY-GSE",
+        "ACEZ-GSE"
+      ]
+    },
+    {
+      "name": "SC_pos_GSM",
+      "description": "ACE s/c position, 3 comp. in GSM coord.",
+      "type": "double",
+      "x_labelTitle": "S/C position in GSM",
+      "units": "km",
+      "fill": "-1.0E31",
+      "size": [
+        3
+      ],
+      "vectorComponents": [
+        "x",
+        "y",
+        "z"
+      ],
+      "coordinateSystemName": "GSM",
+      "label": [
+        "ACEX-GSM",
+        "ACEY-GSM",
+        "ACEZ-GSM"
+      ]
+    }
+  ],
+  "x_DEPEND_0": "Epoch"
 }

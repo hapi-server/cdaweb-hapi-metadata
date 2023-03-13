@@ -2,7 +2,7 @@
   "startDate": "1997-08-25T17:48:00Z",
   "stopDate": "2023-04-24T23:48:00Z",
   "sampleStartDate": "1997-08-25T17:48:00.000Z",
-  "sampleStopDate": "1997-09-06T18:00:00.000Z",
+  "sampleStopDate": "1997-08-25T19:36:00.000Z",
   "x_sampleRecords": 1442,
   "cadence": "PT12M",
   "contact": "SSC/SSCWeb @ NASA's GSFC",
@@ -17,7 +17,7 @@
       "type": "isotime",
       "units": "UTC",
       "length": 24,
-      "fill": "0000-01-01T00:00:00.000Z"
+      "fill": null
     },
     {
       "name": "GSE_LAT",

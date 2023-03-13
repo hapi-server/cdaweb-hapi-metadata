@@ -1,63 +1,59 @@
 {
-  "id": "AC_K0_SWE",
-  "title": "K0 - ACE Solar Wind Experiment 5-Minute Key Parameters [PRELIM] - D. J. McComas (Southwest Research Institute)",
-  "info": {
-    "startDate": "2017-07-01T00:00:00Z",
-    "stopDate": "2023-02-16T23:55:00Z",
-    "sampleStartDate": "2017-07-01T00:00:00.000Z",
-    "sampleStopDate": "2017-07-06T00:05:00.000Z",
-    "x_sampleRecords": 1442,
-    "cadence": "PT5M",
-    "contact": "D. J. McComas @ Southwest Research Institute",
-    "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_K0_SWE",
-    "resourceID": "spase://NASA/NumericalData/ACE/SWEPAM/KeyParameter/PT5M",
-    "x_creationDate": "2017-07-06",
-    "x_datasetCitation": "Please acknowledge the Principal Investigator, D. J. McComas of NASA LANL",
-    "x_datasetTermsOfUse": "See the rules of use available from the ACE Science Center at: http://www.srl.caltech.edu/ACE/",
-    "parameters": [
-      {
-        "name": "Time",
-        "type": "isotime",
-        "units": "UTC",
-        "length": 24,
-        "fill": "0000-01-01T00:00:00.000Z"
-      },
-      {
-        "name": "Np",
-        "description": "[PRELIMINARY VALUES - BROWSE USE ONLY] Solar Wind Proton Number Density, scalar",
-        "type": "double",
-        "x_labelTitle": "Proton No. density",
-        "label": "[PRELIM] SW H Num Density",
-        "units": "#/cc",
-        "fill": "-1.0E31"
-      },
-      {
-        "name": "Vp",
-        "description": "[PRELIMINARY VALUES - BROWSE USE ONLY] Solar Wind Bulk Speed",
-        "type": "double",
-        "x_labelTitle": "Solar Wind Proton Speed",
-        "label": "[PRELIM] SW Bulk Speed",
-        "units": "km/s",
-        "fill": "-1.0E31"
-      },
-      {
-        "name": "He_ratio",
-        "description": "[PRELIMINARY VALUES - BROWSE USE ONLY] Percent of Helium++ ions to protons",
-        "type": "double",
-        "x_labelTitle": "He Ratio - He++/H+",
-        "label": "[PRELIM] He++/H+",
-        "units": "%",
-        "fill": "-1.0E31"
-      },
-      {
-        "name": "Tpr",
-        "description": "[PRELIMINARY VALUES - BROWSE USE ONLY] radial component of the proton temperature",
-        "type": "double",
-        "x_labelTitle": "Proton Temperature",
-        "label": "[PRELIM] H Temp (radical)",
-        "units": "Kelvin",
-        "fill": "-1.0E31"
-      }
-    ]
-  }
+  "startDate": "2017-07-01T00:00:00Z",
+  "stopDate": "2023-02-16T23:55:00Z",
+  "sampleStartDate": "2017-07-01T00:00:00.000Z",
+  "sampleStopDate": "2017-07-01T00:45:00.000Z",
+  "x_sampleRecords": 1442,
+  "cadence": "PT5M",
+  "contact": "D. J. McComas @ Southwest Research Institute",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_K0_SWE",
+  "resourceID": "spase://NASA/NumericalData/ACE/SWEPAM/KeyParameter/PT5M",
+  "x_creationDate": "2017-07-06",
+  "x_datasetCitation": "Please acknowledge the Principal Investigator, D. J. McComas of NASA LANL",
+  "x_datasetTermsOfUse": "See the rules of use available from the ACE Science Center at: http://www.srl.caltech.edu/ACE/",
+  "parameters": [
+    {
+      "name": "Time",
+      "type": "isotime",
+      "units": "UTC",
+      "length": 24,
+      "fill": null
+    },
+    {
+      "name": "Np",
+      "description": "[PRELIMINARY VALUES - BROWSE USE ONLY] Solar Wind Proton Number Density, scalar",
+      "type": "double",
+      "x_labelTitle": "Proton No. density",
+      "label": "[PRELIM] SW H Num Density",
+      "units": "#/cc",
+      "fill": "-1.0E31"
+    },
+    {
+      "name": "Vp",
+      "description": "[PRELIMINARY VALUES - BROWSE USE ONLY] Solar Wind Bulk Speed",
+      "type": "double",
+      "x_labelTitle": "Solar Wind Proton Speed",
+      "label": "[PRELIM] SW Bulk Speed",
+      "units": "km/s",
+      "fill": "-1.0E31"
+    },
+    {
+      "name": "He_ratio",
+      "description": "[PRELIMINARY VALUES - BROWSE USE ONLY] Percent of Helium++ ions to protons",
+      "type": "double",
+      "x_labelTitle": "He Ratio - He++/H+",
+      "label": "[PRELIM] He++/H+",
+      "units": "%",
+      "fill": "-1.0E31"
+    },
+    {
+      "name": "Tpr",
+      "description": "[PRELIMINARY VALUES - BROWSE USE ONLY] radial component of the proton temperature",
+      "type": "double",
+      "x_labelTitle": "Proton Temperature",
+      "label": "[PRELIM] H Temp (radical)",
+      "units": "Kelvin",
+      "fill": "-1.0E31"
+    }
+  ]
 }

@@ -1,0 +1,6 @@
+ID=AC_OR_SSC
+START=19970827T000000Z
+STOP=19970825T193600Z
+PARAMETERS=GSE_LAT,GSE_LON,RADIUS,XYZ_GSE,XYZ_GSEO
+FORMAT=cdf
+curl "https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/$ID/data/$START,$STOP/$PARAMETERS?format=$FORMAT"

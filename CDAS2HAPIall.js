@@ -33,7 +33,7 @@ let argv = yargs
                 cdasr:  'https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/',
                 allxml: 'https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml',
                 debug: false,
-                maxtries: 5,
+                maxtries: 1,
                 minrecords: 1440,
                 hapiversion: '3.1',
                 cdf2cdfml: 'java CDF2CDFML',
@@ -166,6 +166,16 @@ function buildHAPI(CATALOG) {
           parameter[key] = parameter['_vAttributesKept'][key];
       }
 
+      if (!parameter['fill'] && varType == 'data') {
+        util.warning(dataset['id'], 'No fill for ' + parameter['name']);
+      }
+
+      if (parameter['fill'] && varType == 'data' && parameter['fill'].toLowerCase() == "nan") {
+        // Found in THA_L2_MOM
+        util.warning(dataset['id'], 'FILLVAL cast to lower case is nan for ' + parameter['name'] + '. Setting to -1e31');
+        parameter['units'] = "-1e31";
+      }
+
       if (!parameter['units'] && varType == 'data') {
         util.warning(dataset['id'], 'No units for ' + parameter['name']);
         parameter['units'] = null;
@@ -209,7 +219,7 @@ function buildHAPI(CATALOG) {
 
     let EpochName = DEPEND_0s[0];
     let firstTimeValue = parameters[EpochName]['_variable']['cdfVarData']['record'][0]['value'][0];
-    let timePadValue = parameters[EpochName]['_variable']['cdfVarInfo']['padValue'];
+    //let timePadValue = parameters[EpochName]['_variable']['cdfVarInfo']['padValue'];
     parameterArray
             .unshift(
                       {
@@ -217,7 +227,7 @@ function buildHAPI(CATALOG) {
                         type: 'isotime',
                         units: 'UTC',
                         length: firstTimeValue.length,
-                        fill: timePadValue,
+                        fill: null,
                       });
 
     dataset['info']['parameters'] = parameterArray;
@@ -274,7 +284,6 @@ function writeFiles(datasets) {
     catalog.push({'id': dataset['id'], 'title': dataset['title']});
     ididx = ididx + 1;
   }
-  console.log(datasets)
 
   // Write HAPI ids-hapi.txt containing all HAPI dataset ids.
   util.writeSync(argv.cachedir + '/ids-hapi.txt', allIds.join('\n'), 'utf8');
@@ -322,16 +331,16 @@ function subsetDatasets(datasets) {
     extractDatasetAttributes(dataset, _data);
 
     let subdatasets = subsetDataset(dataset);
-    if (subdatasets !== undefined) {
+    if (subdatasets.length > 1) {
       util.log('  Note: ' + subdatasets.length + ' sub-datasets');
-      datasetsExpanded.splice(dsidx, 1, ...subdatasets);
     }
+    datasetsExpanded.splice(dsidx, 1, ...subdatasets);
   }
 
   datasets = null;
-      // This assumes first variable is always the primarytime variable.
-      // This assumption needs to be checked.
-      // will not be true for datasets with multipl DEPEND_0s.
+  // This assumes first variable is always the primary time variable.
+  // This assumption needs to be checked.
+  // will not be true for datasets with multipl DEPEND_0s.
 
   return datasetsExpanded;
 
@@ -351,15 +360,18 @@ function subsetDatasets(datasets) {
         DEPEND_0s[DEPEND_0] = DEPEND_0;
       }
     }
+
     DEPEND_0s = Object.keys(DEPEND_0s);
     if (DEPEND_0s.length == 1) {
-      return undefined;
+      dataset['info']['x_DEPEND_0'] = DEPEND_0s[0];
+      return [dataset];
     }
 
     let datasets = [];
     for ([sdsidx, DEPEND_0] of Object.entries(DEPEND_0s)) {
       newdataset = util.copy(dataset);
       newdataset['id'] = newdataset['id'] + '@' + sdsidx;
+      newdataset['info']['x_DEPEND_0'] = DEPEND_0;
       for (parameter of Object.keys(newdataset['info']['parameters'])) {
         let depend_0 = parameters[parameter]['_vAttributesKept']['_DEPEND_0'];
         if (depend_0 !== DEPEND_0) {
@@ -397,7 +409,11 @@ function extractDatasetAttributes(dataset, _data) {
   }
   let Nr = epochVariable['cdfVarData']['record'].length;
   dataset['info']['sampleStartDate'] = epochVariable['cdfVarData']['record'][0]['value'][0];
-  dataset['info']['sampleStopDate'] = epochVariable['cdfVarData']['record'][Nr-1]['value'][0];
+  let Nl = Nr;
+  if (Nr > 10) {
+    Nl = 10;
+  }
+  dataset['info']['sampleStopDate'] = epochVariable['cdfVarData']['record'][Nl-1]['value'][0];
   dataset['info']['x_sampleRecords'] = Nr;
 
   for (let attribute of cdfGAttributes) {

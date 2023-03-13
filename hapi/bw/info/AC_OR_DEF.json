@@ -1,59 +1,55 @@
 {
-  "id": "AC_OR_DEF",
-  "title": "ACE Daily GSE and J2000 GCI Position Data - E. C. Stone (California Institute of Technology)",
-  "info": {
-    "startDate": "1997-08-26T00:00:00Z",
-    "stopDate": "2023-02-20T00:00:00Z",
-    "sampleStartDate": "1997-08-26T00:00:00.000Z",
-    "sampleStopDate": "2001-08-06T00:00:00.000Z",
-    "x_sampleRecords": 1442,
-    "cadence": "P1D",
-    "contact": "E. C. Stone @ California Institute of Technology",
-    "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_OR_DEF",
-    "resourceID": "spase://NASA/NumericalData/ACE/Ephemeris/Definitive/P1D",
-    "x_creationDate": "2012-09-20",
-    "x_datasetCitation": "Please acknowledge the Principal Investigator, E. C. Stone of Caltech, USA",
-    "x_datasetTermsOfUse": "See the rules of use available from the ACE Science Center at: http://www.srl.caltech.edu/ACE/ASC/level2/policy_lvl2.html",
-    "parameters": [
-      {
-        "name": "Time",
-        "type": "isotime",
-        "units": "UTC",
-        "length": 24,
-        "fill": "0000-01-01T00:00:00.000Z"
-      },
-      {
-        "name": "GSE_POS",
-        "description": "ACE s/c position, 3 comp. in GSE coord.",
-        "type": "double",
-        "x_labelTitle": "S/C position in GSE",
-        "units": "km",
-        "fill": "-1.0E31",
-        "size": [
-          3
-        ],
-        "label": [
-          "X_GSE",
-          "Y_GSE",
-          "Z_GSE"
-        ]
-      },
-      {
-        "name": "GCI_POS",
-        "description": "ACE s/c position, 3 comp. in J2000GCI coord.",
-        "type": "double",
-        "x_labelTitle": "S/C position in J2000 GCI",
-        "units": "km",
-        "fill": "-1.0E31",
-        "size": [
-          3
-        ],
-        "label": [
-          "X_GCI",
-          "Y_GCI",
-          "Z_GCI"
-        ]
-      }
-    ]
-  }
+  "startDate": "1997-08-26T00:00:00Z",
+  "stopDate": "2023-02-20T00:00:00Z",
+  "sampleStartDate": "1997-08-26T00:00:00.000Z",
+  "sampleStopDate": "1997-09-04T00:00:00.000Z",
+  "x_sampleRecords": 1442,
+  "cadence": "P1D",
+  "contact": "E. C. Stone @ California Institute of Technology",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_OR_DEF",
+  "resourceID": "spase://NASA/NumericalData/ACE/Ephemeris/Definitive/P1D",
+  "x_creationDate": "2012-09-20",
+  "x_datasetCitation": "Please acknowledge the Principal Investigator, E. C. Stone of Caltech, USA",
+  "x_datasetTermsOfUse": "See the rules of use available from the ACE Science Center at: http://www.srl.caltech.edu/ACE/ASC/level2/policy_lvl2.html",
+  "parameters": [
+    {
+      "name": "Time",
+      "type": "isotime",
+      "units": "UTC",
+      "length": 24,
+      "fill": null
+    },
+    {
+      "name": "GSE_POS",
+      "description": "ACE s/c position, 3 comp. in GSE coord.",
+      "type": "double",
+      "x_labelTitle": "S/C position in GSE",
+      "units": "km",
+      "fill": "-1.0E31",
+      "size": [
+        3
+      ],
+      "label": [
+        "X_GSE",
+        "Y_GSE",
+        "Z_GSE"
+      ]
+    },
+    {
+      "name": "GCI_POS",
+      "description": "ACE s/c position, 3 comp. in J2000GCI coord.",
+      "type": "double",
+      "x_labelTitle": "S/C position in J2000 GCI",
+      "units": "km",
+      "fill": "-1.0E31",
+      "size": [
+        3
+      ],
+      "label": [
+        "X_GCI",
+        "Y_GCI",
+        "Z_GCI"
+      ]
+    }
+  ]
 }

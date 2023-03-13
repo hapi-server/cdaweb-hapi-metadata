@@ -1,75 +1,71 @@
 {
-  "id": "AC_AT_DEF",
-  "title": "ACE Hourly RTN, GSE and J2000 GCI Attitude direction cosines - E. C. Stone (California Institute of Technology)",
-  "info": {
-    "startDate": "1997-08-26T00:00:00Z",
-    "stopDate": "2023-02-20T17:00:00Z",
-    "sampleStartDate": "1997-08-26T00:00:00.000Z",
-    "sampleStopDate": "1997-10-25T01:00:00.000Z",
-    "x_sampleRecords": 1442,
-    "cadence": "PT1H",
-    "contact": "E. C. Stone @ California Institute of Technology",
-    "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_AT_DEF",
-    "resourceID": "spase://NASA/NumericalData/ACE/Attitude/Definitive/PT1H",
-    "x_creationDate": "2012-09-18",
-    "x_datasetCitation": "Please acknowledge the Principal Investigator, E. C. Stone of Caltech, USA",
-    "x_datasetTermsOfUse": "See the rules of use available from the ACE Science Center at: http://www.srl.caltech.edu/ACE/ASC/level2/policy_lvl2.html",
-    "parameters": [
-      {
-        "name": "Time",
-        "type": "isotime",
-        "units": "UTC",
-        "length": 24,
-        "fill": "0000-01-01T00:00:00.000Z"
-      },
-      {
-        "name": "RTN_ATT",
-        "description": "ACE s/c attitude, direction cosines in RTN coord.",
-        "type": "double",
-        "x_labelTitle": "S/C attitude in RTN",
-        "fill": "-1.0E31",
-        "size": [
-          3
-        ],
-        "units": null,
-        "label": [
-          "r_RTN",
-          "t_RTN",
-          "n_RTN"
-        ]
-      },
-      {
-        "name": "GCI_ATT",
-        "description": "ACE s/c attitude, direction cosines in J2000 GCI coord.",
-        "type": "double",
-        "x_labelTitle": "S/C attitude in J2000 GCI",
-        "fill": "-1.0E31",
-        "size": [
-          3
-        ],
-        "units": null,
-        "label": [
-          "x_GCI",
-          "y_GCI",
-          "z_GCI"
-        ]
-      },
-      {
-        "name": "GSE_ATT",
-        "description": "ACE s/c attitude, direction cosines in GSE coord.",
-        "type": "double",
-        "x_labelTitle": "S/C attitude in GSE",
-        "fill": "-1.0E31",
-        "size": [
-          3
-        ],
-        "units": null,
-        "label": [
-          "x_GSE",
-          "y_GSE",
-          "z_GSE"
-        ]
-      }
-    ]
-  }
+  "startDate": "1997-08-26T00:00:00Z",
+  "stopDate": "2023-02-20T17:00:00Z",
+  "sampleStartDate": "1997-08-26T00:00:00.000Z",
+  "sampleStopDate": "1997-08-26T09:00:00.000Z",
+  "x_sampleRecords": 1442,
+  "cadence": "PT1H",
+  "contact": "E. C. Stone @ California Institute of Technology",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_AT_DEF",
+  "resourceID": "spase://NASA/NumericalData/ACE/Attitude/Definitive/PT1H",
+  "x_creationDate": "2012-09-18",
+  "x_datasetCitation": "Please acknowledge the Principal Investigator, E. C. Stone of Caltech, USA",
+  "x_datasetTermsOfUse": "See the rules of use available from the ACE Science Center at: http://www.srl.caltech.edu/ACE/ASC/level2/policy_lvl2.html",
+  "parameters": [
+    {
+      "name": "Time",
+      "type": "isotime",
+      "units": "UTC",
+      "length": 24,
+      "fill": null
+    },
+    {
+      "name": "RTN_ATT",
+      "description": "ACE s/c attitude, direction cosines in RTN coord.",
+      "type": "double",
+      "x_labelTitle": "S/C attitude in RTN",
+      "fill": "-1.0E31",
+      "size": [
+        3
+      ],
+      "units": null,
+      "label": [
+        "r_RTN",
+        "t_RTN",
+        "n_RTN"
+      ]
+    },
+    {
+      "name": "GCI_ATT",
+      "description": "ACE s/c attitude, direction cosines in J2000 GCI coord.",
+      "type": "double",
+      "x_labelTitle": "S/C attitude in J2000 GCI",
+      "fill": "-1.0E31",
+      "size": [
+        3
+      ],
+      "units": null,
+      "label": [
+        "x_GCI",
+        "y_GCI",
+        "z_GCI"
+      ]
+    },
+    {
+      "name": "GSE_ATT",
+      "description": "ACE s/c attitude, direction cosines in GSE coord.",
+      "type": "double",
+      "x_labelTitle": "S/C attitude in GSE",
+      "fill": "-1.0E31",
+      "size": [
+        3
+      ],
+      "units": null,
+      "label": [
+        "x_GSE",
+        "y_GSE",
+        "z_GSE"
+      ]
+    }
+  ]
 }

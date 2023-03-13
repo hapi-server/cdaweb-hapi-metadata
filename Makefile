@@ -17,6 +17,9 @@ all: node_modules
 	make compare-meta
 
 CDAS="https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/"
+# Not used. For testing comparing inventory here
+# vs that obtained by CDAS2HAPIall.js by walking HTML
+# directory listing.
 inventory:
 	curl "$(CDAS)dataviews/sp_phys/datasets/AC_H2_MFI/inventory/19970829T000000Z,19970928T100010Z"
 	# Returns
@@ -39,24 +42,23 @@ nl:
 
 # Jeremy Faden's (jf) test version of nl's server
 nljf:
-	node HAPI2HAPIall.js --maxsockets 5 --version 'nljf' --idregex '$(IDREGEX)' --hapiurl 'https://jfaden.net/server/cdaweb/hapi'
+	node HAPI2HAPIall.js --version 'nljf' --idregex '$(IDREGEX)' --hapiurl 'https://jfaden.net/server/cdaweb/hapi'
 
 # Bernie Harris' (bh) prototype HAPI server
 bh:
 	node HAPI2HAPIall.js --version 'bh' --idregex '$(IDREGEX)'	
 
-
 # Jeremy Faden's (jf) AutoplotDataServer HAPI server
-ap-test:
+jf: bin/autoplot.jar
+	node HAPI2HAPIall.js --version 'jf' --idregex '$(IDREGEX)'	
+
+jf-test:
 	java -Djava.awt.headless=true -cp bin/autoplot.jar org.autoplot.AutoplotDataServer -q --uri='vap+cdaweb:ds=OMNI2_H0_MRG1HR&id=DST1800' -f hapi-info	
 
 bin/autoplot.jar:
 	@mkdir -p bin
 	@echo "Downloading $(AUTOPLOT)"
 	@cd bin; curl -s -O $(AUTOPLOT)
-
-jf: bin/autoplot.jar
-	node HAPI2HAPIall.js --version 'jf' --idregex '$(IDREGEX)'	
 
 node_modules:
 	npm install

@@ -1,0 +1,1 @@
+cdfexport -simple -batch text -settings export.set tha_l2_efi_20090102_v01.cdf

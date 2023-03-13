@@ -1,118 +1,114 @@
 {
-  "id": "AC_H1_MFI",
-  "title": "H1 - ACE Magnetic Field 4-Minute Level 2 Data - N. Ness (Bartol Research Institute)",
-  "info": {
-    "startDate": "1997-09-02T00:00:00Z",
-    "stopDate": "2022-12-20T23:56:00Z",
-    "sampleStartDate": "1997-09-02T00:00:00.000Z",
-    "sampleStopDate": "1997-09-06T00:04:00.000Z",
-    "x_sampleRecords": 1442,
-    "cadence": "PT4M",
-    "contact": "N. Ness @ Bartol Research Institute",
-    "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_H1_MFI",
-    "resourceID": "spase://NASA/NumericalData/ACE/MAG/L2/PT4M",
-    "x_creationDate": "88880131",
-    "x_datasetCitation": "Please acknowledge the Principal Investigator, N. Ness of Bartol Research Institute",
-    "x_datasetTermsOfUse": "See the rules of use available from the ACE Science Center at: http://www.srl.caltech.edu/ACE/ASC/level2/policy_lvl2.html",
-    "parameters": [
-      {
-        "name": "Time",
-        "type": "isotime",
-        "units": "UTC",
-        "length": 24,
-        "fill": "0000-01-01T00:00:00.000Z"
-      },
-      {
-        "name": "Magnitude",
-        "description": "B-field magnitude",
-        "type": "double",
-        "x_labelTitle": "B-field magnitude",
-        "units": "nT",
-        "fill": "-1.0E31",
-        "label": "<|B|>"
-      },
-      {
-        "name": "BGSEc",
-        "description": "Magnetic Field Vector in GSE Cartesian coordinates (4 min)",
-        "type": "double",
-        "x_labelTitle": "Mag Field vector, GSE coord",
-        "units": "nT",
-        "fill": "-1.0E31",
-        "size": [
-          3
-        ],
-        "vectorComponents": [
-          "x",
-          "y",
-          "z"
-        ],
-        "coordinateSystemName": "GSE",
-        "label": [
-          "BxGSE",
-          "ByGSE",
-          "BzGSE"
-        ]
-      },
-      {
-        "name": "BGSM",
-        "description": "Magnetic field vector in GSM coordinates (4 min)",
-        "type": "double",
-        "x_labelTitle": "Mag field vector, GSM coord",
-        "units": "nT",
-        "fill": "-1.0E31",
-        "size": [
-          3
-        ],
-        "label": [
-          "Bx(GSM)",
-          "By(GSM)",
-          "Bz(GSM)"
-        ]
-      },
-      {
-        "name": "SC_pos_GSE",
-        "description": "ACE s/c position, 3 comp. in GSE coord.",
-        "type": "double",
-        "x_labelTitle": "S/C position in GSE",
-        "units": "km",
-        "fill": "-1.0E31",
-        "size": [
-          3
-        ],
-        "vectorComponents": [
-          "x",
-          "y",
-          "z"
-        ],
-        "coordinateSystemName": "GSE",
-        "label": [
-          "ACEX-GSE",
-          "ACEY-GSE",
-          "ACEZ-GSE"
-        ]
-      },
-      {
-        "name": "SC_pos_GSM",
-        "description": "ACE s/c position, 3 comp. in GSM coord.",
-        "type": "double",
-        "x_labelTitle": "S/C position in GSM",
-        "units": "km",
-        "fill": "-1.0E31",
-        "size": [
-          3
-        ],
-        "vectorComponents": [
-          "x",
-          "y",
-          "z"
-        ],
-        "coordinateSystemName": "GSM",
-        "label": [
-          "ACEX-GSM",
-          "ACEY-GSM",
-          "ACEZ-GSM"
-        ]
-      }
-    ]
-  }
+  "startDate": "1997-09-02T00:00:00Z",
+  "stopDate": "2022-12-20T23:56:00Z",
+  "sampleStartDate": "1997-09-02T00:00:00.000Z",
+  "sampleStopDate": "1997-09-02T00:36:00.000Z",
+  "x_sampleRecords": 1442,
+  "cadence": "PT4M",
+  "contact": "N. Ness @ Bartol Research Institute",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_H1_MFI",
+  "resourceID": "spase://NASA/NumericalData/ACE/MAG/L2/PT4M",
+  "x_creationDate": "88880131",
+  "x_datasetCitation": "Please acknowledge the Principal Investigator, N. Ness of Bartol Research Institute",
+  "x_datasetTermsOfUse": "See the rules of use available from the ACE Science Center at: http://www.srl.caltech.edu/ACE/ASC/level2/policy_lvl2.html",
+  "parameters": [
+    {
+      "name": "Time",
+      "type": "isotime",
+      "units": "UTC",
+      "length": 24,
+      "fill": null
+    },
+    {
+      "name": "Magnitude",
+      "description": "B-field magnitude",
+      "type": "double",
+      "x_labelTitle": "B-field magnitude",
+      "units": "nT",
+      "fill": "-1.0E31",
+      "label": "<|B|>"
+    },
+    {
+      "name": "BGSEc",
+      "description": "Magnetic Field Vector in GSE Cartesian coordinates (4 min)",
+      "type": "double",
+      "x_labelTitle": "Mag Field vector, GSE coord",
+      "units": "nT",
+      "fill": "-1.0E31",
+      "size": [
+        3
+      ],
+      "vectorComponents": [
+        "x",
+        "y",
+        "z"
+      ],
+      "coordinateSystemName": "GSE",
+      "label": [
+        "BxGSE",
+        "ByGSE",
+        "BzGSE"
+      ]
+    },
+    {
+      "name": "BGSM",
+      "description": "Magnetic field vector in GSM coordinates (4 min)",
+      "type": "double",
+      "x_labelTitle": "Mag field vector, GSM coord",
+      "units": "nT",
+      "fill": "-1.0E31",
+      "size": [
+        3
+      ],
+      "label": [
+        "Bx(GSM)",
+        "By(GSM)",
+        "Bz(GSM)"
+      ]
+    },
+    {
+      "name": "SC_pos_GSE",
+      "description": "ACE s/c position, 3 comp. in GSE coord.",
+      "type": "double",
+      "x_labelTitle": "S/C position in GSE",
+      "units": "km",
+      "fill": "-1.0E31",
+      "size": [
+        3
+      ],
+      "vectorComponents": [
+        "x",
+        "y",
+        "z"
+      ],
+      "coordinateSystemName": "GSE",
+      "label": [
+        "ACEX-GSE",
+        "ACEY-GSE",
+        "ACEZ-GSE"
+      ]
+    },
+    {
+      "name": "SC_pos_GSM",
+      "description": "ACE s/c position, 3 comp. in GSM coord.",
+      "type": "double",
+      "x_labelTitle": "S/C position in GSM",
+      "units": "km",
+      "fill": "-1.0E31",
+      "size": [
+        3
+      ],
+      "vectorComponents": [
+        "x",
+        "y",
+        "z"
+      ],
+      "coordinateSystemName": "GSM",
+      "label": [
+        "ACEX-GSM",
+        "ACEY-GSM",
+        "ACEZ-GSM"
+      ]
+    }
+  ]
 }

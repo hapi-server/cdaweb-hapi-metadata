@@ -150,7 +150,11 @@ function get(opts, cb) {
       }
     } else {
       log("Writing: " + outFile);
-      util.writeSync(outFile, body, encoding(headers));
+      if (/application\/json/.test(headers['content-type'])) {
+        util.writeSync(outFile, obj2json(JSON.parse(body)), encoding(headers));
+      } else {
+        util.writeSync(outFile, body, encoding(headers));
+      }
     }
 
     if (opts["parse"] === false) {
