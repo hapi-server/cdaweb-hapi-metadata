@@ -151,31 +151,35 @@ function makeRequest(url, data, cb) {
 
   if (DEBUG) {console.error("Requesting: \n  " + url)}
 
-  let opts = {"url": url, "strictSSL": false, "gzip": ENCODING};
-
-  if (data == true && FORMAT !== 'csv') {
+  if (data == true) {
     if (FORMAT === 'text') {
       // Pass through.
-      let req = request(opts);
-      req.pipe(process.stdout);
-    } else {
-      let req = request(opts);
-      if (DEBUG) {
-        console.log("Writing: " + cdfFileName);
-      }
-      let cdfFileName = cdfFileDir + "/" + url.split("/").slice(-1)[0];
-      let cdfFileStream = fs.createWriteStream(cdfFileName);
-      req
-        .on('end', () => {
-          console.log("Wrote:   " + cdfFileName);
-          dump(cdfFileName);
-        })
-        .pipe(cdfFileStream);
+      let opts = {"url": url, "strictSSL": false, "gzip": ENCODING};
+      request(opts).pipe(process.stdout);
+      return;
+    } else if (FORMAT === 'csv-cdfdump') {
+      cdfdump();
+      return;
+    } else if (FORMAT == 'csv-apds') {
+    } else if (FORMAT == 'text2csv') {
     }
-    return;
   }
 
-  function dump(cdfFileName) {
+  function cdfdump(cdfFileName) {
+
+    let req = request(opts);
+    if (DEBUG) {
+      console.log("Writing: " + cdfFileName);
+    }
+    let cdfFileName = cdfFileDir + "/" + url.split("/").slice(-1)[0];
+    let cdfFileStream = fs.createWriteStream(cdfFileName);
+    req
+      .on('end', () => {
+        console.log("Wrote:   " + cdfFileName);
+        dump(cdfFileName);
+      })
+      .pipe(cdfFileStream);
+
     let cmd = "python3 cdfdump.py"
             + " --file=" + cdfFileName
             + " --id=" + IDr
@@ -193,6 +197,7 @@ function makeRequest(url, data, cb) {
     });
   }
 
+  let opts = {"url": url, "strictSSL": false, "gzip": ENCODING};
   request(opts,
     function (error, response, body) {
       if (error) {
@@ -208,5 +213,6 @@ function makeRequest(url, data, cb) {
       }
       if (DEBUG) {console.error("Finished request:\n  " + url)}
       cb(body);
-  })
+  });
+
 }
