@@ -33,7 +33,7 @@ let argv = yargs
                 cdasr:  'https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/',
                 allxml: 'https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml',
                 debug: false,
-                maxtries: 1,
+                maxtries: 4,
                 minrecords: 1440,
                 hapiversion: '3.1',
                 cdf2cdfml: 'java CDF2CDFML',
@@ -44,10 +44,10 @@ argv['include'] = argv['include'].split(',');
 argv['omit'] = argv['omit'].split(',');
 argv['skipids'] = argv['skipids'].split(',');
 
-const {util} = require('./CDAS2HAPIall.util.js');
+const {util} = require('./CDAS2HAPIinfo.util.js');
 util.argv = argv;
 
-const {meta} = require('./CDAS2HAPIall.meta.js');
+const {meta} = require('./CDAS2HAPIinfo.meta.js');
 meta.argv = argv;
 
 // meta.run() gets all needed files.
@@ -172,8 +172,8 @@ function buildHAPI(CATALOG) {
 
       if (parameter['fill'] && varType == 'data' && parameter['fill'].toLowerCase() == "nan") {
         // Found in THA_L2_MOM
-        util.warning(dataset['id'], 'FILLVAL cast to lower case is nan for ' + parameter['name'] + '. Setting to -1e31');
-        parameter['units'] = "-1e31";
+        //util.warning(dataset['id'], 'FILLVAL cast to lower case is nan for ' + parameter['name'] + '. Setting to -1e31');
+        //parameter['fill'] = "-1e31";
       }
 
       if (!parameter['units'] && varType == 'data') {
@@ -293,7 +293,6 @@ function writeFiles(datasets) {
 
   // Write HAPI all.json containing all content from all info files.
   util.writeSync(argv.all, util.obj2json(datasets));
-
 }
 
 function deleteUnderscoreKeys(dataset) {
@@ -405,7 +404,7 @@ function extractDatasetAttributes(dataset, _data) {
 
   let epochVariable = _data['cdfVariables']['variable'][0];
   if (!epochVariable['cdfVarInfo']['cdfDatatype'].startsWith('CDF_EPOCH')) {
-    error(id,'First variable does not have cdfDatatype that starts with "CDF_EPOCH', true);    
+    util.error(id,'First variable does not have cdfDatatype that starts with "CDF_EPOCH"', true);    
   }
   let Nr = epochVariable['cdfVarData']['record'].length;
   dataset['info']['sampleStartDate'] = epochVariable['cdfVarData']['record'][0]['value'][0];
@@ -461,9 +460,12 @@ function extractParameterAttributes(dataset) {
       parameters[variable['name']]['name'] = variable['name'];
     }
     if (vAttributesKept['_VAR_TYPE'] === 'data') {
-      parameters[variable['name']]['type'] = cdftype2hapitype(
-        variable['cdfVarInfo']['cdfDatatype']
-      );
+      let cdftype = cdftype2hapitype(variable['cdfVarInfo']['cdfDatatype']);
+      parameters[variable['name']]['type'] = cdftype;
+      if (cdftype === 'string') {
+        parameters[variable['name']]['length'] = variable['cdfVarInfo']['padValue'].length;
+        parameters[variable['name']]['fill'] = variable['cdfVarInfo']['padValue'];
+      }
     }
     parameters[variable['name']]['_vAttributesKept'] = vAttributesKept;
     parameters[variable['name']]['_variable'] = variable;
@@ -482,8 +484,10 @@ function extractParameterAttributes(dataset) {
       return 'integer';
     } else if (cdftype.startsWith('CDF_EPOCH')) {
       return 'integer';
+    } else if (cdftype.startsWith('CDF_CHAR')) {
+      return 'string';
     } else {
-      util.error(dataset['id'], 'Un-handled CDF datatype ' + cdftype);
+      util.error(dataset['id'], 'Un-handled CDF datatype ' + cdftype);      
     }
   }
 }

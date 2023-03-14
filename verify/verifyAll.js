@@ -83,10 +83,12 @@ function info(CATALOG) {
         console.log("Received: " + url);
         let result = JSON.parse(body);
         if (result['pass']) {
-          console.log(chalk.green.bold("✓ PASS" +  CATALOG[ididx]['id']));
+          console.log(chalk.green.bold("✓ PASS " +  CATALOG[ididx]['id']));
         } else {
           fs.writeFileSync(outDir + "/" + id + "-fails.json", JSON.stringify(result['fails'], null, 2));
-          console.log(chalk.red.bold("✗ FAIL " + id + " (" + result['fails'].length + " failures)"));
+          let plural = "";
+          if (result['fails'].length > 1) {plural = "s";}
+          console.log(chalk.red.bold(`✗ FAIL ${id} (${result['fails'].length} failure${plural})`));
         }
         verify(++ididx);
       });

@@ -1,13 +1,14 @@
 const fs = require('fs');
 
-let outFile = __dirname + '/meta/compare-meta.json';
+let outFile = __dirname + '/compare/compare-meta.json';
 
 let alls = {};
-let versions = ['bw','nl','bh', 'jf'];
+//let versions = ['bw','nl','bh', 'jf'];
+let versions = ['bw','nl','bh'];
 
 for (version of versions) {
   alls[version] = {};
-  let fname = __dirname + '/../all/all-' + version + '.json';
+  let fname = __dirname + '/hapi/' + version + '/all.json';
   console.log("Reading: " + fname);
   let all = JSON.parse(fs.readFileSync(fname));
 

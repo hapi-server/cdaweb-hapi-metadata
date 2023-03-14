@@ -1,0 +1,977 @@
+{
+  "A2_K0_MPA@0": {
+    "id": {
+      "bw": "A2_K0_MPA@0"
+    },
+    "title": {
+      "bw": "LANL 2002 Magnetospheric Plasma Analyzer Key Parameters - Mike Henderson (LANL)"
+    },
+    "info": {
+      "startDate": {
+        "bw": "2003-10-29T00:03:04Z"
+      },
+      "stopDate": {
+        "bw": "2008-01-03T01:31:27Z"
+      },
+      "sampleStartDate": {
+        "bw": "2008-01-01T13:26:43.736Z"
+      },
+      "sampleStopDate": {
+        "bw": "2008-01-01T13:42:29.904Z"
+      },
+      "x_sampleRecords": {
+        "bw": 1441
+      },
+      "cadence": {
+        "bw": null
+      },
+      "contact": {
+        "bw": "Mike Henderson @ LANL"
+      },
+      "resourceURL": {
+        "bw": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#A2_K0_MPA@0"
+      },
+      "resourceID": {
+        "bw": "spase://NASA/NumericalData/LANL/2002/MPA/PT87S"
+      },
+      "x_creationDate": {
+        "bw": null
+      },
+      "x_datasetCitation": {
+        "bw": null
+      },
+      "x_datasetTermsOfUse": {
+        "bw": null
+      },
+      "x_DEPEND_0": {
+        "bw": "Epoch"
+      },
+      "parameters": {
+        "Time": {
+          "bw": {
+            "name": "Time",
+            "type": "isotime",
+            "units": "UTC",
+            "length": 24,
+            "fill": null
+          }
+        },
+        "dens_lop": {
+          "bw": {
+            "name": "dens_lop",
+            "description": "Partial density of low energy ions (1-130 eV/e)",
+            "type": "double",
+            "x_labelTitle": "partial density low-E p",
+            "units": "cm-3",
+            "fill": "-1.0E31",
+            "label": "low p dens"
+          }
+        },
+        "vel_lop": {
+          "bw": {
+            "name": "vel_lop",
+            "description": "Velocity, 3 comp. in s/c coord., of low energy ions (1-130 eV/e)",
+            "type": "double",
+            "x_labelTitle": "velocity vector low-E p",
+            "units": "km/sec",
+            "fill": "-1.0E31",
+            "size": [
+              3
+            ],
+            "vectorComponents": [
+              "x",
+              "y",
+              "z"
+            ],
+            "label": [
+              "Vx-S/C",
+              "Vy-S/C",
+              "Vz-S/C"
+            ]
+          }
+        },
+        "dens_hip": {
+          "bw": {
+            "name": "dens_hip",
+            "description": "Partial density of high energy ions (.13-45 keV/e)",
+            "type": "double",
+            "x_labelTitle": "partial density high-E e",
+            "units": "cm-3",
+            "fill": "-1.0E31",
+            "label": "hi p dens"
+          }
+        },
+        "temp_hip": {
+          "bw": {
+            "name": "temp_hip",
+            "description": "Temperatures, parallel & perp. for high energy ions (.13-45 keV/e)",
+            "type": "double",
+            "x_labelTitle": "temperature high-E p",
+            "units": "ev",
+            "fill": "-1.0E31",
+            "size": [
+              2
+            ],
+            "label": [
+              "Tpara",
+              "Tperp"
+            ]
+          }
+        },
+        "theta_phi_hip": {
+          "bw": {
+            "name": "theta_phi_hip",
+            "description": "Proton symmetry axis: polar ang. relative to Earth direction, azim. ang. from north",
+            "type": "double",
+            "x_labelTitle": "polar,azim ang high-E p symm axis",
+            "units": "deg",
+            "fill": "-1.0E31",
+            "size": [
+              2
+            ],
+            "label": [
+              "polarangle",
+              "azimuthangle"
+            ]
+          }
+        },
+        "tratio_hip": {
+          "bw": {
+            "name": "tratio_hip",
+            "description": "Ratio Tperp/Tmid for high energy ions, (.13-45 keV/e)",
+            "type": "double",
+            "x_labelTitle": "Ratio of temperature eigenvalue for high-E p",
+            "fill": "-1.0E31",
+            "label": "Tper/Tmid",
+            "units": null
+          }
+        },
+        "dens_e": {
+          "bw": {
+            "name": "dens_e",
+            "description": "Partial density of electrons (.03-45 keV/q)",
+            "type": "double",
+            "x_labelTitle": "partial density electrons",
+            "units": "cm-3",
+            "fill": "-1.0E31",
+            "label": "elec dens"
+          }
+        },
+        "temp_e": {
+          "bw": {
+            "name": "temp_e",
+            "description": "Temperatures, parallel & perp. for electrons (.03-45 keV/q)",
+            "type": "double",
+            "x_labelTitle": "temperature electrons",
+            "units": "ev",
+            "fill": "-1.0E31",
+            "size": [
+              2
+            ],
+            "label": [
+              "Tpara",
+              "Tperp"
+            ]
+          }
+        },
+        "theta_phi_e": {
+          "bw": {
+            "name": "theta_phi_e",
+            "description": "Electron symmetry axis: polar ang. relative to Earth direction azim. ang. from north",
+            "type": "double",
+            "x_labelTitle": "polar,azim ang e symm axis",
+            "units": "deg",
+            "fill": "-1.0E31",
+            "size": [
+              2
+            ],
+            "label": [
+              "polarangle",
+              "azimuthangle"
+            ]
+          }
+        },
+        "tratio_e": {
+          "bw": {
+            "name": "tratio_e",
+            "description": "Ratio Tperp/Tmid for electrons (.03-45 keV/q)",
+            "type": "double",
+            "x_labelTitle": "Ratio of temperature eigenvalues for electrons",
+            "fill": "-1.0E31",
+            "label": "Tper/Tmid",
+            "units": null
+          }
+        },
+        "sc_pot": {
+          "bw": {
+            "name": "sc_pot",
+            "description": "Spacecraft potential",
+            "type": "double",
+            "x_labelTitle": "spacecraft potential",
+            "units": "volts",
+            "fill": "-1.0E31",
+            "label": "S/C poten."
+          }
+        },
+        "bkgd": {
+          "bw": {
+            "name": "bkgd",
+            "description": "Background count rate",
+            "type": "double",
+            "x_labelTitle": "background count rate",
+            "units": "cts/9ms",
+            "fill": "-1.0E31",
+            "label": "Backgrd"
+          }
+        },
+        "sc_pos_geo": {
+          "bw": {
+            "name": "sc_pos_geo",
+            "description": "S/C position, Geographic coordinates (radius,lat,long)",
+            "type": "double",
+            "x_labelTitle": "S/C position, Polar Geographic coordinates",
+            "fill": "-1.0E31",
+            "size": [
+              3
+            ],
+            "units": null,
+            "label": [
+              "radialdistance",
+              "latitude",
+              "longitude"
+            ]
+          }
+        },
+        "sc_pos_mag": {
+          "bw": {
+            "name": "sc_pos_mag",
+            "description": "S/C position, Magnetic coordinates (radius,mlat,mlt)",
+            "type": "double",
+            "x_labelTitle": "S/C position polar magnetic coordinates",
+            "fill": "-1.0E31",
+            "size": [
+              3
+            ],
+            "units": null,
+            "label": [
+              "Earthradii",
+              "MLAT",
+              "MLT"
+            ]
+          }
+        },
+        "sc_pos_syngci": {
+          "bw": {
+            "name": "sc_pos_syngci",
+            "type": "double",
+            "x_labelTitle": "S/C position, Cartesian GCI coordinates",
+            "description": "[SPECIALIZED USE ONLY] [Computed 3-min vector] S/C position, GCI coordinates (X, Y, Z)",
+            "fill": "-1.0E31",
+            "size": [
+              3
+            ],
+            "units": null,
+            "label": [
+              "X_GCI",
+              "Y_GCI",
+              "Z_GCI"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "A2_K0_MPA@1": {
+    "id": {
+      "bw": "A2_K0_MPA@1"
+    },
+    "title": {
+      "bw": "LANL 2002 Magnetospheric Plasma Analyzer Key Parameters - Mike Henderson (LANL)"
+    },
+    "info": {
+      "startDate": {
+        "bw": "2003-10-29T00:03:04Z"
+      },
+      "stopDate": {
+        "bw": "2008-01-03T01:31:27Z"
+      },
+      "sampleStartDate": {
+        "bw": "2008-01-01T13:26:43.736Z"
+      },
+      "sampleStopDate": {
+        "bw": "2008-01-01T13:42:29.904Z"
+      },
+      "x_sampleRecords": {
+        "bw": 1441
+      },
+      "cadence": {
+        "bw": null
+      },
+      "contact": {
+        "bw": "Mike Henderson @ LANL"
+      },
+      "resourceURL": {
+        "bw": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#A2_K0_MPA@1"
+      },
+      "resourceID": {
+        "bw": "spase://NASA/NumericalData/LANL/2002/MPA/PT87S"
+      },
+      "x_creationDate": {
+        "bw": null
+      },
+      "x_datasetCitation": {
+        "bw": null
+      },
+      "x_datasetTermsOfUse": {
+        "bw": null
+      },
+      "x_DEPEND_0": {
+        "bw": "Epoch1"
+      },
+      "parameters": {
+        "Time": {
+          "bw": {
+            "name": "Time",
+            "type": "isotime",
+            "units": "UTC",
+            "length": 24,
+            "fill": null
+          }
+        },
+        "sc_pos_syngci": {
+          "bw": {
+            "name": "sc_pos_syngci",
+            "description": "[SPECIALIZED USE ONLY] [Computed 3-min vector] S/C position, GCI coordinates (X, Y, Z)",
+            "type": "double",
+            "x_labelTitle": "S/C position, Cartesian GCI coordinates",
+            "fill": "-1.0E31",
+            "size": [
+              3
+            ],
+            "units": null,
+            "label": [
+              "X_GCI",
+              "Y_GCI",
+              "Z_GCI"
+            ]
+          }
+        },
+        "dens_lop": {
+          "bw": {
+            "name": "dens_lop",
+            "type": "double",
+            "x_labelTitle": "partial density low-E p",
+            "description": "Partial density of low energy ions (1-130 eV/e)",
+            "units": "cm-3",
+            "fill": "-1.0E31",
+            "label": "low p dens"
+          }
+        },
+        "vel_lop": {
+          "bw": {
+            "name": "vel_lop",
+            "type": "double",
+            "x_labelTitle": "velocity vector low-E p",
+            "description": "Velocity, 3 comp. in s/c coord., of low energy ions (1-130 eV/e)",
+            "units": "km/sec",
+            "fill": "-1.0E31",
+            "size": [
+              3
+            ],
+            "vectorComponents": [
+              "x",
+              "y",
+              "z"
+            ],
+            "label": [
+              "Vx-S/C",
+              "Vy-S/C",
+              "Vz-S/C"
+            ]
+          }
+        },
+        "dens_hip": {
+          "bw": {
+            "name": "dens_hip",
+            "type": "double",
+            "x_labelTitle": "partial density high-E e",
+            "description": "Partial density of high energy ions (.13-45 keV/e)",
+            "units": "cm-3",
+            "fill": "-1.0E31",
+            "label": "hi p dens"
+          }
+        },
+        "temp_hip": {
+          "bw": {
+            "name": "temp_hip",
+            "type": "double",
+            "x_labelTitle": "temperature high-E p",
+            "description": "Temperatures, parallel & perp. for high energy ions (.13-45 keV/e)",
+            "units": "ev",
+            "fill": "-1.0E31",
+            "size": [
+              2
+            ],
+            "label": [
+              "Tpara",
+              "Tperp"
+            ]
+          }
+        },
+        "theta_phi_hip": {
+          "bw": {
+            "name": "theta_phi_hip",
+            "type": "double",
+            "x_labelTitle": "polar,azim ang high-E p symm axis",
+            "description": "Proton symmetry axis: polar ang. relative to Earth direction, azim. ang. from north",
+            "units": "deg",
+            "fill": "-1.0E31",
+            "size": [
+              2
+            ],
+            "label": [
+              "polarangle",
+              "azimuthangle"
+            ]
+          }
+        },
+        "tratio_hip": {
+          "bw": {
+            "name": "tratio_hip",
+            "type": "double",
+            "x_labelTitle": "Ratio of temperature eigenvalue for high-E p",
+            "description": "Ratio Tperp/Tmid for high energy ions, (.13-45 keV/e)",
+            "fill": "-1.0E31",
+            "label": "Tper/Tmid",
+            "units": null
+          }
+        },
+        "dens_e": {
+          "bw": {
+            "name": "dens_e",
+            "type": "double",
+            "x_labelTitle": "partial density electrons",
+            "description": "Partial density of electrons (.03-45 keV/q)",
+            "units": "cm-3",
+            "fill": "-1.0E31",
+            "label": "elec dens"
+          }
+        },
+        "temp_e": {
+          "bw": {
+            "name": "temp_e",
+            "type": "double",
+            "x_labelTitle": "temperature electrons",
+            "description": "Temperatures, parallel & perp. for electrons (.03-45 keV/q)",
+            "units": "ev",
+            "fill": "-1.0E31",
+            "size": [
+              2
+            ],
+            "label": [
+              "Tpara",
+              "Tperp"
+            ]
+          }
+        },
+        "theta_phi_e": {
+          "bw": {
+            "name": "theta_phi_e",
+            "type": "double",
+            "x_labelTitle": "polar,azim ang e symm axis",
+            "description": "Electron symmetry axis: polar ang. relative to Earth direction azim. ang. from north",
+            "units": "deg",
+            "fill": "-1.0E31",
+            "size": [
+              2
+            ],
+            "label": [
+              "polarangle",
+              "azimuthangle"
+            ]
+          }
+        },
+        "tratio_e": {
+          "bw": {
+            "name": "tratio_e",
+            "type": "double",
+            "x_labelTitle": "Ratio of temperature eigenvalues for electrons",
+            "description": "Ratio Tperp/Tmid for electrons (.03-45 keV/q)",
+            "fill": "-1.0E31",
+            "label": "Tper/Tmid",
+            "units": null
+          }
+        },
+        "sc_pot": {
+          "bw": {
+            "name": "sc_pot",
+            "type": "double",
+            "x_labelTitle": "spacecraft potential",
+            "description": "Spacecraft potential",
+            "units": "volts",
+            "fill": "-1.0E31",
+            "label": "S/C poten."
+          }
+        },
+        "bkgd": {
+          "bw": {
+            "name": "bkgd",
+            "type": "double",
+            "x_labelTitle": "background count rate",
+            "description": "Background count rate",
+            "units": "cts/9ms",
+            "fill": "-1.0E31",
+            "label": "Backgrd"
+          }
+        },
+        "sc_pos_geo": {
+          "bw": {
+            "name": "sc_pos_geo",
+            "type": "double",
+            "x_labelTitle": "S/C position, Polar Geographic coordinates",
+            "description": "S/C position, Geographic coordinates (radius,lat,long)",
+            "fill": "-1.0E31",
+            "size": [
+              3
+            ],
+            "units": null,
+            "label": [
+              "radialdistance",
+              "latitude",
+              "longitude"
+            ]
+          }
+        },
+        "sc_pos_mag": {
+          "bw": {
+            "name": "sc_pos_mag",
+            "type": "double",
+            "x_labelTitle": "S/C position polar magnetic coordinates",
+            "description": "S/C position, Magnetic coordinates (radius,mlat,mlt)",
+            "fill": "-1.0E31",
+            "size": [
+              3
+            ],
+            "units": null,
+            "label": [
+              "Earthradii",
+              "MLAT",
+              "MLT"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "A2_K0_MPA": {
+    "id": {
+      "nl": "A2_K0_MPA",
+      "bh": "spase://NASA/NumericalData/LANL/2002/MPA/PT87S"
+    },
+    "title": {
+      "bh": "LANL 2002 Magnetospheric Plasma Analyzer (MPA) at 87 sec Resolution in Spacecraft Coordinates"
+    },
+    "label": {
+      "bh": "LANL 2002 Magnetospheric Plasma Analyzer (MPA) at 87 sec Resolution in Spacecraft Coordinates"
+    },
+    "x_SPDF_ID": {
+      "bh": "A2_K0_MPA"
+    },
+    "info": {
+      "HAPI": {
+        "nl": "2.0",
+        "bh": "3.1"
+      },
+      "startDate": {
+        "nl": "2003-10-29T00:03:04Z",
+        "bh": "2003-10-29T00:00:00"
+      },
+      "stopDate": {
+        "nl": "2008-01-03T01:31:27Z",
+        "bh": "2008-01-03T23:59:59"
+      },
+      "resourceURL": {
+        "nl": "https://cdaweb.gsfc.nasa.gov/misc/NotesA.html#A2_K0_MPA",
+        "bh": "https://cdaweb.gsfc.nasa.gov/cgi-bin/eval2.cgi?dataset=A2_K0_MPA&index=sp_phys"
+      },
+      "contact": {
+        "nl": "Mike Henderson @ LANL",
+        "bh": "Michelle.F.Thomsen"
+      },
+      "parameters": {
+        "Time": {
+          "nl": {
+            "name": "Time",
+            "type": "isotime",
+            "units": "UTC",
+            "length": 24,
+            "fill": null
+          }
+        },
+        "dens_lop": {
+          "nl": {
+            "name": "dens_lop",
+            "type": "double",
+            "units": "cm-3",
+            "fill": "-1.0E31",
+            "description": "Partial density of low energy ions (1-130 eV/e)"
+          },
+          "bh": {
+            "name": "dens_lop",
+            "description": "Partial density of low energy ions (1-130 eV/e).",
+            "type": "unknown",
+            "units": "cm^-3",
+            "label": "low p dens",
+            "x_SPDF_VALIDMIN": "0.0",
+            "x_SPDF_VALIDMAX": "100000.0",
+            "fill": "-1.0000e+031"
+          }
+        },
+        "vel_lop": {
+          "nl": {
+            "name": "vel_lop",
+            "type": "double",
+            "units": "km/sec",
+            "fill": "-1.0E31",
+            "description": "Velocity, 3 comp. in s/c coord., of low energy ions (1-130 eV/e)",
+            "size": [
+              3
+            ]
+          },
+          "bh": {
+            "name": "vel_lop",
+            "description": "Velocity vector low-enery Ions (1-130 eV/e) in spacecraft Coordinates in units of km/s.",
+            "type": "unknown",
+            "size": [
+              3
+            ],
+            "units": "km/s",
+            "x_SPDF_VALIDMIN": "-2000",
+            "x_SPDF_VALIDMAX": "2000",
+            "fill": "-1.0000e+031"
+          }
+        },
+        "dens_hip": {
+          "nl": {
+            "name": "dens_hip",
+            "type": "double",
+            "units": "cm-3",
+            "fill": "-1.0E31",
+            "description": "Partial density of high energy ions (.13-45 keV/e)"
+          },
+          "bh": {
+            "name": "dens_hip",
+            "description": "Partial density of high energy ions (.13-45 keV/e).",
+            "type": "unknown",
+            "units": "cm^-3",
+            "label": "hi p dens",
+            "x_SPDF_VALIDMIN": "0.0",
+            "x_SPDF_VALIDMAX": "10000.0",
+            "fill": "-1.0000e+031"
+          }
+        },
+        "temp_hip": {
+          "nl": {
+            "name": "temp_hip",
+            "type": "double",
+            "units": "ev",
+            "fill": "-1.0E31",
+            "description": "Temperatures, parallel & perp. for high energy ions (.13-45 keV/e)",
+            "size": [
+              2
+            ]
+          },
+          "bh": {
+            "name": "temp_hip",
+            "description": "Temperature of high energy ions (.13-45 keV/e).",
+            "type": "unknown",
+            "size": [
+              2
+            ],
+            "units": "eV",
+            "label": "high p temp",
+            "x_SPDF_VALIDMIN": "0.0",
+            "x_SPDF_VALIDMAX": "50000.0",
+            "fill": "-1.0000e+031"
+          }
+        },
+        "theta_phi_hip": {
+          "nl": {
+            "name": "theta_phi_hip",
+            "type": "double",
+            "units": "deg",
+            "fill": "-1.0E31",
+            "description": "Proton symmetry axis: polar ang. relative to Earth direction, azim. ang. from north",
+            "size": [
+              2
+            ]
+          },
+          "bh": {
+            "name": "theta_phi_hip",
+            "description": "Proton symmetry axis: polar angle relative to Earth direction, azimuthal angle from the north.",
+            "type": "unknown",
+            "size": [
+              2
+            ],
+            "units": [
+              "degrees",
+              "degrees"
+            ],
+            "fill": "-1.0000e+031"
+          }
+        },
+        "tratio_hip": {
+          "nl": {
+            "name": "tratio_hip",
+            "type": "double",
+            "units": " ",
+            "fill": "-1.0E31",
+            "description": "Ratio Tperp/Tmid for high energy ions, (.13-45 keV/e)"
+          },
+          "bh": {
+            "name": "tratio_hip",
+            "description": "Ratio of temperature (Tperp/Tmid) of low energy ions (.13-45 keV/e).",
+            "type": "unknown",
+            "units": null,
+            "label": "Tper/Tmid",
+            "x_SPDF_VALIDMIN": "0.0",
+            "x_SPDF_VALIDMAX": "100.0",
+            "fill": "-1.0000e+031"
+          }
+        },
+        "dens_e": {
+          "nl": {
+            "name": "dens_e",
+            "type": "double",
+            "units": "cm-3",
+            "fill": "-1.0E31",
+            "description": "Partial density of electrons (.03-45 keV/q)"
+          },
+          "bh": {
+            "name": "dens_e",
+            "description": "Partial density of electrons (.03-45 keV/q).",
+            "type": "unknown",
+            "units": "# cm^-3",
+            "label": "elec dens",
+            "x_SPDF_VALIDMIN": "0.0",
+            "x_SPDF_VALIDMAX": "100000.0",
+            "fill": "-1.0000e+031"
+          }
+        },
+        "temp_e": {
+          "nl": {
+            "name": "temp_e",
+            "type": "double",
+            "units": "ev",
+            "fill": "-1.0E31",
+            "description": "Temperatures, parallel & perp. for electrons (.03-45 keV/q)",
+            "size": [
+              2
+            ]
+          },
+          "bh": {
+            "name": "temp_e",
+            "description": "Temperature of electrons (.03-45 keV/q).",
+            "type": "unknown",
+            "size": [
+              2
+            ],
+            "units": "eV",
+            "label": "Temperatures, parallel and perp. for electrons",
+            "x_SPDF_VALIDMIN": "0.0",
+            "x_SPDF_VALIDMAX": "50000.0",
+            "fill": "-1.0000e+031"
+          }
+        },
+        "theta_phi_e": {
+          "nl": {
+            "name": "theta_phi_e",
+            "type": "double",
+            "units": "deg",
+            "fill": "-1.0E31",
+            "description": "Electron symmetry axis: polar ang. relative to Earth direction azim. ang. from north",
+            "size": [
+              2
+            ]
+          },
+          "bh": {
+            "name": "theta_phi_e",
+            "description": "Electron symmetry axis: polar angle relative to Earth direction, azimuthal angle from the north.",
+            "type": "unknown",
+            "size": [
+              2
+            ],
+            "units": [
+              "degrees",
+              "degrees"
+            ],
+            "fill": "-1.0000e+031"
+          }
+        },
+        "tratio_e": {
+          "nl": {
+            "name": "tratio_e",
+            "type": "double",
+            "units": " ",
+            "fill": "-1.0E31",
+            "description": "Ratio Tperp/Tmid for electrons (.03-45 keV/q)"
+          },
+          "bh": {
+            "name": "tratio_e",
+            "description": "Ratio of temperature (Tperp/Tmid) of electrons (.03-45 keV/q).",
+            "type": "unknown",
+            "units": null,
+            "label": "Tper/Tmid",
+            "x_SPDF_VALIDMIN": "0.0",
+            "x_SPDF_VALIDMAX": "100.0",
+            "fill": "-1.0000e+031"
+          }
+        },
+        "sc_pot": {
+          "nl": {
+            "name": "sc_pot",
+            "type": "double",
+            "units": "volts",
+            "fill": "-1.0E31",
+            "description": "Spacecraft potential"
+          },
+          "bh": {
+            "name": "sc_pot",
+            "description": "Spacecraft potential in units of volts.",
+            "type": "unknown",
+            "units": "volts",
+            "label": "S/C poten.",
+            "x_SPDF_VALIDMIN": "-20000.",
+            "x_SPDF_VALIDMAX": "0.0",
+            "fill": "-1.0000e+031"
+          }
+        },
+        "bkgd": {
+          "nl": {
+            "name": "bkgd",
+            "type": "double",
+            "units": "cts/9ms",
+            "fill": "-1.0E31",
+            "description": "Background count rate"
+          },
+          "bh": {
+            "name": "bkgd",
+            "description": "Background Count Rate.",
+            "type": "unknown",
+            "units": "cts/9ms",
+            "label": "Backgrd",
+            "x_SPDF_VALIDMIN": "0.0",
+            "x_SPDF_VALIDMAX": "1000.0",
+            "fill": "-1.0000e+031"
+          }
+        },
+        "sc_pos_geo": {
+          "nl": {
+            "name": "sc_pos_geo",
+            "type": "double",
+            "units": null,
+            "fill": "-1.0E31",
+            "description": "S/C position, Geographic coordinates (radius,lat,long)",
+            "size": [
+              3
+            ]
+          },
+          "bh": {
+            "name": "sc_pos_geo",
+            "description": "Spacecraft position, polar geographic coordinates (radius,lat,long).",
+            "type": "unknown",
+            "size": [
+              3
+            ],
+            "units": [
+              "EarthRadii",
+              "degrees",
+              "degrees"
+            ],
+            "fill": "-1.0000e+031"
+          }
+        },
+        "sc_pos_mag": {
+          "nl": {
+            "name": "sc_pos_mag",
+            "type": "double",
+            "units": null,
+            "fill": "-1.0E31",
+            "description": "S/C position, Magnetic coordinates (radius,mlat,mlt)",
+            "size": [
+              3
+            ]
+          },
+          "bh": {
+            "name": "sc_pos_mag",
+            "description": "Spacecraft position, polar magnetic coordinates (radius,lat,long).",
+            "type": "unknown",
+            "size": [
+              3
+            ],
+            "units": [
+              "EarthRadii",
+              "degrees",
+              "hours"
+            ],
+            "fill": "-1.0000e+031"
+          }
+        },
+        "sc_pos_syngci": {
+          "nl": {
+            "name": "sc_pos_syngci",
+            "type": "double",
+            "units": null,
+            "fill": "-1.0E31",
+            "description": "[SPECIALIZED USE ONLY] [Computed 3-min vector] S/C position, GCI coordinates (X, Y, Z)",
+            "size": [
+              3
+            ]
+          },
+          "bh": {
+            "name": "sc_pos_syngci",
+            "description": "Spacecraft position, cartesian coordinates (radius,lat,long). Geocentric Celestial Inertial, is earth centered, with the X-axis pointing from the Earth towards the first point of Aries (the position of the Sun at vernal equinox). This direction is the intersection of the Earth's equatorial plane and the ecliptic plane--thus the X-axis lies in both planes. The Z-axis is parallel to the rotation axis of the Earth, and the Y-axis completes a right-handed orthogonal coordinate system. The X-axis is the direction of the mean vernal equinox of J2000. This is a virtual variable generated by read_myCDF w/ useof the data in the sc_pos_geo variable and a conversion routinespecified in the function attribute, namely conv_pos.",
+            "type": "unknown",
+            "size": [
+              3
+            ],
+            "units": null,
+            "fill": "-1.0000e+031"
+          }
+        }
+      },
+      "creationDate": {
+        "bh": "2023-03-14T14:52:19.099Z"
+      },
+      "description": {
+        "bh": "The LANL 02A MPA data set contains numerical moments computed from measurements of the \nLos Alamos Magnetospheric Plasma Analyzer (MPA) [Bame et al., \nRev. Sci. Inst., in press 1993]. \nThe moments are presented in s/c coordinates: the z-axis is aligned with \nthe spin axis, which points radially toward the center of the Earth; \nthe x-axis is in the plane containing the spacecraft spin axis and the spin \naxis of the Earth, with +X generally northward; and the y-axis points \ngenerally eastward. Polar angles are measured relative to the spin axis \n(+Z), and azimuthal angles are measured around the z-axis, with zero along \nthe +X direction. The moments are computed for three 'species': \nlop (low-ener. ions, ~1eV/e-~130eV/e); hip (hi-ener. ions, ~130eV/e-~45keV/e);\n alle (electrons, ~30eV - ~45keV ). The electron measurements are obtained \n21.5 secs after the ion measurements. Epoch is the measurement time \nappropriate for the ions. The moments are computed after the fluxes are \ncorrected for background and s/c potential. Algorithms for these corrections\n are relatively unsophisticated, so the moments are suspect during times of \nhigh background and/or high spacecraft potential. Because the determined  \nspacecraft potential is not very precise, the magnitude of the low-energy \nion flow velocity is probably not accurate, but the flow direction is well \ndetermined.  Tperp and Tpara are obtained from diagonalization of the  \n3-dimensional temperature matrix, with the parallel direction assigned \nto the eigenvalue which is most different from the other two. \nThe corresponding eigenvector is the symmetry axis of the distribution and \nshould be equivalent to the magnetic field direction. The eigenvalue ratio \nTperp/Tmid, which is provided for each species, is a measure of the symmetry \nof the distribution and should be ~1.0 for a good determination. Several of  \nthe parameters have a fairly high daily dynamic range and for survey purposes \nare best displayed logarithmically. These parameters are indicated by  \nnon-zero 'SCALEMIN' values in this file. A quality flag value of 1  \nindicates that the values are suspect because of unreliable \nlocation info."
+      },
+      "time": {
+        "bh": "Epoch"
+      },
+      "resourceID": {
+        "bh": "spase://NASA/NumericalData/LANL/2002/MPA/PT87S"
+      },
+      "cadence": {
+        "bh": "PT1M27S"
+      },
+      "contactID": {
+        "bh": "spase://SMWG/Person/Michelle.F.Thomsen"
+      },
+      "additionalMetadata": {
+        "bh": [
+          {
+            "name": "ISTP",
+            "contentURL": "https://cdaweb.gsfc.nasa.gov/pub/software/cdawlib/0JSONS/a2_k0_mpa_00000000_v01.json",
+            "aboutURL": "https://spdf.gsfc.nasa.gov/sp_use_of_cdf.html"
+          },
+          {
+            "name": "SPASE",
+            "contentURL": "https://cdaweb.gsfc.nasa.gov/registry/hdp/Spase.xql?id=spase://NASA/NumericalData/LANL/2002/MPA/PT87S",
+            "aboutURL": "https://spase-group.org/"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,27 +1,123 @@
 [
   {
+    "id": "AC_OR_SSC",
+    "title": "ACE GSE Positions @ 12 min resolution  - SSC/SSCWeb ( NASA's GSFC)"
+  },
+  {
+    "id": "AC_OR_DEF",
+    "title": "ACE Daily GSE and J2000 GCI Position Data - E. C. Stone (California Institute of Technology)"
+  },
+  {
+    "id": "AC_AT_DEF",
+    "title": "ACE Hourly RTN, GSE and J2000 GCI Attitude direction cosines - E. C. Stone (California Institute of Technology)"
+  },
+  {
     "id": "AC_H2_CRIS",
     "title": "ACE/CRIS Cosmic Ray Isotope Spectrometer 1-Hour Level 2 Data - E. C. Stone (California Institute of Technology)"
+  },
+  {
+    "id": "AC_H3_CRIS",
+    "title": "ACE/CRIS Cosmic Ray Isotope Spectrometer Daily-averaged Level 2 Data - E. C. Stone (California Institute of Technology)"
+  },
+  {
+    "id": "AC_H0_MFI",
+    "title": "H0 - ACE Magnetic Field 16-Second Level 2 Data - N. Ness (Bartol Research Institute)"
+  },
+  {
+    "id": "AC_K0_MFI",
+    "title": "ACE Magnetic Field 5-Minute Key Parameters [PRELIM] - N. Ness (Bartol Research Institute)"
+  },
+  {
+    "id": "AC_H1_MFI",
+    "title": "H1 - ACE Magnetic Field 4-Minute Level 2 Data - N. Ness (Bartol Research Institute)"
+  },
+  {
+    "id": "AC_K1_MFI",
+    "title": "ACE Magnetic Field 16-Second Key Parameters [PRELIM] - N. Ness (Bartol Research Institute)"
   },
   {
     "id": "AC_H2_MFI",
     "title": "H2 - ACE Magnetic Field 1-Hour Level 2 Data - N. Ness (Bartol Research Institute)"
   },
   {
+    "id": "AC_H3_MFI",
+    "title": "H3 - ACE Magnetic Field 1-Second Level 2 Data - N. Ness (Bartol Research Institute)"
+  },
+  {
+    "id": "AC_K2_MFI",
+    "title": "K2 - ACE Magnetic Field 1-Hour Key Parameters [PRELIM] - N. Ness (Bartol Research Institute)"
+  },
+  {
     "id": "AC_H2_SEP",
     "title": "ACE/SEPICA Solar Energetic Particle 1-Hour Level 2 Data - Eberhard Moebius (University of New Hampshire)"
+  },
+  {
+    "id": "AC_H0_SWE",
+    "title": "ACE/SWEPAM Solar Wind Experiment 64-Second Level 2 Data - D. J. McComas (SWRI)"
+  },
+  {
+    "id": "AC_K0_SWE",
+    "title": "K0 - ACE Solar Wind Experiment 5-Minute Key Parameters [PRELIM] - D. J. McComas (Southwest Research Institute)"
   },
   {
     "id": "AC_H2_SWE",
     "title": "ACE/SWEPAM Solar Wind Experiment 1-Hour Level 2 Data - D. J. McComas (SWRI)"
   },
   {
+    "id": "AC_K1_SWE",
+    "title": "K1 - ACE Solar Wind Experiment 1-Hour Key Parameters [PRELIM] - D. J. McComas (Southwest Research Institute)"
+  },
+  {
     "id": "AC_H2_SWI",
     "title": "ACE/SWICS 1.1 Solar Wind 1-Hour Level 2 Data - G. Gloeckler (University of Maryland)"
   },
   {
+    "id": "AC_H3_SWI",
+    "title": "ACE/SWICS 1.1 Solar Wind 2-Hour Level 2 Data - G. Gloeckler (University of Maryland)"
+  },
+  {
+    "id": "AC_H3_SW2",
+    "title": "ACE/SWICS 2.0 Solar Wind 2-Hour Level 2 Data - G. Gloeckler (University of Maryland)"
+  },
+  {
+    "id": "AC_H4_SWI",
+    "title": "ACE/SWICS 1.1 Solar Wind 1-Day Level 2 Data - G. Gloeckler (University of Maryland)"
+  },
+  {
+    "id": "AC_H5_SWI",
+    "title": "ACE/SWICS 1.1 Solar Wind 2-Hour Level 2 Q-state distributions - G. Gloeckler (University of Maryland)"
+  },
+  {
+    "id": "AC_H6_SWI",
+    "title": "ACE/SWICS Solar Wind Protons 12-min Level 2 Data - G. Gloeckler (University of Maryland)"
+  },
+  {
+    "id": "AC_H1_EPM",
+    "title": "ACE/EPAM Solar Energetic Particle 5-Minute Level 2 Data - R. Gold (JHU/APL)"
+  },
+  {
     "id": "AC_H2_EPM",
     "title": "ACE/EPAM Solar Energetic Particle 1-Hour Level 2 Data - R. Gold (JHU/APL)"
+  },
+  {
+    "id": "AC_H3_EPM",
+    "title": "ACE/EPAM Solar Energetic Particle 12-second Level 2 Data - R. Gold (JHU/APL)"
+  },
+  {
+    "id": "AC_K0_EPM",
+    "title": "K0 - ACE EPAM 5-Minute Key Parameters - R. Gold (JHU Applied Physics Laboratory)"
+  },
+  {
+    "id": "AC_K1_EPM",
+    "title": "K1 - ACE EPAM 1-Hour Key Parameters - R. Gold (JHU Applied Physics Laboratory)"
+  },
+  {
+    "id": "AC_K0_SIS",
+    "title": "K0 - ACE SIS 1-Hour Key Parameters - E. C. Stone (California Institute of Technology)"
+  },
+  {
+    "id": "AC_H1_SIS",
+    "title": "ACE/SIS Solar Isotope Spectrometer 256-sec Level 2 Data - E. C. Stone (California Institute of Technology)"
   },
   {
     "id": "AC_H2_SIS",

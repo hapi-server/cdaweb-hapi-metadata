@@ -284,8 +284,10 @@ function getVariableDetails(CATALOG) {
     } else {
       seconds = 100*Math.pow(timeRangeScalePower, tries);
     }
-    let start = datasets[ididx]['info']['startDate'];
-    let stop = util.incrementTime(start, seconds, 'seconds');
+    //let start = datasets[ididx]['info']['startDate'];
+    //let stop = util.incrementTime(start, seconds, 'seconds');
+    let stop = datasets[ididx]['info']['stopDate'];
+    let start = util.decrementTime(stop, seconds, 'seconds');
 
     if (reason !== undefined) {
       util.log(`- Retrying ${id} (attempt # ${tries}/${meta.argv['maxtries']}): ${reason}`);

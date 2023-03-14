@@ -67,5 +67,6 @@
         "z_GSE"
       ]
     }
-  ]
+  ],
+  "x_DEPEND_0": "Epoch"
 }

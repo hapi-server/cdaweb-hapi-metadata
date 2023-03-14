@@ -16,6 +16,7 @@ module.exports.util = {
   "xml2js": xml2js,
   "baseDir": baseDir,
   "incrementTime": incrementTime,
+  "decrementTime": decrementTime,
   "str2ISODateTime": str2ISODateTime,
   "str2ISODuration": str2ISODuration
 }
@@ -299,6 +300,9 @@ function error(dsid, msg, exit) {
 const moment  = require('moment');
 function incrementTime(timestr, incr, unit) {
   return moment(timestr).add(incr,unit).toISOString().slice(0,19) + "Z";
+}
+function decrementTime(timestr, incr, unit) {
+  return moment(timestr).subtract(incr,unit).toISOString().slice(0,19) + "Z";
 }
 function sameDateTime(a, b) {
   return moment(a).isSame(b);

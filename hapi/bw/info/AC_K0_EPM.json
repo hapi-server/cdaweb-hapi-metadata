@@ -82,5 +82,6 @@
       "fill": "-1.0E31",
       "label": "Electron (175-315 keV)"
     }
-  ]
+  ],
+  "x_DEPEND_0": "Epoch"
 }

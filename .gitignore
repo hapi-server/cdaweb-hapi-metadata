@@ -1,6 +1,6 @@
 tmp/
 all/
-bin/
+bin/autoplot.jar
 cache/
 verify/data
 compare/data
