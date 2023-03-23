@@ -1,0 +1,159 @@
+[
+  {
+    "id": "AC_OR_SSC",
+    "title": "ACE GSE Positions @ 12 min resolution  - SSC/SSCWeb ( NASA's GSFC)",
+    "info": {
+      "startDate": "1997-08-25T17:48:00Z",
+      "stopDate": "2023-05-22T23:48:00Z",
+      "sampleStartDate": "2023-05-10T23:36:00.000Z",
+      "sampleStopDate": "2023-05-11T01:24:00.000Z",
+      "x_sampleRecords": 1442,
+      "cadence": "PT12M",
+      "contact": "SSC/SSCWeb @ NASA's GSFC",
+      "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_OR_SSC",
+      "resourceID": "spase://NASA/NumericalData/ACE/Ephemeris/PT12M",
+      "x_datasetCitation": "SSC/SSCWeb",
+      "x_datasetTermsOfUse": "Public",
+      "parameters": [
+        {
+          "name": "Time",
+          "type": "isotime",
+          "units": "UTC",
+          "length": 24,
+          "fill": null
+        },
+        {
+          "name": "GSE_LAT",
+          "description": "ACE GSE latitude",
+          "type": "double",
+          "x_labelTitle": "GSE_LAT",
+          "label": "ACE GSE_Lat",
+          "units": "Deg",
+          "fill": "-1.0E31"
+        },
+        {
+          "name": "GSE_LON",
+          "description": "ACE GSE longitude",
+          "type": "double",
+          "x_labelTitle": "GSE_LON",
+          "label": "ACE GSE_Long",
+          "units": "Deg",
+          "fill": "-1.0E31"
+        },
+        {
+          "name": "RADIUS",
+          "description": "ACE distance from Earth (km)",
+          "type": "double",
+          "x_labelTitle": "RADIUS",
+          "label": "ACE Dist Earth",
+          "units": "KM",
+          "fill": "-1.0E31"
+        },
+        {
+          "name": "XYZ_GSE",
+          "description": "ACE X/Y/Z GSE coordinates (time-series)",
+          "type": "double",
+          "x_labelTitle": "XYZ_GSE",
+          "units": "km",
+          "fill": "-1.0E31",
+          "size": [
+            3
+          ],
+          "vectorComponents": [
+            "x",
+            "y",
+            "z"
+          ],
+          "coordinateSystemName": "GSE",
+          "label": [
+            "x",
+            "y",
+            "z"
+          ]
+        },
+        {
+          "name": "XYZ_GSEO",
+          "description": "ACE orbit plot in GSE coordinates",
+          "type": "double",
+          "x_labelTitle": "XYZ_GSE",
+          "units": "km",
+          "fill": "-1.0E31",
+          "size": [
+            3
+          ],
+          "vectorComponents": [
+            "x",
+            "y",
+            "z"
+          ],
+          "coordinateSystemName": "GSE",
+          "label": [
+            "x",
+            "y",
+            "z"
+          ]
+        }
+      ],
+      "x_DEPEND_0": "Epoch"
+    }
+  },
+  {
+    "id": "AC_OR_DEF",
+    "title": "ACE Daily GSE and J2000 GCI Position Data - E. C. Stone (California Institute of Technology)",
+    "info": {
+      "startDate": "1997-08-26T00:00:00Z",
+      "stopDate": "2023-03-17T00:00:00Z",
+      "sampleStartDate": "2019-04-06T00:00:00.000Z",
+      "sampleStopDate": "2019-04-15T00:00:00.000Z",
+      "x_sampleRecords": 1442,
+      "cadence": "P1D",
+      "contact": "E. C. Stone @ California Institute of Technology",
+      "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_OR_DEF",
+      "resourceID": "spase://NASA/NumericalData/ACE/Ephemeris/Definitive/P1D",
+      "x_datasetCitation": "Please acknowledge the Principal Investigator, E. C. Stone of Caltech, USA",
+      "x_datasetTermsOfUse": "See the rules of use available from the ACE Science Center at: http://www.srl.caltech.edu/ACE/ASC/level2/policy_lvl2.html",
+      "parameters": [
+        {
+          "name": "Time",
+          "type": "isotime",
+          "units": "UTC",
+          "length": 24,
+          "fill": null
+        },
+        {
+          "name": "GSE_POS",
+          "description": "ACE s/c position, 3 comp. in GSE coord.",
+          "type": "double",
+          "x_labelTitle": "S/C position in GSE",
+          "units": "km",
+          "fill": "-1.0E31",
+          "size": [
+            3
+          ],
+          "label": [
+            "X_GSE",
+            "Y_GSE",
+            "Z_GSE"
+          ]
+        },
+        {
+          "name": "GCI_POS",
+          "description": "ACE s/c position, 3 comp. in J2000GCI coord.",
+          "type": "double",
+          "x_labelTitle": "S/C position in J2000 GCI",
+          "units": "km",
+          "fill": "-1.0E31",
+          "size": [
+            3
+          ],
+          "label": [
+            "X_GCI",
+            "Y_GCI",
+            "Z_GCI"
+          ]
+        }
+      ],
+      "x_DEPEND_0": "Epoch"
+    }
+  }
+]

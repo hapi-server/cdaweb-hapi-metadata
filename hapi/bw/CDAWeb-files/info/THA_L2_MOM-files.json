@@ -1,0 +1,40 @@
+{
+  "startDate": "2007-08-02Z",
+  "stopDate": "2023-03-09Z",
+  "cadence": "PT24H",
+  "parameters": [
+    {
+      "name": "Time",
+      "type": "isotime",
+      "units": "UTC",
+      "fill": null,
+      "length": 11
+    },
+    {
+      "name": "URL",
+      "type": "string",
+      "units": null,
+      "fill": null,
+      "length": 1000
+    },
+    {
+      "name": "LastModified",
+      "type": "isotime",
+      "units": "UTC",
+      "fill": null,
+      "length": 17
+    },
+    {
+      "name": "FileSize",
+      "type": "integer",
+      "fill": null,
+      "units": "bytes"
+    },
+    {
+      "name": "FileVersion",
+      "type": "string",
+      "fill": null,
+      "units": null
+    }
+  ]
+}

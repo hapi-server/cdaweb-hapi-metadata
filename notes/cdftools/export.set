@@ -1,8 +1,11 @@
 CDF V3.8.1_0
 ITEM=Record,no,,,no,6,
 ITEM=Indices,no,,,no,11,
-ITEM=Variable,"tha_efs_dot0_epoch",YES,[5.9958200000000e+13],[6.6301200000000e+13],no,[9999-12-31T23:59:59.999],Unknown,,23,None,None,1,
-ITEM=Variable,"tha_efs_dot0_gse",YES,[-1.000000e+03],[1.000000e+03],no,[nan          ],n/a,"E13.6",16,None,GZIP.6,28548,
+ITEM=Variable,"Epoch",YES,[6.2987673600000e+13],[6.3745056000000e+13],no,[9999-12-31T23:59:59.999],Increase,"E14.8",23,None,None,0,
+ITEM=Variable,"Magnitude",YES,[0.000     ],[500.000     ],no,[-1.0e+31],Unknown,"F8.3",9,None,GZIP.6,16384,
+ITEM=Variable,"BGSEc",YES,[-65534.000   ],[65534.000    ],no,[-1.0e+31],n/a,"F9.3",9,None,GZIP.6,5462,
+ITEM=Variable,"cartesian",no,,,no,,Unknown,"a12",13,None,None,0,
+ITEM=Variable,"metavar0",no,,,no,,Unknown,"a6",8,None,None,0,
 USE_FILTERS=YES
 USE_FILLS=YES
 CDF_FORMAT=single

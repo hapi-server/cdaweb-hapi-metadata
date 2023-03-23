@@ -10,6 +10,7 @@ module.exports.util = {
   "appendSync": appendSync,
   "copy": function (obj) {return JSON.parse(JSON.stringify(obj))},
   "log": log,
+  "cp": cp,  
   "warning": warning,
   "error": error,
   "obj2json": obj2json,
@@ -17,6 +18,8 @@ module.exports.util = {
   "baseDir": baseDir,
   "incrementTime": incrementTime,
   "decrementTime": decrementTime,
+  "sameDuration": sameDuration,
+  "sameDateTime": sameDateTime,
   "str2ISODateTime": str2ISODateTime,
   "str2ISODuration": str2ISODuration
 }
@@ -33,7 +36,14 @@ function appendSync(fname, data) {
   }
   fs.appendFileSync(fname, data, {flags: "a+"})
 }
-
+function cp(src, dest, mode) {
+  const path = require('path');
+  let dir = path.dirname(dest);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, {recursive: true});
+  }
+  fs.copyFileSync(src, dest, mode);
+}
 function writeSync(fname, data, opts) {
   const path = require('path');
   let dir = path.dirname(fname);
@@ -56,6 +66,12 @@ function get(opts, cb) {
 
   const path = require("path");
   const request = require('request');
+
+
+  if (!opts["headers"]) {
+    opts["headers"] = {};
+  }
+  opts["headers"]["User-Agent"] = "CDAS2HAPI; https://github.com/hapi-server/cdaweb-hapi-metadata";
 
   opts['pool'] = pool;
   pool['maxSockets'] = util.argv.maxsockets;
@@ -306,6 +322,18 @@ function decrementTime(timestr, incr, unit) {
 }
 function sameDateTime(a, b) {
   return moment(a).isSame(b);
+}
+function sameDuration(a, b) {
+  a = moment.duration(a)['_data'];
+  b = moment.duration(a)['_data'];
+  let match = true;
+  for (key in Object.keys(a)) {
+    if (a[key] !== b[key]) {
+      match = false;
+      break;
+    }
+  }
+  return match;
 }
 function str2ISODateTime(stro) {
 

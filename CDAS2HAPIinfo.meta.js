@@ -29,15 +29,16 @@ function run(cb) {
       util.log.debug(CATALOG);
       util.log.debug("CATALOG['datasets']:");
       util.log.debug(CATALOG['datasets']);
-      if (!meta.argv['omit'].includes('inventory')) {
-        getFileLists(CATALOG);
-      } else {
-        getMasters(CATALOG);
-      }
+      getFileLists0(CATALOG);
   });
 }
 
-function getFileLists(CATALOG) {
+function getFileLists0(CATALOG) {
+
+  if (meta.argv['omit'].includes('files0')) {
+    getFileLists1(CATALOG);
+    return;
+  }
 
   for (let dataset of CATALOG['datasets']) {
     let rootURL = dataset['_allxml']['access'][0]['URL'][0];
@@ -59,7 +60,7 @@ function getFileLists(CATALOG) {
     if (getFileList.finished === undefined) {getFileList.finished = 0;}
     util.log.debug(`Started a dir walk for ${id}; # of walks left = ${getFileList.finished}`);
 
-    let outFile = meta.argv.cachedir + '/' + id.split('_')[0] + '/' + id + '/files/index.html';
+    let outFile = meta.argv.cachedir + '/' + id.split('_')[0] + '/' + id + '/files0/index.html';
     getDirIndex(id, rootURL, outFile, inventory[id]);
 
     function finished(id) {
@@ -72,19 +73,24 @@ function getFileLists(CATALOG) {
         util.log.debug('Finished walking dirs for ' + id);
         getFileList.finished = getFileList.finished + 1;
 
-        let inventoryJSON0 = util.baseDir(id) + '/' + id + '-ls-lR.json';
+        let inventoryJSON0 = util.baseDir(id) + '/' + id + 'files0-tree.json';
         util.writeSync(inventoryJSON0, util.obj2json(inventory));
 
-        let inventoryJSON1 = util.baseDir(id) + '/' + id + '-files.json';
-        util.writeSync(inventoryJSON1, util.obj2json(inventory_flat));
+        let inventoryJSON1 = util.baseDir(id) + '/' + id + '-files0.json';
 
-        let inventoryCSV = util.baseDir(id) + '/' + id + '-files.csv';
+        inventory_flat_split = [];
+        for (line of inventory_flat) {
+          inventory_flat_split.push(line.split(","));
+        }
+        util.writeSync(inventoryJSON1, util.obj2json(inventory_flat_split));
+
+        let inventoryCSV = util.baseDir(id) + '/' + id + '-files0.csv';
         util.writeSync(inventoryCSV, inventory_flat.join('\n'));
 
         dataset['_files'] = inventoryJSON1;
         if (getFileList.finished == CATALOG['datasets'].length) {
           util.log.debug('Finished dir walk for all datasets');
-          getMasters(CATALOG);
+          getFileLists1(CATALOG);
         }
       }
     }
@@ -107,29 +113,36 @@ function getFileLists(CATALOG) {
         const $ = cheerio.load(html);
         $('tr').each((i, elem) => {
           // .each is sync so no callback needed.
-          if (i > 3) {
-            // May break if Apache dir listing HTML changes.
-            // First three links are not relevant.
+          // May break if Apache dir listing HTML changes.
+          // First three links are not relevant.
 
-            let cols = $(elem).find('td');
-            let href = $($(cols[0]).find('a')[0]).attr('href');
-            let mtime = $(cols[1]).text().replace(/([0-9]) ([0-9])/, '$1T$2').trim() + 'Z';
-            let size = $(cols[2]).text().trim();
+          let cols = $(elem).find('td');
+          let href = $($(cols[0]).find('a')[0]).attr('href');
+          // i < 2 b/c first two rows are header and "Parent Directory"
+          if (!href || i < 2) return;
+          let mtime = $(cols[1]).text().replace(/([0-9]) ([0-9])/, '$1T$2').trim() + 'Z';
+          let size = $(cols[2]).text().trim();
+          size = size
+                  .replace("E","e18")
+                  .replace("P","e15")
+                  .replace("T","e12")
+                  .replace("G","e9")
+                  .replace("M","e6")
+                  .replace("K","e3")
+                  .replace("B","");
 
-            if (href.endsWith('.cdf')) {
-              let fileDate = href.replace(/.*([0-9]{4})([0-9]{2})([0-9]{2}).*/,'$1-$2-$3Z');
-              let fileVersion = href.replace(/.*(v.*)\.cdf/, '$1');
-              parent['files'].push([fileDate, url + href, mtime, size, fileVersion]);
-              inventory_flat.push(`${fileDate}, ${url + href}, ${mtime}, ${size}, ${fileVersion}`);
-            }
-
-            if (href.endsWith('/')) {
-              let subdir = href.replace('/', '');
-              let newOutDir = outFile.split('/').slice(0, -1).join('/') + '/' + href;
-              let newOutFile = newOutDir + 'index.html';
-              parent['dirs'][subdir] = {};
-              getDirIndex(id, url + href, newOutFile, parent['dirs'][subdir]);
-            }
+          if (href.endsWith('.cdf')) {
+            let fileDate = href.replace(/.*([0-9]{4})([0-9]{2})([0-9]{2}).*/,'$1-$2-$3Z');
+            let fileVersion = href.replace(/.*_v(.*)\.cdf/, '$1');
+            parent['files'].push([fileDate, url + href, mtime, size, fileVersion]);
+            inventory_flat.push(`${fileDate}, ${url + href}, ${mtime}, ${size}, ${fileVersion}`);
+          }
+          if (href.endsWith('/')) {
+            let subdir = href.replace('/', '');
+            let newOutDir = outFile.split('/').slice(0, -1).join('/') + '/' + href;
+            let newOutFile = newOutDir + 'index.html';
+            parent['dirs'][subdir] = {};
+            getDirIndex(id, url + href, newOutFile, parent['dirs'][subdir]);
           }
         });
 
@@ -141,7 +154,87 @@ function getFileLists(CATALOG) {
   }
 }
 
+function getFileLists1(CATALOG) {
+
+  if (meta.argv['omit'].includes('files1')) {
+    getInventories(CATALOG);
+  }
+
+  for (dataset of CATALOG['datasets']) {
+
+    let id = dataset['id'];
+    let stop = dataset['info']['stopDate'];
+    let start = dataset['info']['startDate'];
+
+    let url = meta.argv.cdasr + id + '/orig_data/' 
+            + start.replace(/-|:/g, '')
+            + ',' 
+            + stop.replace(/-|:/g, '') 
+            + '/';
+
+    let fnameCoverage = util.baseDir(id) + "/" + id + "-files1.json";
+    let headers = {"Accept": "application/json"};
+    util.get({"uri": url, "outFile": fnameCoverage, "headers": headers, "parse": true},
+      (err, json) => {
+        if (err) {
+          util.error(id, [url, 'Error message', err], false);
+        }
+        dataset['_files1'] = json;
+        finished(err);
+    });
+  }
+
+  function finished(err) {
+    if (finished.N == undefined) {finished.N = 0;}
+    finished.N = finished.N + 1;
+    if (finished.N == datasets.length) {
+      //datasets = datasets.filter(function (el) {return el != null;});
+      util.log.debug('catalog after masters:');
+      util.log.debug(CATALOG);
+      getInventories(CATALOG);
+    }
+  }  
+}
+
+function getInventories(CATALOG) {
+
+  if (meta.argv['omit'].includes('inventory')) {
+    getMasters(CATALOG);
+  }
+
+  for (dataset of CATALOG['datasets']) {
+
+    let id = dataset['id'];
+    let url = meta.argv.cdasr + dataset['id'] + '/inventory/';
+    let fnameInventory = util.baseDir(id) + "/" + id + "-inventory.json";
+    let headers = {"Accept": 'application/json'};
+    util.get({"uri": url, "outFile": fnameInventory, "headers": headers, "parse": true},
+      (err, obj) => {
+        if (err) {
+          util.error(id, [url, 'Error message', err], false);
+        }
+        dataset['_inventory'] = obj["json"];
+        finished(err);
+    });
+  }
+
+  function finished(err) {
+    if (finished.N == undefined) {finished.N = 0;}
+    finished.N = finished.N + 1;
+    if (finished.N == datasets.length) {
+      //datasets = datasets.filter(function (el) {return el != null;});
+      util.log.debug('catalog after masters:');
+      util.log.debug(CATALOG);
+      getMasters(CATALOG);
+    }
+  }  
+}
+
 function getMasters(CATALOG) {
+
+  if (meta.argv['omit'].includes('inventory')) {
+    getVariables(CATALOG);
+  }
 
   let datasets = CATALOG['datasets'];
 
@@ -213,8 +306,8 @@ function getVariables(CATALOG) {
 
   function requestVariables(url, fnameVariables, dataset) {
     let id = dataset['id'];
-    let headers = { Accept: 'application/json' };
-    let opts = { uri: url, headers: headers, outFile: fnameVariables };
+    let headers = {"Accept": 'application/json'};
+    let opts = { uri: url, "headers": headers, outFile: fnameVariables };
     util.get(opts, function (err, variables) {
       if (err) {
         util.error(id, [url, err], false);
@@ -249,7 +342,7 @@ function getVariableDetails(CATALOG) {
 
   for (let ididx = 0; ididx < datasets.length; ididx++) {
     let names = [];
-    let variableDescriptions = datasets[ididx]['_variables']['VariableDescription']
+    let variableDescriptions = datasets[ididx]['_variables']['VariableDescription'];
     for (let variableDescription of variableDescriptions) {
       names.push(variableDescription['Name']);
     }
@@ -258,6 +351,11 @@ function getVariableDetails(CATALOG) {
   }
 
   function requestVariableDetails(ididx, names, timeRangeScalePower, reason) {
+
+    // TODO: Reconsider using command line call to 'HAPIdata.js --lib
+    // cdflib ...' (which calls cdf2csv.py) to get data from first 
+    // file in _files0 or _files1 in order to find time range for
+    // sample{Start,Stop}. 
 
     let id = datasets[ididx]['id'];
 
@@ -439,7 +537,7 @@ function getSPASERecords(CATALOG) {
     if (!finished.N) finished.N = 0;
     finished.N = finished.N + 1;
     if (obj === null) return;
-    //dataset['info']['x_additionalMetadata'] = {json: obj['json'], xml: obj['xml']};
+    dataset['_spase'] = obj['json']["Spase"];
     let id = dataset['id'];
     //util.writeSync(util.baseDir(id) + "/" + id + "-combined.json",obj2json(dataset));
     if (finished.N == datasets.length) {
@@ -574,4 +672,3 @@ function getVAttribute(cdfVAttributes, attributeName) {
   }
   return null;
 }
-

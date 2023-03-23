@@ -1,5 +1,7 @@
+__pycache__/
 tmp/
 all/
+notes/cdfs
 bin/autoplot.jar
 cache/
 verify/data

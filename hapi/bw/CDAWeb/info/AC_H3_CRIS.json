@@ -1,0 +1,1079 @@
+{
+  "startDate": "1997-08-27T00:00:00Z",
+  "stopDate": "2023-02-12T00:00:00Z",
+  "sampleStartDate": "2019-03-04T00:00:00.000Z",
+  "sampleStopDate": "2019-03-13T00:00:00.000Z",
+  "x_sampleRecords": 1442,
+  "cadence": "PT1H",
+  "contact": "E. C. Stone @ California Institute of Technology",
+  "resourceURL": "https://cdaweb.gsfc.nasa.gov/misc/Notes.html#AC_H3_CRIS",
+  "resourceID": "spase://NASA/NumericalData/ACE/CRIS/L2/P1D",
+  "x_datasetCitation": "Please acknowledge the Principal Investigator, E. C. Stone of Caltech, USA",
+  "x_datasetTermsOfUse": "See the rules of use available from the ACE Science Center at: http://www.srl.caltech.edu/ACE/ASC/level2/policy_lvl2.html",
+  "parameters": [
+    {
+      "name": "Time",
+      "type": "isotime",
+      "units": "UTC",
+      "length": 24,
+      "fill": null
+    },
+    {
+      "name": [
+        "flux_B"
+      ],
+      "description": "B intensity, at 7 energies 49.1-172.3 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_B",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_B49.1-63.9",
+        "flux_B65.4-88.8",
+        "flux_B89.9-109.2",
+        "flux_B110.1-127.0",
+        "flux_B127.8-143.2",
+        "flux_B144.0-158.2",
+        "flux_B158.8-172.3"
+      ]
+    },
+    {
+      "name": [
+        "flux_C"
+      ],
+      "description": "C intensity, at 7 energies 56.3-198.7 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_C",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_C56.3-73.4",
+        "flux_C75.0-102.0",
+        "flux_C103.3-125.6",
+        "flux_C126.6-146.2",
+        "flux_C147.1-164.9",
+        "flux_C165.8-182.3",
+        "flux_C183.1-198.7"
+      ]
+    },
+    {
+      "name": [
+        "flux_N"
+      ],
+      "description": "N intensity, at 7 energies 60.4-213.8 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_N",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_N60.4-78.7",
+        "flux_N80.5-109.5",
+        "flux_N110.8-134.9",
+        "flux_N136.0-157.1",
+        "flux_N158.0-177.3",
+        "flux_N178.3-196.1",
+        "flux_N196.9-213.8"
+      ]
+    },
+    {
+      "name": [
+        "flux_O"
+      ],
+      "description": "O intensity, at 7 energies 66.3-235.8 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_O",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_O66.3-86.4",
+        "flux_O88.4-120.3",
+        "flux_O121.8-148.3",
+        "flux_O149.5-172.9",
+        "flux_O173.9-195.2",
+        "flux_O196.4-216.1",
+        "flux_O217.0-235.8"
+      ]
+    },
+    {
+      "name": [
+        "flux_F"
+      ],
+      "description": "F intensity, at 7 energies 68.7-245.3 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_F",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_F68.7-89.6",
+        "flux_F91.7-124.9",
+        "flux_F126.5-154.1",
+        "flux_F155.3-179.7",
+        "flux_F180.7-203.0",
+        "flux_F204.1-224.7",
+        "flux_F225.7-245.3"
+      ]
+    },
+    {
+      "name": [
+        "flux_Ne"
+      ],
+      "description": "Ne intensity, at 7 energies 73.7-264.3 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_Ne",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_Ne73.7-96.2",
+        "flux_Ne98.4-134.1",
+        "flux_Ne135.8-165.6",
+        "flux_Ne167.0-193.2",
+        "flux_Ne194.4-218.4",
+        "flux_Ne219.7-242.0",
+        "flux_Ne243.0-264.3"
+      ]
+    },
+    {
+      "name": [
+        "flux_Na"
+      ],
+      "description": "Na intensity, at 7 energies 77.3-278.3 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_Na",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_Na77.3-100.9",
+        "flux_Na103.3-140.9",
+        "flux_Na142.7-174.0",
+        "flux_Na175.5-203.2",
+        "flux_Na204.4-229.8",
+        "flux_Na231.1-254.7",
+        "flux_Na255.8-278.3"
+      ]
+    },
+    {
+      "name": [
+        "flux_Mg"
+      ],
+      "description": "Mg intensity, at 7 energies 82.4-298.0 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_Mg",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_Mg82.4-107.6",
+        "flux_Mg110.1-150.4",
+        "flux_Mg152.3-185.9",
+        "flux_Mg187.5-217.3",
+        "flux_Mg218.6-245.8",
+        "flux_Mg247.3-272.7",
+        "flux_Mg273.8-298.0"
+      ]
+    },
+    {
+      "name": [
+        "flux_Al"
+      ],
+      "description": "Al intensity, at 7 energies 85.3-309.6 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_Al",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_Al85.3-111.5",
+        "flux_Al114.1-155.9",
+        "flux_Al157.9-192.8",
+        "flux_Al194.5-225.4",
+        "flux_Al226.8-255.2",
+        "flux_Al256.7-283.1",
+        "flux_Al284.3-309.6"
+      ]
+    },
+    {
+      "name": [
+        "flux_Si"
+      ],
+      "description": "Si intensity, at 7 energies 90.5-329.8 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_Si",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_Si90.5-118.3",
+        "flux_Si121.0-165.5",
+        "flux_Si167.6-204.9",
+        "flux_Si206.6-239.7",
+        "flux_Si241.1-271.5",
+        "flux_Si273.1-301.4",
+        "flux_Si302.7-329.8"
+      ]
+    },
+    {
+      "name": [
+        "flux_P"
+      ],
+      "description": "P intensity, at 7 energies 92.6-338.5 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_P",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_P92.6-121.1",
+        "flux_P123.9-169.6",
+        "flux_P171.8-210.0",
+        "flux_P211.8-245.8",
+        "flux_P247.3-278.5",
+        "flux_P280.2-309.3",
+        "flux_P310.6-338.5"
+      ]
+    },
+    {
+      "name": [
+        "flux_S"
+      ],
+      "description": "S intensity, at 7 energies 97.1-356.4 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_S",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_S97.1-127.0",
+        "flux_S130.0-178.1",
+        "flux_S180.3-220.7",
+        "flux_S222.6-258.4",
+        "flux_S260.0-293.0",
+        "flux_S294.8-325.5",
+        "flux_S327.0-356.4"
+      ]
+    },
+    {
+      "name": [
+        "flux_Cl"
+      ],
+      "description": "Cl intensity, at 7 energies 98.6-362.7 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_Cl",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_Cl98.6-129.0",
+        "flux_Cl132.1-181.0",
+        "flux_Cl183.3-224.4",
+        "flux_Cl226.3-262.8",
+        "flux_Cl264.4-298.0",
+        "flux_Cl299.8-331.2",
+        "flux_Cl332.7-362.7"
+      ]
+    },
+    {
+      "name": [
+        "flux_Ar"
+      ],
+      "description": "Ar intensity, at 7 energies 102.9-380.4 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_Ar",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_Ar102.9-134.8",
+        "flux_Ar138.0-189.2",
+        "flux_Ar191.7-234.8",
+        "flux_Ar236.8-275.2",
+        "flux_Ar276.9-312.3",
+        "flux_Ar314.2-347.2",
+        "flux_Ar348.7-380.4"
+      ]
+    },
+    {
+      "name": [
+        "flux_K"
+      ],
+      "description": "K intensity, at 7 energies 104.9-388.8 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_K",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_K104.9-137.5",
+        "flux_K140.7-193.1",
+        "flux_K195.6-239.7",
+        "flux_K241.7-281.0",
+        "flux_K282.7-319.0",
+        "flux_K320.9-354.8",
+        "flux_K356.3-388.8"
+      ]
+    },
+    {
+      "name": [
+        "flux_Ca"
+      ],
+      "description": "Ca intensity, at 7 energies 108.2-402.4 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_Ca",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_Ca108.2-141.8",
+        "flux_Ca145.2-199.4",
+        "flux_Ca202.0-247.6",
+        "flux_Ca249.8-290.5",
+        "flux_Ca292.3-329.9",
+        "flux_Ca331.9-367.0",
+        "flux_Ca368.6-402.4"
+      ]
+    },
+    {
+      "name": [
+        "flux_Sc"
+      ],
+      "description": "Sc intensity, at 7 energies 109.4-407.9 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_Sc",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_Sc109.4-143.5",
+        "flux_Sc146.9-201.9",
+        "flux_Sc204.5-250.8",
+        "flux_Sc253.0-294.3",
+        "flux_Sc296.1-334.2",
+        "flux_Sc336.3-372.0",
+        "flux_Sc373.6-407.9"
+      ]
+    },
+    {
+      "name": [
+        "flux_Ti"
+      ],
+      "description": "Ti intensity, at 7 energies 112.2-419.7 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_Ti",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_Ti112.2-147.3",
+        "flux_Ti150.8-207.3",
+        "flux_Ti210.0-257.6",
+        "flux_Ti259.9-302.5",
+        "flux_Ti304.3-343.7",
+        "flux_Ti345.8-382.6",
+        "flux_Ti384.3-419.7"
+      ]
+    },
+    {
+      "name": [
+        "flux_V"
+      ],
+      "description": "V intensity, at 7 energies 114.5-429.7 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_V",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_V114.5-150.4",
+        "flux_V154.0-211.8",
+        "flux_V214.6-263.4",
+        "flux_V265.7-309.4",
+        "flux_V311.3-351.6",
+        "flux_V353.8-391.6",
+        "flux_V393.3-429.7"
+      ]
+    },
+    {
+      "name": [
+        "flux_Cr"
+      ],
+      "description": "Cr intensity, at 7 energies 117.7-443.1 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_Cr",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_Cr117.7-154.6",
+        "flux_Cr158.3-218.0",
+        "flux_Cr220.8-271.2",
+        "flux_Cr273.6-318.7",
+        "flux_Cr320.7-362.4",
+        "flux_Cr364.6-403.7",
+        "flux_Cr405.5-443.1"
+      ]
+    },
+    {
+      "name": [
+        "flux_Mn"
+      ],
+      "description": "Mn intensity, at 7 energies 120.1-453.6 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_Mn",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_Mn120.1-157.9",
+        "flux_Mn161.7-222.7",
+        "flux_Mn225.6-277.3",
+        "flux_Mn279.7-325.9",
+        "flux_Mn328.0-370.8",
+        "flux_Mn373.0-413.2",
+        "flux_Mn415.0-453.6"
+      ]
+    },
+    {
+      "name": [
+        "flux_Fe"
+      ],
+      "description": "Fe intensity, at 7 energies 122.9-465.9 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_Fe",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_Fe122.9-161.7",
+        "flux_Fe165.6-228.3",
+        "flux_Fe231.2-284.3",
+        "flux_Fe286.8-334.4",
+        "flux_Fe336.5-380.5",
+        "flux_Fe382.9-424.2",
+        "flux_Fe426.1-465.9"
+      ]
+    },
+    {
+      "name": [
+        "flux_Co"
+      ],
+      "description": "Co intensity, at 7 energies 125.5-477.2 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_Co",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_Co125.5-165.2",
+        "flux_Co169.1-233.3",
+        "flux_Co236.4-290.8",
+        "flux_Co293.4-342.1",
+        "flux_Co344.3-389.5",
+        "flux_Co391.9-434.4",
+        "flux_Co436.3-477.2"
+      ]
+    },
+    {
+      "name": [
+        "flux_Ni"
+      ],
+      "description": "Ni intensity, at 7 energies 129.9-496.1 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "flux_Ni",
+      "units": "1/(cm2 Sr sec MeV/nucleon)",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "flux_Ni129.9-171.0",
+        "flux_Ni175.1-241.8",
+        "flux_Ni245.0-301.6",
+        "flux_Ni304.3-355.1",
+        "flux_Ni357.3-404.5",
+        "flux_Ni407.0-451.3",
+        "flux_Ni453.4-496.1"
+      ]
+    },
+    {
+      "name": [
+        "cnt_B"
+      ],
+      "description": "B counts, at 7 energies 49.1-172.3 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_B",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_B49.1-63.9",
+        "cnt_B65.4-88.8",
+        "cnt_B89.9-109.2",
+        "cnt_B110.1-127.0",
+        "cnt_B127.8-143.2",
+        "cnt_B144.0-158.2",
+        "cnt_B158.8-172.3"
+      ]
+    },
+    {
+      "name": [
+        "cnt_C"
+      ],
+      "description": "C counts, at 7 energies 56.3-198.7 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_C",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_C56.3-73.4",
+        "cnt_C75.0-102.0",
+        "cnt_C103.3-125.6",
+        "cnt_C126.6-146.2",
+        "cnt_C147.1-164.9",
+        "cnt_C165.8-182.3",
+        "cnt_C183.1-198.7"
+      ]
+    },
+    {
+      "name": [
+        "cnt_N"
+      ],
+      "description": "N counts, at 7 energies 60.4-213.8 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_N",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_N60.4-78.7",
+        "cnt_N80.5-109.5",
+        "cnt_N110.8-134.9",
+        "cnt_N136.0-157.1",
+        "cnt_N158.0-177.3",
+        "cnt_N178.3-196.1",
+        "cnt_N196.9-213.8"
+      ]
+    },
+    {
+      "name": [
+        "cnt_O"
+      ],
+      "description": "O counts, at 7 energies 66.3-235.8 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_O",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_O66.3-86.4",
+        "cnt_O88.4-120.3",
+        "cnt_O121.8-148.3",
+        "cnt_O149.5-172.9",
+        "cnt_O173.9-195.2",
+        "cnt_O196.4-216.1",
+        "cnt_O217.0-235.8"
+      ]
+    },
+    {
+      "name": [
+        "cnt_F"
+      ],
+      "description": "F counts, at 7 energies 68.7-245.3 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_F",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_F68.7-89.6",
+        "cnt_F91.7-124.9",
+        "cnt_F126.5-154.1",
+        "cnt_F155.3-179.7",
+        "cnt_F180.7-203.0",
+        "cnt_F204.1-224.7",
+        "cnt_F225.7-245.3"
+      ]
+    },
+    {
+      "name": [
+        "cnt_Ne"
+      ],
+      "description": "Ne counts, at 7 energies 73.7-264.3 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_Ne",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_Ne73.7-96.2",
+        "cnt_Ne98.4-134.1",
+        "cnt_Ne135.8-165.6",
+        "cnt_Ne167.0-193.2",
+        "cnt_Ne194.4-218.4",
+        "cnt_Ne219.7-242.0",
+        "cnt_Ne243.0-264.3"
+      ]
+    },
+    {
+      "name": [
+        "cnt_Na"
+      ],
+      "description": "Na counts, at 7 energies 77.3-278.3 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_Na",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_Na77.3-100.9",
+        "cnt_Na103.3-140.9",
+        "cnt_Na142.7-174.0",
+        "cnt_Na175.5-203.2",
+        "cnt_Na204.4-229.8",
+        "cnt_Na231.1-254.7",
+        "cnt_Na255.8-278.3"
+      ]
+    },
+    {
+      "name": [
+        "cnt_Mg"
+      ],
+      "description": "Mg counts, at 7 energies 82.4-298.0 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_Mg",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_Mg82.4-107.6",
+        "cnt_Mg110.1-150.4",
+        "cnt_Mg152.3-185.9",
+        "cnt_Mg187.5-217.3",
+        "cnt_Mg218.6-245.8",
+        "cnt_Mg247.3-272.7",
+        "cnt_Mg273.8-298.0"
+      ]
+    },
+    {
+      "name": [
+        "cnt_Al"
+      ],
+      "description": "Al counts, at 7 energies 85.3-309.6 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_Al",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_Al85.3-111.5",
+        "cnt_Al114.1-155.9",
+        "cnt_Al157.9-192.8",
+        "cnt_Al194.5-225.4",
+        "cnt_Al226.8-255.2",
+        "cnt_Al256.7-283.1",
+        "cnt_Al284.3-309.6"
+      ]
+    },
+    {
+      "name": [
+        "cnt_Si"
+      ],
+      "description": "Si counts, at 7 energies 90.5-329.8 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_Si",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_Si90.5-118.3",
+        "cnt_Si121.0-165.5",
+        "cnt_Si167.6-204.9",
+        "cnt_Si206.6-239.7",
+        "cnt_Si241.1-271.5",
+        "cnt_Si273.1-301.4",
+        "cnt_Si302.7-329.8"
+      ]
+    },
+    {
+      "name": [
+        "cnt_P"
+      ],
+      "description": "P counts, at 7 energies 92.6-338.5 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_P",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_P92.6-121.1",
+        "cnt_P123.9-169.6",
+        "cnt_P171.8-210.0",
+        "cnt_P211.8-245.8",
+        "cnt_P247.3-278.5",
+        "cnt_P280.2-309.3",
+        "cnt_P310.6-338.5"
+      ]
+    },
+    {
+      "name": [
+        "cnt_S"
+      ],
+      "description": "S counts, at 7 energies 97.1-356.4 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_S",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_S97.1-127.0",
+        "cnt_S130.0-178.1",
+        "cnt_S180.3-220.7",
+        "cnt_S222.6-258.4",
+        "cnt_S260.0-293.0",
+        "cnt_S294.8-325.5",
+        "cnt_S327.0-356.4"
+      ]
+    },
+    {
+      "name": [
+        "cnt_Cl"
+      ],
+      "description": "Cl counts, at 7 energies 98.6-362.7 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_Cl",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_Cl98.6-129.0",
+        "cnt_Cl132.1-181.0",
+        "cnt_Cl183.3-224.4",
+        "cnt_Cl226.3-262.8",
+        "cnt_Cl264.4-298.0",
+        "cnt_Cl299.8-331.2",
+        "cnt_Cl332.7-362.7"
+      ]
+    },
+    {
+      "name": [
+        "cnt_Ar"
+      ],
+      "description": "Ar counts, at 7 energies 102.9-380.4 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_Ar",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_Ar102.9-134.8",
+        "cnt_Ar138.0-189.2",
+        "cnt_Ar191.7-234.8",
+        "cnt_Ar236.8-275.2",
+        "cnt_Ar276.9-312.3",
+        "cnt_Ar314.2-347.2",
+        "cnt_Ar348.7-380.4"
+      ]
+    },
+    {
+      "name": [
+        "cnt_K"
+      ],
+      "description": "K counts, at 7 energies 104.9-388.8 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_K",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_K104.9-137.5",
+        "cnt_K140.7-193.1",
+        "cnt_K195.6-239.7",
+        "cnt_K241.7-281.0",
+        "cnt_K282.7-319.0",
+        "cnt_K320.9-354.8",
+        "cnt_K356.3-388.8"
+      ]
+    },
+    {
+      "name": [
+        "cnt_Ca"
+      ],
+      "description": "Ca counts, at 7 energies 108.2-402.4 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_Ca",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_Ca108.2-141.8",
+        "cnt_Ca145.2-199.4",
+        "cnt_Ca202.0-247.6",
+        "cnt_Ca249.8-290.5",
+        "cnt_Ca292.3-329.9",
+        "cnt_Ca331.9-367.0",
+        "cnt_Ca368.6-402.4"
+      ]
+    },
+    {
+      "name": [
+        "cnt_Sc"
+      ],
+      "description": "Sc counts, at 7 energies 109.4-407.9 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_Sc",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_Sc109.4-143.5",
+        "cnt_Sc146.9-201.9",
+        "cnt_Sc204.5-250.8",
+        "cnt_Sc253.0-294.3",
+        "cnt_Sc296.1-334.2",
+        "cnt_Sc336.3-372.0",
+        "cnt_Sc373.6-407.9"
+      ]
+    },
+    {
+      "name": [
+        "cnt_Ti"
+      ],
+      "description": "Ti counts, at 7 energies 112.2-419.7 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_Ti",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_Ti112.2-147.3",
+        "cnt_Ti150.8-207.3",
+        "cnt_Ti210.0-257.6",
+        "cnt_Ti259.9-302.5",
+        "cnt_Ti304.3-343.7",
+        "cnt_Ti345.8-382.6",
+        "cnt_Ti384.3-419.7"
+      ]
+    },
+    {
+      "name": [
+        "cnt_V"
+      ],
+      "description": "V counts, at 7 energies 114.5-429.7 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_V",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_V114.5-150.4",
+        "cnt_V154.0-211.8",
+        "cnt_V214.6-263.4",
+        "cnt_V265.7-309.4",
+        "cnt_V311.3-351.6",
+        "cnt_V353.8-391.6",
+        "cnt_V393.3-429.7"
+      ]
+    },
+    {
+      "name": [
+        "cnt_Cr"
+      ],
+      "description": "Cr counts, at 7 energies 117.7-443.1 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_Cr",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_Cr117.7-154.6",
+        "cnt_Cr158.3-218.0",
+        "cnt_Cr220.8-271.2",
+        "cnt_Cr273.6-318.7",
+        "cnt_Cr320.7-362.4",
+        "cnt_Cr364.6-403.7",
+        "cnt_Cr405.5-443.1"
+      ]
+    },
+    {
+      "name": [
+        "cnt_Mn"
+      ],
+      "description": "Mn counts, at 7 energies 120.1-453.6 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_Mn",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_Mn120.1-157.9",
+        "cnt_Mn161.7-222.7",
+        "cnt_Mn225.6-277.3",
+        "cnt_Mn279.7-325.9",
+        "cnt_Mn328.0-370.8",
+        "cnt_Mn373.0-413.2",
+        "cnt_Mn415.0-453.6"
+      ]
+    },
+    {
+      "name": [
+        "cnt_Fe"
+      ],
+      "description": "Fe counts, at 7 energies 122.9-465.9 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_Fe",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_Fe122.9-161.7",
+        "cnt_Fe165.6-228.3",
+        "cnt_Fe231.2-284.3",
+        "cnt_Fe286.8-334.4",
+        "cnt_Fe336.5-380.5",
+        "cnt_Fe382.9-424.2",
+        "cnt_Fe426.1-465.9"
+      ]
+    },
+    {
+      "name": [
+        "cnt_Co"
+      ],
+      "description": "Co counts, at 7 energies 125.5-477.2 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_Co",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_Co125.5-165.2",
+        "cnt_Co169.1-233.3",
+        "cnt_Co236.4-290.8",
+        "cnt_Co293.4-342.1",
+        "cnt_Co344.3-389.5",
+        "cnt_Co391.9-434.4",
+        "cnt_Co436.3-477.2"
+      ]
+    },
+    {
+      "name": [
+        "cnt_Ni"
+      ],
+      "description": "Ni counts, at 7 energies 129.9-496.1 MeV/nuc",
+      "type": "double",
+      "x_labelTitle": "cnt_Ni",
+      "units": "Counts/day",
+      "fill": "-1.0E31",
+      "size": [
+        7
+      ],
+      "label": [
+        "cnt_Ni129.9-171.0",
+        "cnt_Ni175.1-241.8",
+        "cnt_Ni245.0-301.6",
+        "cnt_Ni304.3-355.1",
+        "cnt_Ni357.3-404.5",
+        "cnt_Ni407.0-451.3",
+        "cnt_Ni453.4-496.1"
+      ]
+    }
+  ],
+  "x_DEPEND_0": "Epoch"
+}

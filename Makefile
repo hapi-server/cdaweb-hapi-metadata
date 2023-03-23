@@ -1,11 +1,12 @@
 IDREGEX=^AC_OR
-CDAS="https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/"
+CDAS=https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/
 #AUTOPLOT=http://autoplot.org/devel/autoplot.jar
 AUTOPLOT=https://ci-pw.physics.uiowa.edu/job/autoplot-release-2022/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/autoplot.jar
 
-.PHONY: all bw jf nl bh compare-meta compare-data
+.PHONY: all bw jf nl bh
 
-all: node_modules bin/autoplot.jar
+#all: node_modules bin/autoplot.jar
+all: node_modules
 	@mkdir -p hapi
 	@echo "\n-----bw------\n"
 	make bw IDREGEX=$(IDREGEX)
@@ -15,39 +16,25 @@ all: node_modules bin/autoplot.jar
 	make bh IDREGEX=$(IDREGEX)
 	#@echo "\n-----jf------\n"
 	#make jf IDREGEX=$(IDREGEX)
-	@echo "\n-----compare-meta------\n"
-	make compare-meta IDREGEX=$(IDREGEX) && cat compare/compare-meta.json
-	make compare-data IDREGEX=$(IDREGEX)
-
-rsync:
-	rsync -avz --delete cache weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata
-	rsync -avz --delete hapi weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata
-	rsync -avz --delete verify/data weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata/verify
-
-compare-meta:
-	mkdir -p compare/meta && node compare-meta.js
-
-compare-data:
-	mkdir -p compare/data && node compare-data.js
 
 bw:
 	node CDAS2HAPIinfo.js --idregex '$(IDREGEX)'
 
 # Nand's Lal's (nl) production HAPI server
 nl:
-	node HAPIinfo.js --version 'nl' --idregex '$(IDREGEX)'
+	node bin/HAPIinfo.js --version 'nl' --idregex '$(IDREGEX)'
 
 # Jeremy Faden's (jf) test version of nl's server
 nljf:
-	node HAPIinfo.js --version 'nljf' --idregex '$(IDREGEX)' --hapiurl 'https://jfaden.net/server/cdaweb/hapi'
+	node bin/HAPIinfo.js --version 'nljf' --idregex '$(IDREGEX)' --hapiurl 'https://jfaden.net/server/cdaweb/hapi'
 
 # Bernie Harris' (bh) prototype HAPI server
 bh:
-	node HAPIinfo.js --version 'bh' --idregex '$(IDREGEX)'	
+	node bin/HAPIinfo.js --version 'bh' --idregex '$(IDREGEX)'	
 
 # Jeremy Faden's (jf) AutoplotDataServer HAPI server
 jf: bin/autoplot.jar
-	node HAPIinfo.js --version 'jf' --idregex '$(IDREGEX)'	
+	node bin/HAPIinfo.js --version 'jf' --idregex '$(IDREGEX)'	
 
 jf-test:
 	java -Djava.awt.headless=true -cp bin/autoplot.jar org.autoplot.AutoplotDataServer -q --uri='vap+cdaweb:ds=OMNI2_H0_MRG1HR&id=DST1800' -f hapi-info	
@@ -97,13 +84,18 @@ clean:
 	make clean-jf
 	rm -f package-lock.json
 
-
+rsync:
+	rsync -avz --delete cache weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata
+	rsync -avz --delete hapi weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata
+	rsync -avz --delete verify/data weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata/verify
 
 # Not used. Could be used for comparing inventory here
 # vs that obtained by CDAS2HAPIinfo.js by walking HTML
 # directory listing.
 inventory:
-	curl "$(CDAS)dataviews/sp_phys/datasets/AC_H2_MFI/inventory/19970829T000000Z,19970928T100010Z"
-	# Returns
-	# <Start>1997-09-02T00:00:00.000Z</Start><End>1997-09-28T23:00:00.000Z</End>
+	#curl "$(CDAS)dataviews/sp_phys/datasets/THA_L2_MOM/inventory/20090102T000000Z,20230309T000000Z"
+	curl "$(CDAS)dataviews/sp_phys/datasets/AC_H2_MFI/inventory/"
 
+orig_data:
+	curl "$(CDAS)dataviews/sp_phys/datasets/AC_H2_MFI/orig_data/19970829T000000Z,20220928T100010Z"
+	curl "$(CDAS)dataviews/sp_phys/datasets/THA_L2_MOM/orig_data/20090102T000000Z,20230309T000000Z"

@@ -1,41 +1,36 @@
-all:
-	make AC_H2_CRIS
-	echo -e "\n\n"
-	make C1_JP_PSE
-	echo -e "\n\n"
-	make THA_L2_MOM
-	echo -e "\n\n"
-	make "AMPTECCE_H0_MEPA@0"
-	echo -e "\n\n"
-	make OMNI_HRO_1MIN
+compare-meta:
+	node compare-meta.js
 
-single:
-	bash compare-data.sh \
-		"$(ID)" "$(PARAMS)" "$(START)" "$(STOP)" \
-		2>&1 | tee data/$(ID).log
-	#@make compare ID="$(ID)" 2>&1 | tee data/"$(ID)".log
+compare-data1:
+	mkdir -p data && node compare-data.js \
+		--id AC_H2_MFI \
+		--parameters Magnitude \
+		--start '2008-06-01T00:00:00.000000000Z' \
+		--stop '2008-06-01T01:00:00.000000000Z' \
+		--debug
 
-compare:
-	@head -3 data/$(ID).hapi.csv | sed 's/e+00//' | sed 's/e/E/' > data/$(ID).hapi.csv.tmp 
-	@head -3 data/$(ID).cdas.csv > data/$(ID).cdas.csv.tmp
-	@echo -e "\n\n"
-	@echo "---- Diff of HAPI Production CSV to CDAS CSV from text response ----"
-	@diff -w data/$(ID).hapi.csv.tmp data/$(ID).cdas.csv.tmp && echo "No differences"
-	@echo "--------------------------------------------------------------------"
+# All records for one year
+compare-data2:
+	mkdir -p data && node compare-data.js \
+		--id AC_H2_MFI \
+		--parameters Magnitude \
+		--start '2008-01-01T00:00:00.000000000Z' \
+		--stop '2009-01-01T00:00:00.000000000Z' \
 
-AC_H2_CRIS:
-	make single ID=AC_H2_CRIS PARAMS=flux_B START="2010-06-21T14:50:52Z" STOP="2010-07-30T14:50:52Z"
+# All records for two years
+compare-data3:
+	mkdir -p data && node compare-data.js \
+		--id AC_H2_MFI \
+		--parameters Magnitude \
+		--start '2006-01-01T00:00:00.000000000Z' \
+		--stop '2008-01-01T00:00:00.000000000Z' \
 
-AMPTECCE_H0_MEPA@0:
-	make single ID="AMPTECCE_H0_MEPA@0" PARAMS=SpinPeriod START="1985-06-21T14:50:52.472Z" STOP="1985-06-26T00:00:00.477Z"
+#   --summary \
+#   --debug
 
-C1_JP_PSE:
-	make single ID=C1_JP_PSE PARAMS=event_code__C1_JP_PSE START="2000-08-01T00:00:00Z" STOP="2000-08-20T00:00:00.000Z"
-
-OMNI_HRO_1MIN:
-	make single ID="OMNI_HRO_1MIN" PARAMS=SYM_H START="2010-06-01T00:00:00Z" STOP="2010-07-01T00:00:00Z"
-
-THA_L2_MOM:
-	make single ID=THA_L2_MOM PARAMS=tha_peim_densityQ START="2007-08-02T00:00:30.705Z" STOP="2007-08-02T00:00:36.723Z"
-
-
+# 1 record returned for all variables.
+compare-data4:
+	mkdir -p data && node compare-data.js \
+		--id AC_H2_CRIS \
+		--start '2008-06-01T00:00:00.000000000Z' \
+		--stop '2008-06-01T01:00:00.000000000Z' \

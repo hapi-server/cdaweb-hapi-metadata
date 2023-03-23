@@ -1,0 +1,40 @@
+{
+  "startDate": "1997-08-27Z",
+  "stopDate": "2023-01-01Z",
+  "cadence": "PT3048H",
+  "parameters": [
+    {
+      "name": "Time",
+      "type": "isotime",
+      "units": "UTC",
+      "fill": null,
+      "length": 5
+    },
+    {
+      "name": "URL",
+      "type": "string",
+      "units": null,
+      "fill": null,
+      "length": 5
+    },
+    {
+      "name": "LastModified",
+      "type": "isotime",
+      "units": "UTC",
+      "fill": null,
+      "length": 17
+    },
+    {
+      "name": "Length",
+      "type": "integer",
+      "fill": null,
+      "units": "bytes"
+    },
+    {
+      "name": "FileVersion",
+      "type": "string",
+      "fill": null,
+      "units": null
+    }
+  ]
+}

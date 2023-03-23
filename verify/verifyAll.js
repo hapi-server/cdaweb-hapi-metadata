@@ -1,6 +1,3 @@
-// Create a HAPI all.json catalog using HAPI /catalog
-// and /info responses from https://cdaweb.gsfc.nasa.gov/hapi.
-
 const fs      = require('fs');
 const chalk   = require("chalk");
 const request = require("request");
@@ -8,33 +5,39 @@ const xml2js  = require('xml2js').parseString;
 const argv    = require('yargs')
                   .default
                     ({
-                      'idregex': '^.*',
-                      'url': 'http://localhost:8999/CDAWeb-cdas/hapi',
+                      'idregex': '^AC_OR',
+                      'urls': 'http://localhost:8999/CDAWeb-cdas/hapi,https://cdaweb.gsfc.nasa.gov/hapi',
                       'vurl': 'http://localhost:9999/',
+                      'showfails': false,
                       'dataset': '',
                       'maxsockets': 1
                     })
                   .argv;
 
-let outDir = "data/"
-              + argv["url"]
-                .replace("://",".")
-                .replace(/hapi(\/|)$/,"")
-                .replace(/\//g,"-")
-                .replace(/-$/g,"")
-
-if (!fs.existsSync(outDir)) {
-  fs.mkdirSync(outDir, {recursive: true});
+function outDir(url) {
+  let dir = "data/"
+              + url
+              .replace("://",".")
+              .replace(/hapi(\/|)$/,"")
+              .replace(/\//g,"-")
+              .replace(/-$/g,"")
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, {recursive: true});
+  }
+  return dir;
 }
 
 let CATALOG = {};
+
+let urls = argv.urls.split(",");
+//urls = [urls[0]];
 
 catalog();
 
 function catalog(cb) {
 
-  let fname = outDir + "/catalog.json";
-  let url = argv['url'] + "/catalog"
+  let fname = outDir(urls[0]) + "/catalog.json";
+  let url = urls[0] + "/catalog"
   let reqOpts = {uri: url};
   console.log("Requesting: " + url);
   request(reqOpts, function (err,res,body) {
@@ -46,7 +49,7 @@ function catalog(cb) {
 
 function info(CATALOG) {
 
-  for (ididx in CATALOG) {
+  for (let ididx in CATALOG) {
 
     // ididx = datset id index
     let id = CATALOG[ididx]['id'];
@@ -63,9 +66,13 @@ function info(CATALOG) {
   // Remove nulled elements.
   CATALOG = CATALOG.filter(function (el) {return el !== null;});
   if (CATALOG.length === 0) {
-    console.error("idregx selected zero ids. Exiting.");
+    console.error(`idregx ${argv.idregex} selected zero id. Exiting.`);
     process.exit(1);
+  } else {
+    let plural = CATALOG.length > 1 ? "s" : "";
+    console.log(`idregx ${argv.idregex} selected ${CATALOG.length} id${plural}. Each test takes 5-60 seconds.`);
   }
+
   verify(0);
 
   function verify(ididx) {
@@ -74,23 +81,53 @@ function info(CATALOG) {
       return;
     }
 
+    get[ididx] = {};
+    for (let url of urls) {
+      get(ididx, url);
+    }
+
+  }
+
+  function get(ididx, urlo) {
+
     let id = CATALOG[ididx]['id'];
-    let url = argv['vurl'] + "?url=" + argv['url'] + "&id=" + id + "&output=json";
+    let url = argv['vurl'] 
+            + "?url=" + urlo 
+            + "&id=" + id 
+            + "&output=json";
+
     let reqOpts = {uri: url};
-    console.log("Requesting: " + url);
-      request(reqOpts, function (err,res,body) {
-        if (err) console.log(err);
-        console.log("Received: " + url);
-        let result = JSON.parse(body);
-        if (result['pass']) {
-          console.log(chalk.green.bold("✓ PASS " +  CATALOG[ididx]['id']));
-        } else {
-          fs.writeFileSync(outDir + "/" + id + "-fails.json", JSON.stringify(result['fails'], null, 2));
-          let plural = "";
-          if (result['fails'].length > 1) {plural = "s";}
-          console.log(chalk.red.bold(`✗ FAIL ${id} (${result['fails'].length} failure${plural})`));
+    //console.log("Requesting: " + url);
+    let msstart = Date.now();
+    request(reqOpts, function (err,res,body) {
+
+      if (err) console.log(err);
+      let result = JSON.parse(body);
+
+      let dt = ((Date.now()-msstart)/1000.0).toFixed(1);
+      if (result['fails'].length == 0) {
+        get[ididx][urlo] = chalk.green.bold(`✓ PASS: ${id} `) + `${dt} [s] ${urlo}`;
+      } else {
+        fs.writeFileSync(outDir(urlo) + "/" + id + "-fails.json", JSON.stringify(result['fails'], null, 2));
+        let plural = result['fails'].length > 1 ? "s" : "";
+        let fails = "\n  " + url;
+        let see = `see ${outDir(urlo)}/${id}-fails.json`
+        if (argv.showfails) {
+          see = "";
+          let num = 1;
+          for (fail of result['fails']) {
+            fails = fails + "\n  " + num + ". " + fail['description'].replace(/(<([^>]+)>)/gi, "") + "\n     Result: " + fail['got'];
+            num++;
+          }
+        }
+        get[ididx][urlo] = chalk.red.bold(`✗ FAIL: ${id} `) + `${dt} [s] ${urlo} ` + chalk.red(`| ${result['fails'].length} failure${plural} ${see} ` + fails);
+      }
+      if (Object.keys(get[ididx]).length == urls.length) {
+        for (let urlo of urls) {
+          console.log(get[ididx][urlo]);
         }
         verify(++ididx);
-      });
+      }
+    });
   }
 }

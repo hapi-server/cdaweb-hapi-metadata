@@ -9,6 +9,7 @@ import numpy as np
 parser = argparse.ArgumentParser()
 parser.add_argument('--id', default='AC_H2_MFI')
 parser.add_argument('--parameters', default='Magnitude,BGSEc')
+# TODO: We assume start and stop always given to ns precision.
 parser.add_argument('--start', default='1997-08-26T00:00:00.000000000Z')
 parser.add_argument('--stop', default='1997-09-04T00:00:00.000000000Z')
 parser.add_argument('--file', default='notes/cdfs/ac_h2s_mfi_20090601000000_20090601120000.cdf')
@@ -40,6 +41,9 @@ def hapi_info(infodir, dataset):
     info = json.load(f)
   return info
 
+def _print(msg, end=None):
+  print(msg,end=end)
+  return len('{}'.format(msg))
 
 def dump(time, meta, data):
 
@@ -47,8 +51,13 @@ def dump(time, meta, data):
 
   for i in range(len(time)):
 
+    tstr = str(time[i])
+    if tstr >= stop[0:len(tstr)]:
+      nbytes = nbytes + 1
+      break
+
     nbytes = nbytes + len(str(time[i]))
-    sys.stdout.write('%sZ' % str(time[i]))
+    sys.stdout.write('%sZ' % tstr)
     for p in range(0,len(data)):
 
       # e.g., 10s => s and 10a => s
@@ -69,8 +78,8 @@ def dump(time, meta, data):
         #el = fmtc % data[p][i]
         #el = el.replace("nan", FILLVAL)
         #nbytes = nbytes + len(el)
-        print(",", end='')
-        print(data[p][i], end='')
+        nbytes = nbytes + _print(",", end='')
+        nbytes = nbytes + _print(data[p][i], end='')
         #sys.stdout.write(el)
       else:
         for j in range(data[p].shape[1]):
@@ -78,10 +87,12 @@ def dump(time, meta, data):
           #el = el.replace("nan", FILLVAL)
           #nbytes = nbytes + len(el)
           #sys.stdout.write(el)
-          print(",", end='')
-          print(data[p][i,j], end='')
+          nbytes = nbytes + _print(",", end='')
+          nbytes = nbytes + _print(data[p][i,j], end='')
 
-    sys.stdout.write("\n")
+    if i < len(time) - 1:
+      nbytes = nbytes + 1
+      sys.stdout.write("\n")
 
   return nbytes
 
@@ -94,12 +105,12 @@ def report(begin, nbytes, nrecords, what=None):
   dt = _time.time() - begin
 
   if what == 'read':
-    fmtstr = "Read  {0:.1f} MB | {1:.1f} MB/s | {2:d} records/s"
-    print(fmtstr.format(nbytes/1000000., nbytes/(1000000.*dt), int(nrecords/dt)))
+    fmtstr = "Read  {0:.1f} KB | {1:.1f} KB/s | {2:d} records/s"
+    print(fmtstr.format(nbytes/1000., nbytes/(1000.*dt), int(nrecords/dt)))
 
   if what == 'write':
-    fmtstr = "Wrote {0:.1f} MB | {1:.1f} MB/s | {2:d} records/s"
-    print(fmtstr.format(nbytes/1000000., nbytes/(1000000.*dt), int(nrecords/dt)))
+    fmtstr = "Wrote {0:.1f} KB | {1:.1f} KB/s | {2:d} records/s"
+    print(fmtstr.format(nbytes/1000., nbytes/(1000.*dt), int(nrecords/dt)))
 
 
 def tick():
@@ -120,16 +131,17 @@ def data():
   size = []
 
   if argv['lib'] == 'pycdaws':
+
     from cdasws import CdasWs
     from cdasws.datarepresentation import DataRepresentation
     cdas = CdasWs()
 
     # CdasWs() sends warnings to stdout instead of using Python logging
     # module. We need to capture to prevent it from being sent out.
-    from contextlib import redirect_stdout
     import io
     stdout_ = io.StringIO()
     datasetr = re.sub(r"@[0-9].*$","",dataset)
+    from contextlib import redirect_stdout
     with redirect_stdout(stdout_):
       status, xrdata = cdas.get_data(\
                         datasetr, parameters, start, stop,
@@ -167,8 +179,8 @@ def data():
 
 begin = tick()
 time, data, meta, nrecords, size = data()
-#report(begin, size, nrecords, what='read')
+report(begin, size, nrecords, what='read')
 
 begin = tick()
 nbytes = dump(time, meta, data)
-#report(begin, nbytes, nrecords, what='write')
+report(begin, nbytes, nrecords, what='write')
