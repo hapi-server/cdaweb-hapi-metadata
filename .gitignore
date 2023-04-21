@@ -1,6 +1,7 @@
 __pycache__/
 tmp/
 all/
+hapi/
 notes/cdfs
 bin/autoplot.jar
 cache/

@@ -31,6 +31,7 @@ compare-data3:
 # 1 record returned for all variables.
 compare-data4:
 	mkdir -p data && node compare-data.js \
-		--id AC_H2_CRIS \
+		--id AC_H3_CRIS \
 		--start '2008-06-01T00:00:00.000000000Z' \
 		--stop '2008-06-01T01:00:00.000000000Z' \
+		--showdata

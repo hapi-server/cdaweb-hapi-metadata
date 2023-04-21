@@ -5,17 +5,29 @@ meta = module.exports.meta;
 
 function run(cb) {
 
+  util.log('\n*Reading input files.*\n');
+
   run.finished = function (CATALOG) {
     for (dataset of CATALOG["datasets"]) {
       let id = dataset['id'];
-      let fnameCombined = util.baseDir(id) + "/" + id + ".combined.json";
+      let fnameCombined = util.baseDir(id) + "/" + id + "-combined.json";
       util.writeSync(fnameCombined, util.obj2json(dataset));
     }
     if (cb) {cb()}
   }
 
+  getAllXML();
+
+}
+
+function getAllXML() {
+
   // Request all.xml to get dataset names.
-  // Then call getFileLists() or getMasters()
+  // Could instead use
+  //  https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets
+  // but this URL request takes > 60 seconds (all.xml takes < 0.1 s) and 
+  // does not provide SPASE IDs (could still get SPASE IDs from data
+  // request as it is in its metadata).
 
   let fnameAllXML  = meta.argv.cachedir + '/all.xml';
   let fnameAllJSON = fnameAllXML + '.json';
@@ -30,10 +42,16 @@ function run(cb) {
       util.log.debug("CATALOG['datasets']:");
       util.log.debug(CATALOG['datasets']);
       getFileLists0(CATALOG);
-  });
+  });  
 }
 
 function getFileLists0(CATALOG) {
+
+  // This function is not needed b/c getFileLists1() does
+  // the same thing. Could use results from this function
+  // as a check, however. This function was written before
+  // it was realized that there was a CDAS query that
+  // provided similar information.
 
   if (meta.argv['omit'].includes('files0')) {
     getFileLists1(CATALOG);
@@ -73,7 +91,7 @@ function getFileLists0(CATALOG) {
         util.log.debug('Finished walking dirs for ' + id);
         getFileList.finished = getFileList.finished + 1;
 
-        let inventoryJSON0 = util.baseDir(id) + '/' + id + 'files0-tree.json';
+        let inventoryJSON0 = util.baseDir(id) + '/' + id + '-files0-tree.json';
         util.writeSync(inventoryJSON0, util.obj2json(inventory));
 
         let inventoryJSON1 = util.baseDir(id) + '/' + id + '-files0.json';
@@ -135,7 +153,7 @@ function getFileLists0(CATALOG) {
             let fileDate = href.replace(/.*([0-9]{4})([0-9]{2})([0-9]{2}).*/,'$1-$2-$3Z');
             let fileVersion = href.replace(/.*_v(.*)\.cdf/, '$1');
             parent['files'].push([fileDate, url + href, mtime, size, fileVersion]);
-            inventory_flat.push(`${fileDate}, ${url + href}, ${mtime}, ${size}, ${fileVersion}`);
+            inventory_flat.push(`${fileDate},${url + href},${mtime},${size},${fileVersion}`);
           }
           if (href.endsWith('/')) {
             let subdir = href.replace('/', '');
@@ -232,7 +250,13 @@ function getInventories(CATALOG) {
 
 function getMasters(CATALOG) {
 
-  if (meta.argv['omit'].includes('inventory')) {
+  // This function is no longer needed given that we are obtaining
+  // metadata from a request for all parameters in each dataset
+  // through a web service call. In this case, the web service
+  // has already applied the supplementary metadata in the masters
+  // to the metadata stored in the raw cdf files.
+
+  if (meta.argv['omit'].includes('masters')) {
     getVariables(CATALOG);
   }
 
@@ -515,6 +539,10 @@ function getVariableDetails(CATALOG) {
 
 function getSPASERecords(CATALOG) {
 
+  if (meta.argv['omit'].includes('spase')) {
+    run.finished(CATALOG);
+  }
+
   let datasets = CATALOG['datasets'];
   for (let dataset of datasets) {
 
@@ -529,7 +557,7 @@ function getSPASERecords(CATALOG) {
     let spaseFile = meta.argv.cachedir + '/' +
                     dataset['id'].split('_')[0] + '/' +
                     dataset['id'] + '/' +
-                    dataset['id'] + '.spase.xml';
+                    dataset['id'] + '-spase.xml';
     getSPASERecord(dataset, spaseURL, spaseFile);
   }
 
@@ -539,7 +567,6 @@ function getSPASERecords(CATALOG) {
     if (obj === null) return;
     dataset['_spase'] = obj['json']["Spase"];
     let id = dataset['id'];
-    //util.writeSync(util.baseDir(id) + "/" + id + "-combined.json",obj2json(dataset));
     if (finished.N == datasets.length) {
       run.finished(CATALOG);
     }
@@ -592,7 +619,7 @@ function createDatasets(json) {
 
     keptIds.push(id);
 
-    let fnameAllXML = util.baseDir(id) + "/" + id + ".allxml.json";
+    let fnameAllXML = util.baseDir(id) + "/" + id + "-allxml.json";
     util.writeSync(fnameAllXML, util.obj2json(dataset_allxml));
 
     let startDate = dataset_allxml['$']['timerange_start'];

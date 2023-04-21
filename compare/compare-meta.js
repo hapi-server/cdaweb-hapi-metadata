@@ -8,7 +8,7 @@ let versions = ['bw','nl','bh'];
 
 for (version of versions) {
   alls[version] = {};
-  let fname = __dirname + '/../hapi/' + version + '/all.json';
+  let fname = __dirname + '/../hapi/' + version + '/CDAWeb/all.json';
   console.log("Reading: " + fname);
   let all = JSON.parse(fs.readFileSync(fname));
 

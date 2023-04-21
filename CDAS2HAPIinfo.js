@@ -9,9 +9,9 @@
 const yargs = require('yargs');
 let argv = yargs
             .help()
-            .describe('idregex', 'Comma-separated list of regex pattern to process')
-            .describe('skipids', 'Comma-separated list of regex pattern to exclude')
-            .describe('omit', 'Omit steps')
+            .describe('idregex', 'Comma-separated list of regex patterns to process')
+            .describe('skipids', 'Comma-separated list of regex patterns to exclude')
+            .describe('omit', 'Comma-separated list of steps to omit from: inventory, files0, files1, masters')
             .describe('maxsockets', 'Maximum open sockets per server')
             .describe('maxage', 'Do HEAD requests if file age < maxage (in seconds)')
             .describe('maxretries', 'Maximum # of retries for CDAS data requests')
@@ -73,15 +73,15 @@ function buildHAPI(CATALOG) {
 
     datasets = [];
     for (id of ids) {
-      let fnameCombined = util.baseDir(id) + "/" + id + ".combined.json";
+      let fnameCombined = util.baseDir(id) + "/" + id + "-combined.json";
       datasets.push(JSON.parse(util.readSync(fnameCombined)));
     }
   }
 
   buildHAPIfiles(datasets);
-  return;
+
   //console.log(datasets);
-  util.log('\nCreating HAPI catalog and info responses for CDAWeb datasets.\n');
+  util.log('\n*Creating HAPI catalog and info responses for CDAWeb data datasets.*\n');
 
   for (let dataset of datasets) {
     // Create dataset['info']['parameters'] array of objects. Give each object
@@ -216,6 +216,7 @@ function buildHAPI(CATALOG) {
   }
 
   writeFiles(datasets);
+  console.log("\nConsole messages written to " + util.log.fname);
 }
 
 function buildHAPIfiles(datasets) {
@@ -226,7 +227,15 @@ function buildHAPIfiles(datasets) {
   inventory();
   files0();
   files1();
-  console.log(all)
+
+  // Sort by part of ID before slash
+  all = all.sort(function(a, b) {
+          a = a.id.split("/")[0];
+          b = b.id.split("/")[0];
+          if (a > b) {return 1;} 
+          if (a < b) {return -1;}
+          return 0;
+        });
 
   let fnameAll = argv.infodir + '/CDAWeb-files/all.json';
   util.writeSync(fnameAll, util.obj2json(all));
@@ -235,7 +244,7 @@ function buildHAPIfiles(datasets) {
 
   function inventory() {
 
-    util.log('\nCreating HAPI catalog and info responses for CDAWeb inventory datasets.\n');
+    util.log('\n*Creating HAPI catalog and info responses for CDAWeb inventory datasets.*\n');
 
     if (meta.argv['omit'].includes('inventory')) {
       return;
@@ -291,20 +300,23 @@ function buildHAPIfiles(datasets) {
                 ]
             }
 
-      let fnameData = argv.infodir + '/CDAWeb-files/data/' + id + '-inventory.csv';
+      let fnameData = argv.infodir + '/CDAWeb-files/data/' + id + '/inventory.csv';
       util.writeSync(fnameData, data.join("\n"));
-      let fnameInfo = argv.infodir + '/CDAWeb-files/info/' + id + '-inventory.json';
+      let fnameInfo = argv.infodir + '/CDAWeb-files/info/' + id + '/inventory.json';
       util.writeSync(fnameInfo, util.obj2json(info));
       let title = "";
       let ida = id + "/inventory";
       all.push({"id": ida, "title": title, "info": info});
       catalog.push({"id": ida, "title": title});
     }
+
+    util.log(`\nWrote: ${datasets.length} inventory.json files to ` + argv.infodir + '/CDAWeb-files/info/');
+    util.log(`Wrote: ${datasets.length} inventory.csv files to ` + argv.infodir + '/CDAWeb-files/data/');
   }
 
   function files0() {
 
-    util.log('\nCreating HAPI catalog and info responses for CDAWeb files datasets (version 0 method).\n');
+    util.log('\n*Creating HAPI catalog and info responses for CDAWeb files datasets (version 0 method).*\n');
 
     if (meta.argv['omit'].includes('files0')) {
       return;
@@ -318,17 +330,15 @@ function buildHAPIfiles(datasets) {
       let fileList = util.baseDir(id) + '/' + id + '-files0.json';
       let files = JSON.parse(util.readSync(fileList));
 
-      let startLen = 0;
-      let endLen = 0;
-      let urlLen = 0;
+      let startLen = 0; let endLen = 0; let urlLen = 0;
       for (file of files) {
-        timeLen = Math.max(startLen,files[0].length);
-        urlLen = Math.max(urlLen,files[1].length);
+        timeLen = Math.max(startLen,files[0][0].length);
+        urlLen = Math.max(urlLen,files[0][1].length);
       }
 
       let fileData1 = util.baseDir(id) + '/' + id + '-files0.csv';
       let dirData2 = argv.infodir + '/CDAWeb-files/data/';
-      let fileData2 =  dirData2 + id + '-files0.csv';
+      let fileData2 =  dirData2 + id + '/files0.csv';
       util.cp(fileData1, fileData2);
 
       if (files.length == 0) {
@@ -401,11 +411,12 @@ function buildHAPIfiles(datasets) {
       all.push({"id": ida, "title": title, "info": info});
       catalog.push({"id": ida, "title": title});
     }
+    util.log(`\nWrote: ${datasets.length} files0.json files to ` + argv.infodir + '/CDAWeb-files/info/');
   }
 
   function files1() {
 
-    util.log('\nCreating HAPI catalog and info responses for CDAWeb files datasets (version 1).\n');
+    util.log('\n*Creating HAPI catalog and info responses for CDAWeb files datasets (version 1 method).*\n');
 
     if (meta.argv['omit'].includes('inventory')) {
       return;
@@ -491,15 +502,17 @@ function buildHAPIfiles(datasets) {
                 ]
             }
 
-      let fnameData = argv.infodir + '/CDAWeb-files/data/' + id + '-files.csv';
+      let fnameData = argv.infodir + '/CDAWeb-files/data/' + id + '/files.csv';
       util.writeSync(fnameData, data.join("\n"));
-      let fnameInfo = argv.infodir + '/CDAWeb-files/info/' + id + '-files.json';
+      let fnameInfo = argv.infodir + '/CDAWeb-files/info/' + id + '/files.json';
       util.writeSync(fnameInfo, util.obj2json(info));
       let title = "";
       let ida = id + "/files";
       all.push({"id": ida, "title": title, "info": info});
       catalog.push({"id": ida, "title": title});
     }
+    util.log(`\nWrote: ${datasets.length} files.csv files to ` + argv.infodir + '/CDAWeb-files/data/');
+    util.log(`Wrote: ${datasets.length} files.json files to ` + argv.infodir + '/CDAWeb-files/info/');
   }
 
 }
@@ -508,7 +521,7 @@ function writeFiles(datasets) {
 
   // Write one info file per HAPI dataset.
 
-  util.log('\nWriting HAPI info and info-full files.\n');
+  util.log(`\n*Writing HAPI info and info-full json files to ${argv.infodir}/CDAWeb/info/*`);
 
   let allIds = [];
   let catalog = [];

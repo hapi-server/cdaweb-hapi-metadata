@@ -26,11 +26,9 @@ stop       = argv['stop']
 
 parameters = parameters.split(",")
 
-if argv['debug'] == True:
-  # So piping to head works.
-  # https://stackoverflow.com/a/30091579
-  from signal import signal, SIGPIPE, SIG_DFL
-  signal(SIGPIPE, SIG_DFL)
+# https://stackoverflow.com/a/30091579
+from signal import signal, SIGPIPE, SIG_DFL
+signal(SIGPIPE, SIG_DFL)
 
 
 def hapi_info(infodir, dataset):
@@ -41,9 +39,11 @@ def hapi_info(infodir, dataset):
     info = json.load(f)
   return info
 
+
 def _print(msg, end=None):
   print(msg,end=end)
   return len('{}'.format(msg))
+
 
 def dump(time, meta, data):
 

@@ -14,7 +14,7 @@ const argv    = require('yargs')
                         'format': 'csv',
                         'from': 'cdas-text-using-js',
                         'encoding': 'gzip',
-                        'infodir': '../hapi/bw/info',
+                        'infodir': '../hapi/bw/CDAWeb/info',
                         'debug': false,
                     })
                   .option('debug',{'type': 'boolean'})
@@ -102,7 +102,7 @@ if (FROM === 'bh-hapi') {
   });    
 }
 
-if (FROM === 'cdas-cdf-using-pycdas') {
+if (FROM === 'cdas-cdf-using-pycdaws') {
   cdf2csv();
 }
 
@@ -290,6 +290,7 @@ function text2csv(body) {
     console.log(body);
     return;
   }
+
   if (FROM === 'text-noheader') {
     // Remove header and footer
     let idx = body.search(/^[0-9][0-9]/gm);
@@ -307,7 +308,7 @@ function text2csv(body) {
         .split("\n")
         .map(function(line){
             if (line.search(re1) != -1) {
-              if (FROM === "cdas-csv-using-js") {
+              if (FROM === "cdas-text-using-js") {
                 // First replace converts to restricted HAPI 8601
                 // Second converts fractional sections from form
                 // .xxx.yyyy to .xxxyyy.
@@ -373,16 +374,22 @@ function cdf2csv(cdfFileName) {
   }
   if (FROM === 'apds') {
     cmd = "java -Djava.awt.headless=true"
-        + " -cp ../bin/autoplot.jar"
+        + ` -cp ${__dirname}/autoplot.jar`
         + " org.autoplot.AutoplotDataServer"
         + " -q"
         + " -f hapi-data"
         + ` --uri='vap+cdaweb:ds=${IDr}&id=${argv.parameters.replace(",",";")}&timerange=${argv.start}/${argv.stop}'`;
   }
   if (FROM === 'cdas-cdf-using-pycdf' || FROM === 'cdaweb-cdf-using-pycdf') {
-    cmd = "python3 ../bin/cdf2csv.py"
-        + " --lib=cdflib"
-        + " --file=" + cdfFileName
+    let lib = 'pycdaws';
+    let filearg = '';
+    if (FROM === 'cdaweb-cdf-using-pycdaws') {
+      lib = 'cdflib';
+      filearg = " --file=" + cdfFileName;
+    }
+    cmd = `python3 ${__dirname}/cdf2csv.py`
+        + ` --lib=${lib}`
+        + filearg
         + " --id=" + ID
         + " --parameters='" + argv.parameters + "'"
         + " --start=" + argv.start
@@ -390,8 +397,8 @@ function cdf2csv(cdfFileName) {
         + " --infodir=" + argv.infodir
         + debugstr;
   }
-  if (FROM === 'cdas-cdf-using-pycdas') {
-    cmd = "python3 ../bin/cdf2csv.py"
+  if (FROM === 'cdas-cdf-using-pycdaws') {
+    cmd = `python3 ${__dirname}/cdf2csv.py`
         + " --lib=pycdaws"
         + " --id=" + ID
         + " --parameters='" + argv.parameters + "'"

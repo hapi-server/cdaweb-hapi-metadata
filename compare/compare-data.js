@@ -7,7 +7,7 @@ const argv  = require('yargs')
                         'parameters': '',
                         'start': '',
                         'stop': '',
-                        'infodir': '../hapi/bw/info',
+                        'infodir': '../hapi/bw/CDAWeb/info',
                         'debug': true,
                         'showdata': false
                     })
@@ -19,7 +19,7 @@ let fmts = [
     'cdaweb-csv-using-js   ',
     'cdaweb-cdf-using-pycdf',
     'cdas-text-using-js    ',
-    'cdas-cdf-using-pycdas ',
+    'cdas-cdf-using-pycdaws ',
     'cdas-cdf-using-pycdf  ',
     'nl-hapi               ',
 //  'bh-hapi               ',
@@ -94,10 +94,10 @@ function exec(f) {
 
     if (data && (argv.debug || argv.showdata)) {
       let xdata = data.toString();
-      if (argv.debug == true && argv.showdata == false) {
+      if (argv.debug === true && argv.showdata === false) {
         xdata = xdata.split("\n");
         for (d of xdata) {
-          if (d !== "" && !/^[0-9]{4}/.test(d)) {
+          if (d !== "" && !/^[0-9]{2}/.test(d)) {
             console.log(d);
           }
         }

@@ -250,9 +250,13 @@ function log(msg, color) {
     log.fname = fname;
   }
   appendSync(fname, msg + "\n");
-  if (color === "blue") {
+  if (color || (msg.trim().startsWith("*") && msg.trim().endsWith("*"))) {
     const chalk = require("chalk");
-    console.log(chalk.blue.bold(msg));
+    if (msg.trim().startsWith("*") && msg.trim().endsWith("*")) {
+      console.log(chalk.inverse(msg));
+    } else {
+      console.log(chalk[color].bold(msg));
+    }
   } else {
     console.log(msg);
   }
@@ -269,17 +273,8 @@ log.debug = function (msg) {
 
 function warning(dsid, msg) {
 
-  let warnDir = baseDir(dsid);
-  let fname = warnDir + "/" + dsid + ".warning.txt";
-  msgf = "  Warning: " + msg;
-  if (!warning.fname) {
-    fs.rmSync(fname, { recursive: true, force: true });
-    warning.fname = fname;
-  }
-  appendSync(fname, msgf + "\n");
-  const chalk = require("chalk");
-  msg = "  " + chalk.yellow.bold("Warning: ") + msg;
-  log(msg, msgf);
+  msg = "  Warning: " + msg;
+  log(msg, "yellow");
 }
 
 function error(dsid, msg, exit) {

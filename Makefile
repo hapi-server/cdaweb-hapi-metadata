@@ -88,14 +88,3 @@ rsync:
 	rsync -avz --delete cache weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata
 	rsync -avz --delete hapi weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata
 	rsync -avz --delete verify/data weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata/verify
-
-# Not used. Could be used for comparing inventory here
-# vs that obtained by CDAS2HAPIinfo.js by walking HTML
-# directory listing.
-inventory:
-	#curl "$(CDAS)dataviews/sp_phys/datasets/THA_L2_MOM/inventory/20090102T000000Z,20230309T000000Z"
-	curl "$(CDAS)dataviews/sp_phys/datasets/AC_H2_MFI/inventory/"
-
-orig_data:
-	curl "$(CDAS)dataviews/sp_phys/datasets/AC_H2_MFI/orig_data/19970829T000000Z,20220928T100010Z"
-	curl "$(CDAS)dataviews/sp_phys/datasets/THA_L2_MOM/orig_data/20090102T000000Z,20230309T000000Z"
