@@ -1,4 +1,5 @@
 const fs = require('fs');
+const chalk = require("chalk");
 
 module.exports.util = {
   "get": get,
@@ -12,6 +13,7 @@ module.exports.util = {
   "log": log,
   "cp": cp,  
   "warning": warning,
+  "note": note,
   "error": error,
   "obj2json": obj2json,
   "xml2js": xml2js,
@@ -67,7 +69,6 @@ function get(opts, cb) {
   const path = require("path");
   const request = require('request');
 
-
   if (!opts["headers"]) {
     opts["headers"] = {};
   }
@@ -78,6 +79,7 @@ function get(opts, cb) {
 
   let outFile = opts['outFile'];
   let outFileHeaders = outFile +  ".httpheader";
+  let outFileURL = outFile +  ".url";
   let outDir = path.dirname(outFile);
 
   let hrs = Infinity;
@@ -124,11 +126,10 @@ function get(opts, cb) {
 
   log("Requesting: " + opts.uri);
   opts.method = "GET";
-  request(opts, function (err,res,body) {
+  request(opts, function (err, res, body) {
 
     if (res && res.statusCode !== 200) {
-      error(null, [opts.uri, "Status code " + res.statusCode], false);
-      cb(null, null);
+      cb(null, body);
       return;
     }
 
@@ -140,6 +141,7 @@ function get(opts, cb) {
       log("Received:   " + opts.uri);
     }
 
+    res.headers['x-Request-URL'] = opts.uri;
     log("Writing: " + outFileHeaders);
     util.writeSync(outFileHeaders, obj2json(res.headers), 'utf-8');
 
@@ -161,7 +163,7 @@ function get(opts, cb) {
       // Cached local file
       if (outFile.endsWith(".cdf") === false) {
         // If CDF file, processing is done from command line
-        // call, so don't need to ready.
+        // call, so don't need to read.
         log("Reading: " + outFile);
         body = fs.readFileSync(outFile);
       }
@@ -250,10 +252,13 @@ function log(msg, color) {
     log.fname = fname;
   }
   appendSync(fname, msg + "\n");
-  if (color || (msg.trim().startsWith("*") && msg.trim().endsWith("*"))) {
-    const chalk = require("chalk");
-    if (msg.trim().startsWith("*") && msg.trim().endsWith("*")) {
-      console.log(chalk.inverse(msg));
+  let inverse = msg.trim().startsWith("*") && msg.trim().endsWith("*");
+  if (inverse && !color) {
+    color = 'yellow';
+  }
+  if (color && chalk[color]) {
+    if (inverse) {
+      console.log(chalk[color].inverse(msg));
     } else {
       console.log(chalk[color].bold(msg));
     }
@@ -272,19 +277,26 @@ log.debug = function (msg) {
 }
 
 function warning(dsid, msg) {
-
   msg = "  Warning: " + msg;
   log(msg, "yellow");
 }
 
-function error(dsid, msg, exit) {
+function note(dsid, msg) {
+  let pad = "";
+  if (dsid !== null) {
+    pad = "  ";
+  }
+  log(pad + "Note:    " + msg);
+}
 
+function error(dsid, msg, exit, prefix) {
   let errorDir = util.argv.cachedir;
+  let fname = undefined;
   if (dsid) {
     errorDir = util.argv.cachedir + "/" + dsid.split("_")[0];
+    fname = errorDir + "/" + dsid + "/" + dsid + ".error.txt";
   }
-  let fname = errorDir + "/" + dsid + "/" + ".error.txt";
-  if (!error.fname) {
+  if (fname && !error.fname) {
     fs.rmSync(fname, {"recursive": true, "force": true});
     error.fname = fname;
   }
@@ -293,14 +305,14 @@ function error(dsid, msg, exit) {
   } else {
     msg = msg.toString();
   }
-  appendSync(fname, "  " + msg);
-  let msgf = msg.split("\n");
-  const chalk = require("chalk");
-  msg = chalk.red.bold("Error: ") + msg;
-  if (dsid) {
-    msg = chalk.red.bold(dsid) + "\n" + msg;
+  if (fname) {
+    appendSync(fname, "  " + msg);
   }
-  log(msg, msgf);
+  msg = "  Error:   " + msg;
+  if (prefix !== false) {
+    msg = dsid + "\n" + msg;
+  }
+  log(msg, "red");
   if (exit === undefined || exit == true) {
     process.exit(1);
   }
@@ -362,7 +374,8 @@ function str2ISODateTime(stro) {
 }
 function str2ISODuration(cadenceStr) {
 
-  let cadence;
+  let cadence = "";
+  cadenceStr = cadenceStr.toLowerCase();
   if (cadenceStr.match(/day/)) {
     cadence = "P" + cadenceStr.replace(/\s.*days?/,'D');
   } else if (cadenceStr.match(/hour/)) {
@@ -380,9 +393,13 @@ function str2ISODuration(cadenceStr) {
   } else if (cadenceStr.match(/[0-9]s/)) {
     cadence = "PT" + cadenceStr.replace(/([0-9].*)s/,'$1S');
   } else if (cadenceStr.match(/millisecond/)) {
-    cadence = "PT" + cadenceStr.replace(/\s.*milliseconds?/,'S');
+    let ms = cadenceStr.match(/(\d.*\d+)/)[0];
+    let S = parseFloat(ms)/1000;
+    cadence = "PT" + S + 'S';
   } else if (cadenceStr.match(/ms/)) {
-    cadence = "PT" + cadenceStr.replace(/\s.*ms/,'S');
+    let ms = cadenceStr.match(/(\d.*\d+)/)[0];
+    let S = parseFloat(ms)/1000;
+    cadence = "PT" + S + 'S';
   } else {
     return undefined;
   }

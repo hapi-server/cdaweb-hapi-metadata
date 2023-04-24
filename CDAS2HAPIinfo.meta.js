@@ -17,7 +17,6 @@ function run(cb) {
   }
 
   getAllXML();
-
 }
 
 function getAllXML() {
@@ -97,15 +96,18 @@ function getFileLists0(CATALOG) {
         let inventoryJSON1 = util.baseDir(id) + '/' + id + '-files0.json';
 
         inventory_flat_split = [];
+        let _files0Size = 0;
         for (line of inventory_flat) {
           inventory_flat_split.push(line.split(","));
+          _files0Size += parseFloat(inventory_flat_split.slice(-1)[0][3]);
         }
         util.writeSync(inventoryJSON1, util.obj2json(inventory_flat_split));
 
         let inventoryCSV = util.baseDir(id) + '/' + id + '-files0.csv';
         util.writeSync(inventoryCSV, inventory_flat.join('\n'));
 
-        dataset['_files'] = inventoryJSON1;
+        dataset['_files0Size'] = _files0Size;
+        dataset['_files0'] = inventoryJSON1;
         if (getFileList.finished == CATALOG['datasets'].length) {
           util.log.debug('Finished dir walk for all datasets');
           getFileLists1(CATALOG);
@@ -197,7 +199,7 @@ function getFileLists1(CATALOG) {
         if (err) {
           util.error(id, [url, 'Error message', err], false);
         }
-        dataset['_files1'] = json;
+        dataset['_files1'] = fnameCoverage;
         finished(err);
     });
   }
@@ -374,7 +376,7 @@ function getVariableDetails(CATALOG) {
     requestVariableDetails(ididx, names);
   }
 
-  function requestVariableDetails(ididx, names, timeRangeScalePower, reason) {
+  function requestVariableDetails(ididx, names, seconds, reason) {
 
     // TODO: Reconsider using command line call to 'HAPIdata.js --lib
     // cdflib ...' (which calls cdf2csv.py) to get data from first 
@@ -383,8 +385,8 @@ function getVariableDetails(CATALOG) {
 
     let id = datasets[ididx]['id'];
 
-    if (timeRangeScalePower === undefined) {
-      timeRangeScalePower = 10;
+    if (seconds === undefined) {
+      seconds = 100;
     }
 
     if (!requestVariableDetails.tries) {
@@ -398,22 +400,26 @@ function getVariableDetails(CATALOG) {
 
     let fnameCDFML = util.baseDir(id) + "/" + id + '-cdas.json';
 
+    if (util.existsSync(fnameCDFML) && tries == 1) {
+      util.log(`Reading: ${fnameCDFML}`);
+      let body = util.readSync(fnameCDFML);
+      finished(ididx, names, fnameCDFML, JSON.parse(body), null);
+      return;
+    }
+
     if (tries > 1) {util.rmSync(fnameCDFML);}
 
-    let seconds;
-    if (timeRangeScalePower < 0) {
-      seconds = -timeRangeScalePower;
-    } else {
-      seconds = 100*Math.pow(timeRangeScalePower, tries);
-    }
     //let start = datasets[ididx]['info']['startDate'];
     //let stop = util.incrementTime(start, seconds, 'seconds');
     let stop = datasets[ididx]['info']['stopDate'];
     let start = util.decrementTime(stop, seconds, 'seconds');
 
-    if (reason !== undefined) {
-      util.log(`- Retrying ${id} (attempt # ${tries}/${meta.argv['maxtries']}): ${reason}`);
+    if (reason === undefined) {
+      util.log(`- Trying ${id} (attempt # ${tries}/${meta.argv['maxtries']})`);
       util.log(`- Requesting ${id} over ${seconds} second time range starting at ${start}.`);
+    } else {
+      util.log(`- Retrying ${id} (attempt # ${tries}/${meta.argv['maxtries']}) because: ${reason}`);
+      util.log(`- Requesting ${id} over ${seconds} second time range starting at ${start}.`);      
     }
 
     let url = meta.argv.cdasr + id + '/variables';
@@ -423,110 +429,132 @@ function getVariableDetails(CATALOG) {
     let headers = {Accept: 'application/json'};
     let reqOpts = {uri: url, headers: headers, outFile: fnameCDFML};
     util.get(reqOpts, function (err, body) {
-      if (err) {
-        util.error(id, err, true);
+      if (err !== null) {
+        err = true;
+        reason = err.message;
       } else {
         if (body === null) {
           err = true;
           reason = 'Empty body (usually non-200 HTTP status)';
         }
-        let timeRangeScalePower = 10;
         if (typeof body === 'string') {
           if (body.match('Internal Server Error') || body.match('Bad Request') ||
               body.match('No data available') || body.match('Not Found')) {
             err = true;
             reason = body;
+            seconds = 10*seconds;
           } else if (body.match('Requested amount of data is too large')) {
             err = true;
-            timeRangeScalePower = 1/10;
+            // TODO: Don't send scaled down request if last request was a scale up request.
+            seconds = seconds/10;
             reason = 'Requested amount of data is too large';
           } else {
+            util.error(id, "Un-handled error condition in get", false);
+            err = true;
+            reason = body;
+            console.log(body)
             // TODO: Handle this case.
           }
         }
       }
 
-      if (err && tries < meta.argv['maxtries']) {
-        requestVariableDetails(ididx, names, timeRangeScalePower, reason);
+      if (err == true && tries < meta.argv['maxtries']) {
+        requestVariableDetails(ididx, names, seconds, reason);
       } else {
-        finished(ididx, names, fnameCDFML, body, false);
+        if (err == true) body = null;
+        finished(ididx, names, fnameCDFML, body, seconds);
       }
     });
   }
 
-  function finished(ididx, names, fnameCDFML, body, fromCache) {
+  function finished(ididx, names, fnameCDFML, body, seconds) {
 
     if (!finished.N) {finished.N = 0;}
     finished.N = finished.N + 1;
 
     let id = datasets[ididx]['id']
-    if (body && !body['CDF']) {
-      util.error(id, 'CDFML JSON has no CDF element. Omitting. Returned content: \n' +
-                      util.obj2json(body),false);
-
-      datasets[ididx] = null;
-      if (body['Error'] && body['Error'].length > 0) {
-        util.error(id,
-            [
-              'Request for ' + datasets[ididx]['id'] + ' gave',
-              'Error: ' + body['Error'][0],
-              'Message: ' + body['Message'][0],
-              'Status: ' + body['Message'][0],
-              'Omitting.',
-            ],
-            false);
-      }
-    } else if (body && body['CDF'] && !body['CDF'][0]) {
-      util.error(id,'CDFML JSON has no CDF[0] element. Omitting. Returned content: \n' +
-                    util.obj2json(body),false);
+    if (body === null) {
+      util.rmSync(fnameCDFML);
     } else {
-      let cdfVariables = body['CDF'][0]['cdfVariables'];
-      if (cdfVariables.length > 1) {
-        util.error(id, ['Case of more than one cdfVariable not implemented. Omitting.',
-                        cdfVariables],false);
-      }
+      if (!body['CDF']) {
+        util.error(id, 'CDFML JSON has no CDF element. Returned content:\n' +
+                        util.obj2json(body),false);
 
-      let rstats = getRecordStats(cdfVariables);
-      let Nr = rstats['N'];
-      let timeRangeScalePower = 10;
-      if (rstats['Rps'] !== null) {
-        // If records per second (Rps) could be computed, 
-        // pass timeRangeScalePower as a negative number of seconds.
-        // The negative sign tells requestVariableDetails to use
-        // -timeRangeScalePower as the number of seconds for the time
-        // span of the request.
-        // TODO: Hacky. Fix.
-        timeRangeScalePower = -rstats['Rps']*(meta.argv['minrecords']+1);
-      }
+        if (body['Error'] && body['Error'].length > 0) {
+          util.error(id,
+              [
+                'Request for ' + datasets[ididx]['id'] + ' gave',
+                'Error: ' + body['Error'][0],
+                'Message: ' + body['Message'][0],
+                'Status: ' + body['Message'][0],
+                'Omitting.',
+              ],
+              false);
+        }
+        util.rmSync(fnameCDFML);
+        body = null;
+      } else if (body['CDF'] && !body['CDF'][0]) {
 
-      let tries = requestVariableDetails.tries[ididx];
-      let reason = `# of records returned (${Nr}) < ${meta.argv['minrecords']}`;
-      if (tries < meta.argv['maxtries']) {
-        if (Nr < meta.argv['minrecords']) {
-          requestVariableDetails(ididx, names, timeRangeScalePower, reason);
+        util.error(id,'CDFML JSON has no CDF[0] element. Returned content:\n' +
+                  util.obj2json(body),false);
+        util.rmSync(fnameCDFML);
+        body = null;
+      } else if (seconds !== null) {
+
+        let cdfVariables = body['CDF'][0]['cdfVariables'];
+        if (cdfVariables.length > 1) {
+          util.error(id, ['Case of more than one cdfVariables elements not implemented.',
+                          cdfVariables],true);
+        }
+
+        util.cp(fnameCDFML, fnameCDFML + ".lastok");
+
+        let rstats = getRecordStats(cdfVariables);
+        let Nr = rstats['N'];
+        let tries = requestVariableDetails.tries[ididx];
+        if (Nr < meta.argv['minrecords'] && tries < meta.argv['maxtries']) {
+          let secondsLast = seconds;
+          seconds = 10*seconds;
+          let reason = `# of records returned (${Nr}) < ${meta.argv['minrecords']}`;
+          if (rstats['Rps'] !== null) {
+            let secondsNew = (meta.argv['minrecords']+1)/rstats['Rps'];
+            if (secondsLast != secondsNew) {
+              seconds = secondsNew;
+            }
+          }
+          requestVariableDetails(ididx, names, seconds, reason);
           finished.N = finished.N - 1;
           return;
         }
       }
+    }
+
+    datasets[ididx]['_data'] = null;
+    if (body !== null || util.existsSync(fnameCDFML + ".lastok")) {
+
+      if (body === null) {
+        body = JSON.parse(util.readSync(fnameCDFML + ".lastok"));
+        util.rmSync(fnameCDFML + ".lastok");
+      }
+
+      let rstats = getRecordStats(body['CDF'][0]['cdfVariables']);
+      //util.log(`${id}: ${rstats['N']} records.`);
 
       let orphanAttributes = body['CDF'][0]['orphanAttributes'];
       if (orphanAttributes && orphanAttributes['attribute'].length > 0) {
-        if (fromCache == false) {
           let fnameOrphan = fnameCDFML.replace('.json', '.orphan.json');
           util.writeSync(fnameOrphan, util.obj2json(orphanAttributes['attribute']));
-        }
       }
 
-      if (fromCache == false) {
-        util.writeSync(fnameCDFML, util.obj2json(body), 'utf8');
-        if (body['Warning'].length > 0) {
-          let fnameCDFMLWarn = fnameCDFML.replace('.json', '.warning.json');
-          util.writeSync(fnameCDFMLWarn,util.obj2json(body['Warning']),'utf8');
-        }
+      util.writeSync(fnameCDFML, util.obj2json(body), 'utf8');
+      if (body['Warning'].length > 0) {
+        let fnameCDFMLWarn = fnameCDFML.replace('.json', '.warning.json');
+        util.writeSync(fnameCDFMLWarn,util.obj2json(body['Warning']),'utf8');
       }
 
       //datasets[ididx]['_data'] = body['CDF'][0];
       datasets[ididx]['_data'] = fnameCDFML;
+
     }
 
     if (finished.N == datasets.length) {
@@ -546,12 +574,32 @@ function getSPASERecords(CATALOG) {
   let datasets = CATALOG['datasets'];
   for (let dataset of datasets) {
 
-    _data = JSON.parse(util.readSync(dataset['_data']))['CDF'][0];
+    if (false && !dataset) {
+      finished(dataset, "No dataset");
+      return;      
+    }
 
-    let resourceID = getGAttribute(_data['cdfGAttributes'], 'SPASE_DATASETRESOURCEID');
+    let resourceID = "";
+    let emsg1 = "";
+    if (!dataset['_masters']['json']['CDFglobalAttributes']) {
+      emsg1 = "No CDFglobalAttributes in master JSON";
+      util.error(dataset['id'], emsg1, false);
+    } else {
+      for (let obj of dataset['_masters']['json']['CDFglobalAttributes']) {
+        if (obj['spase_DatasetResourceID']) {
+          resourceID = obj['spase_DatasetResourceID'][0]['0'];
+          break;
+        }
+      }
+    }
+    //console.log(`${dataset['id']}: Reading ${dataset['_data']}`)
+    //_data = JSON.parse(util.readSync(dataset['_data']))['CDF'][0];
+    //let resourceID = getGAttribute(_data['cdfGAttributes'], 'SPASE_DATASETRESOURCEID');
+    //let emsg2 = 'No SPASE_DATASETRESOURCEID in cdfGAttributes in ' + dataset['_data'];
+
     if (!resourceID || !resourceID.startsWith('spase://')) {
-      util.warning(dataset['id'], 'No SPASE link in resourceID');
-      finished(dataset, null);
+      finished(dataset, emsg1);
+      continue;
     }
     let spaseURL = resourceID.replace('spase://', 'https://hpde.io/') + '.xml';
     let spaseFile = meta.argv.cachedir + '/' +
@@ -561,24 +609,26 @@ function getSPASERecords(CATALOG) {
     getSPASERecord(dataset, spaseURL, spaseFile);
   }
 
-  function finished(dataset, obj, cb) {
+  function finished(dataset, obj) {
     if (!finished.N) finished.N = 0;
     finished.N = finished.N + 1;
-    if (obj === null) return;
-    dataset['_spase'] = obj['json']["Spase"];
-    let id = dataset['id'];
+    if (typeof obj === 'string') {
+      dataset['_spaseError'] = obj;
+    } else {
+      dataset['_spase'] = obj['json']["Spase"];      
+    }
     if (finished.N == datasets.length) {
       run.finished(CATALOG);
     }
   }
 
-  function getSPASERecord(dataset, url, outFile, cb) {
+  function getSPASERecord(dataset, url, outFile) {
     util.get({uri: url, outFile: outFile}, (err, obj) => {
       if (err) {
         util.error(dataset['id'], [url, err], false);
-        obj = {json: null, xml: null};
+        obj = "Failed to fetch " + url;
       }
-      finished(dataset, obj, cb);
+      finished(dataset, obj);
     });
   }
 }
@@ -678,7 +728,7 @@ function getRecordStats(cdfVariables) {
   let lastTime = timeRecords[N-1]['value'];
   let dt = new Date(lastTime).getTime() - new Date(firstTime).getTime();
 
-  return {"N": N, "Rps": (dt/1000)/(N-1)};
+  return {"N": N, "Rps": (N-1)/(dt/1000)};
 }
 
 function getGAttribute(cdfGAttributes, attributeName) {
