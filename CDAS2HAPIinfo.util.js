@@ -14,6 +14,7 @@ module.exports.util = {
   "cp": cp,  
   "warning": warning,
   "note": note,
+  "debug": debug,
   "error": error,
   "obj2json": obj2json,
   "xml2js": xml2js,
@@ -26,6 +27,8 @@ module.exports.util = {
   "str2ISODuration": str2ISODuration
 }
 util = module.exports.util;
+
+let logExt = "request";
 
 function rmSync(fname) {
   {if (fs.existsSync(fname)) {fs.unlinkSync(fname)}}  
@@ -52,7 +55,7 @@ function writeSync(fname, data, opts) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, {recursive: true});
   }
-  //util.log('Writing: ' + fname);
+  util.debug(null, 'Writing: ' + fname, logExt);
   fs.writeFileSync(fname, data, opts);
 }
 
@@ -84,12 +87,12 @@ function get(opts, cb) {
 
   let hrs = Infinity;
   if (fs.existsSync(outFileHeaders) && fs.existsSync(outFile)) {
-    log.debug(`Stating: ${outFileHeaders}`);
+    util.debug(opts.id, `Stating: ${outFileHeaders}`, logExt);
     let stat = fs.statSync(outFileHeaders);
     hrs = (new Date().getTime() - stat['mtimeMs'])/3600000;
     let secs = hrs*3600;
-    log.debug(`         file age    = ${secs.toFixed(0)} [s]`);
-    log.debug(`         argv.maxage = ${util.argv.maxage} [s]`);
+    util.debug(opts.id, `         file age    = ${secs.toFixed(0)} [s]`, logExt);
+    util.debug(opts.id, `         argv.maxage = ${util.argv.maxage} [s]`, logExt);
     let headersLast = JSON.parse(fs.readFileSync(outFileHeaders,'utf-8'));
     parse(outFile, null, headersLast, cb);
     return;
@@ -98,7 +101,7 @@ function get(opts, cb) {
   if (hrs < util.argv.maxage && !opts['ignoreCache'] && fs.existsSync(outFileHeaders)) {
 
     opts.method = "HEAD";
-    log("Requesting (HEAD): " + opts.uri);
+    util.debug(opts.id, "Requesting (HEAD): " + opts.uri, logExt);
     request(opts, function (err, res, body) {
       if (err) {
         error(null, [opts.uri, err], true);
@@ -112,11 +115,11 @@ function get(opts, cb) {
         let currLastModified = new Date(res.headers['last-modified']).getTime();
         let d = (currLastModified - lastLastModified)/86400000;
         if (currLastModified > lastLastModified) {
-          log("File " + outFile + " is " + d.toFixed(2) + " days older than that reported by HEAD request");
+          util.debug(null, "File " + outFile + " is " + d.toFixed(2) + " days older than that reported by HEAD request");
           opts['ignoreCache'] = true;
           get(opts, cb);
         } else {
-          log(outFile + " does not need to be updated.");
+          util.debug(null, outFile + " does not need to be updated.");
           parse(outFile, null, res.headers, cb);
         }
       }
@@ -124,7 +127,7 @@ function get(opts, cb) {
     return;
   }
 
-  log("Requesting: " + opts.uri);
+  util.log(opts.id, "Requesting: " + opts.uri, "", null, logExt);
   opts.method = "GET";
   request(opts, function (err, res, body) {
 
@@ -138,16 +141,15 @@ function get(opts, cb) {
       cb(err, null);
       return;
     } else {
-      log("Received:   " + opts.uri);
+      util.log(opts.id, "Received:   " + opts.uri, "", null, logExt);
     }
 
     res.headers['x-Request-URL'] = opts.uri;
-    log("Writing: " + outFileHeaders);
+    util.debug(null, "Writing: " + outFileHeaders);
     util.writeSync(outFileHeaders, obj2json(res.headers), 'utf-8');
 
     parse(outFile, body, res.headers, cb);
   });
-
 
   function encoding(headers) {
     if (/json|xml/.test(headers['content-type'])) {
@@ -161,14 +163,13 @@ function get(opts, cb) {
 
     if (body === null) {
       // Cached local file
-      if (outFile.endsWith(".cdf") === false) {
+      if (outFile.endsWith(".cdf") === false && opts["parse"] !== false) {
         // If CDF file, processing is done from command line
         // call, so don't need to read.
-        log("Reading: " + outFile);
+        util.log(opts.id, "Reading: " + outFile, null, logExt);
         body = fs.readFileSync(outFile);
       }
     } else {
-      log("Writing: " + outFile);
       if (/application\/json/.test(headers['content-type'])) {
         util.writeSync(outFile, obj2json(JSON.parse(body)), encoding(headers));
       } else {
@@ -213,21 +214,21 @@ function cdf2json(fnameCDF, cb) {
   let args = " -withZ -mode:cdfxdf -output:STDOUT " 
   let cmd = util.argv.cdf2cdfml + args + fnameCDF;
   try {
-    util.log("Executing: " + cmd);
+    util.debug(opts.id, "Executing: " + cmd, logExt);
     cdfxml = util.execSync(cmd, {maxBuffer: 8*1024*1024});
   } catch (err) {
     cb(err, null);
     return;
   }
 
-  util.log("Writing: " + fnameXML);
+  util.debug(opts.id, "Writing: " + fnameXML, logExt);
   cdfxml = cdfxml.toString()
   util.writeSync(fnameXML, cdfxml, 'utf8');
 
-  util.log("Converting " + fnameXML + " to JSON.");
+  util.debug(opts.id, "Converting " + fnameXML + " to JSON.", logExt);
   util.xml2js(cdfxml,
     function (err, obj) {
-      util.log("Writing: " + fnameJSON);
+      util.debug(opts.id, "Writing: " + fnameJSON, logExt);
       util.writeSync(fnameJSON, obj2json(obj), 'utf8');
       cb(err, {"json": obj, "xml": cdfxml});
   });
@@ -244,14 +245,48 @@ function obj2json(obj) {
   return JSON.stringify(obj, null, 2);
 }
 
-function log(msg, color) {
+function log(dsid, msg, prefix, color, fext) {
 
-  let fname = util.argv.cachedir + "/log.txt";
-  if (!log.fname) {
-    util.rmSync(fname, { recursive: true, force: true });
-    log.fname = fname;
+  if (!fext) {
+    fext = "log";
   }
-  appendSync(fname, msg + "\n");
+  if (dsid) {
+    if (prefix) {
+      prefix = "  " + prefix;
+    } else {
+      prefix = "";
+    }
+  }
+  if (!prefix) prefix = "";
+
+  if (Array.isArray(msg)) {
+    msg[0] = prefix + msg[0];
+    msg = msg.join('\n').replace(/\n/g,'\n' + " ".repeat(msg[0].length));
+  } else {
+    msg = prefix + msg;
+  }
+
+  let fname1 = util.argv.cachedir + "/" + fext + ".txt";
+  log["logFileName"] = fname1;
+  if (!log[fname1]) {
+    util.rmSync(fname1, { recursive: true, force: true });
+    log[fname1] = fname1;
+  }
+  if (fext === "error" && dsid) {
+    appendSync(fname1, dsid + "\n" + msg + "\n");
+  } else {
+    appendSync(fname1, msg + "\n");
+  }
+
+  if (dsid) {
+    let fname2 = baseDir(dsid) + "/" + dsid + "." + fext + ".txt";
+    if (!log[fname2]) {
+      util.rmSync(fname2, { recursive: true, force: true });
+      log[fname2] = fname2;
+    }
+    appendSync(fname2, msg + "\n");
+  }
+
   let inverse = msg.trim().startsWith("*") && msg.trim().endsWith("*");
   if (inverse && !color) {
     color = 'yellow';
@@ -266,53 +301,29 @@ function log(msg, color) {
     console.log(msg);
   }
 }
-log.debug = function (msg) {
-  if (util.argv.debug) {
-    if (typeof(msg) === "string") {
-      console.log("[debug] " + msg);        
-    } else {
-      console.log(msg);
-    }
-  }
+
+function msgtype(mtype1, mtype2) {
+  if (mtype2) {return mtype2 + "." + mtype1} else {return mtype1}
 }
 
-function warning(dsid, msg) {
-  msg = "  Warning: " + msg;
-  log(msg, "yellow");
+function debug(dsid, msg, mtype) {
+  if (!util.argv.debug) return;
+  if (typeof msg !== 'string') {
+    msg = "\n" + JSON.stringify(msg, null, 2);
+  }
+  log(dsid, msg, "[debug]: ", "", msgtype("log", mtype));
 }
 
-function note(dsid, msg) {
-  let pad = "";
-  if (dsid !== null) {
-    pad = "  ";
-  }
-  log(pad + "Note:    " + msg);
+function warning(dsid, msg, mtype) {
+  log(dsid, msg, "Warning: ", "yellow", msgtype("log", mtype));
 }
 
-function error(dsid, msg, exit, prefix) {
-  let errorDir = util.argv.cachedir;
-  let fname = undefined;
-  if (dsid) {
-    errorDir = util.argv.cachedir + "/" + dsid.split("_")[0];
-    fname = errorDir + "/" + dsid + "/" + dsid + ".error.txt";
-  }
-  if (fname && !error.fname) {
-    fs.rmSync(fname, {"recursive": true, "force": true});
-    error.fname = fname;
-  }
-  if (Array.isArray(msg)) {
-    msg = msg.join('\n').replace(/\n/g,'\n       ');
-  } else {
-    msg = msg.toString();
-  }
-  if (fname) {
-    appendSync(fname, "  " + msg);
-  }
-  msg = "  Error:   " + msg;
-  if (prefix !== false) {
-    msg = dsid + "\n" + msg;
-  }
-  log(msg, "red");
+function note(dsid, msg, mtype) {
+  log(dsid, msg, "Note:    ", null, msgtype("log", mtype));
+}
+
+function error(dsid, msg, exit, mtype) {
+  log(dsid, msg, "Error:   ", "red", msgtype("error", mtype));
   if (exit === undefined || exit == true) {
     process.exit(1);
   }

@@ -11,7 +11,7 @@ let argv = yargs
             .help()
             .describe('idregex', 'Comma-separated list of regex patterns to process')
             .describe('skipids', 'Comma-separated list of regex patterns to exclude')
-            .describe('omit', 'Comma-separated list of steps to omit from: inventory, files0, files1, masters')
+            .describe('omit', 'Comma-separated list of steps to omit from: {inventory, files0, files1, masters, spase}')
             .describe('maxsockets', 'Maximum open sockets per server')
             .describe('maxage', 'Do HEAD requests if file age < maxage (in seconds)')
             .describe('maxretries', 'Maximum # of retries for CDAS data requests')
@@ -49,13 +49,13 @@ const {meta} = require('./CDAS2HAPIinfo.meta.js');
 meta.argv = argv;
 
 // meta.run() gets all needed metadata files.
-meta.run(() => buildHAPI());
+//meta.run(() => buildHAPI());
 
 // To only get metadata files:
 //meta.run();
 
 // To only build HAPI metadata based on cached metadata files:
-//buildHAPI()
+buildHAPI()
 
 // Create HAPI info responses for file list datasets
 //buildHAPIfiles()
@@ -73,19 +73,22 @@ function buildHAPI(CATALOG) {
   if (CATALOG !== undefined) {
     datasets = CATALOG['datasets'];
   } else {
+
     let allIdsFile = argv["cachedir"] + '/ids-cdas-processed.txt';
     let ids = util.readSync(allIdsFile).toString().split("\n");
-
+    util.log(null, `\n*Reading ${ids.length} combined.json input files*\n`, "");
     datasets = [];
     for (id of ids) {
       let fnameCombined = util.baseDir(id) + "/" + id + "-combined.json";
       datasets.push(JSON.parse(util.readSync(fnameCombined)));
     }
+    util.log(null, "Read " + datasets.length + " combined.json files", "");
   }
+
   buildHAPIfiles(datasets);
 
   //console.log(datasets);
-  util.log('\n*Creating HAPI catalog and info responses for CDAWeb data datasets.*\n');
+  util.log(null, '\n*Creating HAPI catalog and info responses for CDAWeb data datasets.*\n', "");
 
   let dataset;
   for (dsidx in datasets) {
@@ -105,7 +108,7 @@ function buildHAPI(CATALOG) {
   if (datasets.length == 0) {
   }
 
-  util.log.debug('Looking for datasets with more than one DEPEND_0.');
+  util.debug('Looking for datasets with more than one DEPEND_0.');
   datasets = subsetDatasets(datasets);
 
   let omsg = ' from HAPI all.json because no variable attributes.';
@@ -114,10 +117,10 @@ function buildHAPI(CATALOG) {
   for (let dataset of datasets) {
 
     let dsid = dataset['id'];
-    util.log(dsid, 'blue');
+    util.log(dsid, dsid, "", 'blue');
 
     if (dataset['_data'] === null) {
-      util.error(dsid, 'Omitting ' + dsid + ' because no data sample obtained', false, false);
+      util.error(dsid, 'Omitting ' + dsid + ' because no data sample obtained', false);
       continue;
     }
 
@@ -174,7 +177,7 @@ function buildHAPI(CATALOG) {
       }
 
       if (!parameter['fill'] && varType == 'data') {
-        util.warning(dataset['id'], 'No fill for ' + parameter['name']);
+        util.warning(dataset['id'], 'No fill for data parameter ' + parameter['name']);
       }
 
       if (parameter['fill'] && varType == 'data' && parameter['fill'].toLowerCase() == "nan") {
@@ -264,7 +267,7 @@ function buildHAPI(CATALOG) {
   util.writeSync(fnameAll, util.obj2json(datasets));
   util.note(null, 'Wrote ' + fnameAll);
 
-  util.note(null,"Console messages written to " + util.log.fname);
+  util.note(null, "Console messages written to " + util.log.logFileName);
 }
 
 function buildHAPIfiles(datasets) {
@@ -292,7 +295,7 @@ function buildHAPIfiles(datasets) {
 
   function inventory() {
 
-    util.log('\n*Creating HAPI catalog and info responses for CDAWeb inventory datasets.*\n');
+    util.log(null, '\n*Creating HAPI catalog and info responses for CDAWeb inventory datasets.*\n', "");
 
     if (meta.argv['omit'].includes('inventory')) {
       return;
@@ -301,12 +304,12 @@ function buildHAPIfiles(datasets) {
     for (let dataset of datasets) {
       let id = dataset['id'];
 
-      util.log(id, 'blue');
+      util.log(id, id, "", 'blue');
 
       let fileList = util.baseDir(id) + '/' + id + '-inventory.json';
       let intervals = JSON.parse(util.readSync(fileList))["InventoryDescription"][0]["TimeInterval"];
       if (intervals === undefined) {
-        util.warning(id,'No intervals');
+        util.warning(id, 'No intervals');
         continue;
       }
 
@@ -322,7 +325,7 @@ function buildHAPIfiles(datasets) {
       let stopDate = data[data.length-1][1];
 
       if (data.length == 0) {
-        util.warning(id,'No intervals');
+        util.warning(id, 'No intervals');
         continue;
       } else {
         let plural = data.length == 1 ? "" : "s";
@@ -373,7 +376,7 @@ function buildHAPIfiles(datasets) {
 
   function files0() {
 
-    util.log('\n*Creating HAPI catalog and info responses for CDAWeb files datasets (version 0 method).*\n');
+    util.log(null, '\n*Creating HAPI catalog and info responses for CDAWeb files datasets (version 0 method).*\n', "");
 
     if (meta.argv['omit'].includes('files0')) {
       return;
@@ -382,10 +385,18 @@ function buildHAPIfiles(datasets) {
     for (let dataset of datasets) {
       let id = dataset['id'];
 
-      util.log(id, 'blue');
+      util.log(id, id, "", 'blue');
 
       let fileList = dataset['_files0'];
+      if (!fileList) {
+        util.warning(id, 'No _files1');
+        continue;
+      }
       let files = JSON.parse(util.readSync(fileList));
+      if (files.length === 0) {
+        util.warning(id, 'No files in ' + fileList);
+        continue;
+      }
 
       let startLen = 0; let endLen = 0; let urlLen = 0;
       for (file of files) {
@@ -399,7 +410,7 @@ function buildHAPIfiles(datasets) {
       util.cp(fileData1, fileData2);
 
       if (files.length == 0) {
-        util.warning(id,'No files');
+        util.warning(id, 'No files');
         continue;
       } else {
         sizeOf = function (bytes) {
@@ -482,7 +493,7 @@ function buildHAPIfiles(datasets) {
 
   function files1() {
 
-    util.log('\n*Creating HAPI catalog and info responses for CDAWeb files datasets (version 1 method).*\n');
+    util.log(null, '\n*Creating HAPI catalog and info responses for CDAWeb files datasets (version 1 method).*\n', "");
 
     if (meta.argv['omit'].includes('inventory')) {
       return;
@@ -490,13 +501,16 @@ function buildHAPIfiles(datasets) {
 
     for (let dataset of datasets) {
       let id = dataset['id'];
-
-      util.log(id, 'blue');
+      util.log(id, id, "", 'blue');
 
       let fileList = dataset['_files1'];
+      if (!fileList) {
+        util.warning(id, 'No _files1');
+        continue;
+      }
       let files = JSON.parse(util.readSync(fileList))["FileDescription"];
       if (!files) {
-        util.warning(id,'No files');
+        util.warning(id, 'No FileDescription in ' + fileList);
         continue;
       }
 
@@ -522,7 +536,7 @@ function buildHAPIfiles(datasets) {
       let stopDate = data[data.length-1][1];
     
       if (data.length == 0) {
-        util.warning(id,'No files');
+        util.warning(id, 'No files');
         continue;
       } else {
         let plural = data.length == 1 ? "" : "s";
@@ -661,8 +675,11 @@ function subsetDatasets(datasets) {
   for (let [dsidx, dataset] of Object.entries(datasets)) {
     let subdatasets = subsetDataset(dataset);
     if (subdatasets.length > 1) {
-      util.log(dataset['id'], 'blue');
+      util.log(dataset['id'], dataset['id'], "", 'blue');
       util.note(dataset['id'], subdatasets.length + ' sub-datasets');
+    }
+    if (dataset._dataError !== undefined) {
+      util.error(dataset['id'], dataset._dataError, false);
     }
     for (d of subdatasets) {
       datasetsExpanded.push(d);
@@ -791,7 +808,7 @@ function extractParameterAttributes(dataset, _data) {
   }
   for (let parameterName of Object.keys(dataset['info']['parameters'])) {
     if (!cdfVariableNames.includes(parameterName)) {
-      util.error(dataset['id'], `/variables included '${parameterName}', which was not found in CDF. Omitting.`, false);
+      dataset._dataError = `/variables has '${parameterName}', which was not found in CDF. Omitting.`;
       delete dataset['info']['parameters'][parameterName];
     }
   }
@@ -838,7 +855,7 @@ function extractParameterAttributes(dataset, _data) {
     } else if (cdftype.startsWith('CDF_CHAR')) {
       return 'string';
     } else {
-      util.error(dataset['id'], 'Un-handled CDF datatype ' + cdftype);      
+      util.error(dataset['id'], 'Un-handled CDF datatype ' + cdftype, true);      
     }
   }
 }
@@ -935,13 +952,11 @@ function extractDepend1(dsid, depend1Variable) {
         bins['centers'][cidx] = parseInt(bins['centers'][cidx]);
       }
     } else {
-      util.error(
-        dsid,
-        'Un-handled DEPEND_1 type for bins variable ' +
-          depend1Variable['name'] +
-          DEPEND_1_TYPE,
-        true
-      );
+      util.error(dsid,
+                'Un-handled DEPEND_1 type for bins variable '
+              + depend1Variable['name']
+              + DEPEND_1_TYPE,
+              true);
     }
     return bins;
   }
@@ -972,8 +987,11 @@ function extractCoordSysNameAndVecComps(dsid, parameter, depend1) {
     }
   }
   if (foundComponents) {
-    util.warning(dsid, parameter['name'] + ': Assumed DEPEND_1 = [' 
-                + depend1.join(', ') + '] => vectorComponents = [x, y, z]');
+    util.warning(dsid,
+                  parameter['name'] 
+                + ': Assumed DEPEND_1 = [' 
+                + depend1.join(', ')
+                + '] => vectorComponents = [x, y, z]');
     parameter['vectorComponents'] = ['x', 'y', 'z'];
   }
 
@@ -983,23 +1001,20 @@ function extractCoordSysNameAndVecComps(dsid, parameter, depend1) {
     for (let knownName of knownNames) {
       if (parameter['name'].includes(knownName)) {
         foundName = true;
-        util.warning(
-          dsid,
-          parameter['name'] +
-            ': Assumed parameter name = ' +
-            parameter['name'] +
-            ' => coordinateSystemName = ' +
-            knownName
-        );
+        util.warning(dsid,
+                      parameter['name']
+                    + ': Assumed parameter name = '
+                    + parameter['name']
+                    + ' => coordinateSystemName = '
+                    + knownName);
         parameter['coordinateSystemName'] = knownName;
       }
     }
     if (foundName == false) {
-      util.warning(
-        dsid,
-        'Could not infer coordinateSystemName from parameter name = ' +
-          parameter['name']
-      );
+      util.warning(dsid,
+                    'Could not infer coordinateSystemName '
+                  + ' from parameter name = '
+                  + parameter['name']);
     }
   }
 }
@@ -1091,7 +1106,7 @@ function extractCadence(dataset, _data) {
   if (dthist.length > 0) {
     dthist.sort(function(a, b) {return a[0] - b[0];});
     if (dthist[0][0] <= 0) {
-      util.error(dsid, "Time records not monotonic.", false);
+      util.error(dsid, "Time records not monotonic.", false, false);
     }
   }
 
