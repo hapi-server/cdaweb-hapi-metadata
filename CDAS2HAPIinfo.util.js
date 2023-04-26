@@ -24,7 +24,8 @@ module.exports.util = {
   "sameDuration": sameDuration,
   "sameDateTime": sameDateTime,
   "str2ISODateTime": str2ISODateTime,
-  "str2ISODuration": str2ISODuration
+  "str2ISODuration": str2ISODuration,
+  "sizeOf": sizeOf
 }
 util = module.exports.util;
 
@@ -386,23 +387,18 @@ function str2ISODateTime(stro) {
 function str2ISODuration(cadenceStr) {
 
   let cadence = "";
+  let re = /.*?([0-9]*\.?[0-9]+).*/;
   cadenceStr = cadenceStr.toLowerCase();
   if (cadenceStr.match(/day/)) {
-    cadence = "P" + cadenceStr.replace(/\s.*days?/,'D');
-  } else if (cadenceStr.match(/hour/)) {
-    cadence = "PT" + cadenceStr.replace(/\s.*hours?/,'H');
-  } else if (cadenceStr.match(/hr/)) {
-    cadence = "PT" + cadenceStr.replace(/\s.*hrs?/,'H');
-  } else if (cadenceStr.match(/minute/)) {
-    cadence = "PT" + cadenceStr.replace(/\s.*minutes?/,'M');
-  } else if (cadenceStr.match(/min/)) {
-    cadence = "PT" + cadenceStr.replace(/\s.*mins?/,'M');
-  } else if (cadenceStr.match(/second/)) {
-    cadence = "PT" + cadenceStr.replace(/\s.*seconds?/,'S');
-  } else if (cadenceStr.match(/sec/)) {
-    cadence = "PT" + cadenceStr.replace(/\s.*secs?/,'S');
-  } else if (cadenceStr.match(/[0-9]s/)) {
-    cadence = "PT" + cadenceStr.replace(/([0-9].*)s/,'$1S');
+    cadence = "P" + cadenceStr.replace(re,'$1D');
+  } else if (cadenceStr.match(/hour|hr/)) {
+    cadence = "PT" + cadenceStr.replace(re,'$1H');
+  } else if (cadenceStr.match(/minute|min/)) {
+    cadence = "PT" + cadenceStr.replace(re,'$1M');
+  } else if (cadenceStr.match(/second|sec/)) {
+    cadence = "PT" + cadenceStr.replace(re,'$1S');
+  } else if (cadenceStr.match(/[0-9]s\s?/)) {
+    cadence = "PT" + cadenceStr.replace(re,'$1S');
   } else if (cadenceStr.match(/millisecond/)) {
     let ms = cadenceStr.match(/(\d.*\d+)/)[0];
     let S = parseFloat(ms)/1000;
@@ -418,3 +414,10 @@ function str2ISODuration(cadenceStr) {
 }
 // End time-related functions
 /////////////////////////////////////////////////////////////////////////////
+
+function sizeOf(bytes) {
+  // https://stackoverflow.com/a/28120564
+  if (bytes == 0) { return "0.00 B"; }
+  var e = Math.floor(Math.log(bytes) / Math.log(1000));
+  return (bytes/Math.pow(1000, e)).toFixed(2)+' '+' KMGTP'.charAt(e)+'B';
+}

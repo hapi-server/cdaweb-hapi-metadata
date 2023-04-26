@@ -21,7 +21,7 @@ let argv = yargs
               {
                 idregex: '^AC_',    
                 skipids: '^ALOUETTE2,AIM_CIPS_SCI_3A',
-                omit: '',
+                omit: ' ',
                 include: '',
                 maxsockets: 3,
                 maxage: 3600*24,
@@ -39,8 +39,8 @@ let argv = yargs
               }).argv;
 
 argv['include'] = argv['include'].split(',');
-argv['omit'] = argv['omit'].split(',');
 argv['skipids'] = argv['skipids'].split(',');
+argv['omit'] = argv['omit'].split(',');
 
 const {util} = require('./CDAS2HAPIinfo.util.js');
 util.argv = argv;
@@ -49,13 +49,13 @@ const {meta} = require('./CDAS2HAPIinfo.meta.js');
 meta.argv = argv;
 
 // meta.run() gets all needed metadata files.
-//meta.run(() => buildHAPI());
+meta.run(() => buildHAPI());
 
 // To only get metadata files:
 //meta.run();
 
 // To only build HAPI metadata based on cached metadata files:
-buildHAPI()
+//buildHAPI()
 
 // Create HAPI info responses for file list datasets
 //buildHAPIfiles()
@@ -108,7 +108,7 @@ function buildHAPI(CATALOG) {
   if (datasets.length == 0) {
   }
 
-  util.debug('Looking for datasets with more than one DEPEND_0.');
+  util.debug(null, 'Looking for datasets with more than one DEPEND_0.');
   datasets = subsetDatasets(datasets);
 
   let omsg = ' from HAPI all.json because no variable attributes.';
@@ -295,11 +295,11 @@ function buildHAPIfiles(datasets) {
 
   function inventory() {
 
-    util.log(null, '\n*Creating HAPI catalog and info responses for CDAWeb inventory datasets.*\n', "");
-
     if (meta.argv['omit'].includes('inventory')) {
       return;
     }
+
+    util.log(null, '\n*Creating HAPI catalog and info responses for CDAWeb inventory datasets.*\n', "");
 
     for (let dataset of datasets) {
       let id = dataset['id'];
@@ -364,7 +364,7 @@ function buildHAPIfiles(datasets) {
       util.writeSync(fnameInfo, util.obj2json(info));
       util.note(id,'Wrote ' + fnameInfo);
 
-      let title = "/inventory from https://cdaweb.gsfc.nasa.gov/WebServices/REST/";
+      let title = "Time intervals of data availability from /inventory endpoint at https://cdaweb.gsfc.nasa.gov/WebServices/REST/";
       let ida = id + "/inventory";
       all.push({"id": ida, "title": title, "info": info});
       catalog.push({"id": ida, "title": title});
@@ -376,11 +376,11 @@ function buildHAPIfiles(datasets) {
 
   function files0() {
 
-    util.log(null, '\n*Creating HAPI catalog and info responses for CDAWeb files datasets (version 0 method).*\n', "");
-
     if (meta.argv['omit'].includes('files0')) {
       return;
     }
+
+    util.log(null, '\n*Creating HAPI catalog and info responses for CDAWeb files datasets (version 0 method).*\n', "");
 
     for (let dataset of datasets) {
       let id = dataset['id'];
@@ -413,14 +413,8 @@ function buildHAPIfiles(datasets) {
         util.warning(id, 'No files');
         continue;
       } else {
-        sizeOf = function (bytes) {
-          // https://stackoverflow.com/a/28120564
-          if (bytes == 0) { return "0.00 B"; }
-          var e = Math.floor(Math.log(bytes) / Math.log(1000));
-          return (bytes/Math.pow(1000, e)).toFixed(2)+' '+' KMGTP'.charAt(e)+'B';
-        }
         let plural = files.length == 1 ? "" : "s";
-        util.note(id, `${files.length} file${plural}; ${sizeOf(dataset['_files0Size'])}`);
+        util.note(id, `${files.length} file${plural}; ${util.sizeOf(dataset['_files0Size'])}`);
       }
       let startDate = files[0][0];
       let stopDate = files[files.length-1][0];
@@ -482,8 +476,7 @@ function buildHAPIfiles(datasets) {
       let fnameInfo = argv.infodir + '/CDAWeb-files/info/' + id + '-files0.json';
       util.writeSync(fnameInfo, util.obj2json(info));
       util.note(id,'Wrote ' + fnameInfo);
-
-      let title = "";
+      let title = "List of files obtained from index.html files at access URL in all.xml";
       let ida = id + "/files0";
       all.push({"id": ida, "title": title, "info": info});
       catalog.push({"id": ida, "title": title});
@@ -493,11 +486,11 @@ function buildHAPIfiles(datasets) {
 
   function files1() {
 
-    util.log(null, '\n*Creating HAPI catalog and info responses for CDAWeb files datasets (version 1 method).*\n', "");
-
-    if (meta.argv['omit'].includes('inventory')) {
+    if (meta.argv['omit'].includes('files1')) {
       return;
     }
+
+    util.log(null, '\n*Creating HAPI catalog and info responses for CDAWeb files datasets (version 1 method).*\n', "");
 
     for (let dataset of datasets) {
       let id = dataset['id'];
@@ -540,7 +533,7 @@ function buildHAPIfiles(datasets) {
         continue;
       } else {
         let plural = data.length == 1 ? "" : "s";
-        util.note(id, `${data.length} file${plural}`);
+        util.note(id, `${files.length} file${plural}; ${util.sizeOf(dataset['_files1Size'])}`);
       }
 
       let info = 
@@ -567,7 +560,7 @@ function buildHAPIfiles(datasets) {
                   { 
                     "name": "URL",
                     "type": "string",
-//                    "stringType": {"uri": {"base": "", scheme": "https", "mediaType": "application/x-cdf"}},
+                    "x_stringType": {"uri": {"scheme": "https", "mediaType": "application/x-cdf"}},
                     "units": null,
                     "fill": null,
                     "length": urlLen
@@ -596,7 +589,7 @@ function buildHAPIfiles(datasets) {
       util.writeSync(fnameInfo, util.obj2json(info));
       util.note(id,'Wrote ' + fnameInfo);
 
-      let title = "";
+      let title = "List of files obtained from /orig_data of https://cdaweb.gsfc.nasa.gov/WebServices/REST/";
       let ida = id + "/files";
       all.push({"id": ida, "title": title, "info": info});
       catalog.push({"id": ida, "title": title});
@@ -607,8 +600,6 @@ function buildHAPIfiles(datasets) {
 }
 
 function writeInfoFile(dataset) {
-
-  //util.log(`\n*Writing HAPI info and info-full json files to ${argv.infodir}/CDAWeb/info/*`);
 
   let id = dataset['id'];
 
@@ -646,6 +637,9 @@ function writeInfoFile(dataset) {
   deleteUnderscoreKeys(dataset);
   util.writeSync(fnameInfo, util.obj2json(dataset['info']));
   util.note(id, 'Wrote ' + fnameInfo);
+
+  let fnameInfo2 = util.baseDir(id) + '/' + id + '-info.json';
+  util.writeSync(fnameInfo2, util.obj2json(dataset['info']));
 }
 
 function deleteUnderscoreKeys(dataset) {
@@ -907,6 +901,15 @@ function extractVariableAttributes(dsid, variable) {
     if (attribute['name'] === 'VAR_TYPE') {
       keptAttributes['_VAR_TYPE'] = attribute['entry'][0]['value'];
     }
+    if (attribute['name'] === 'VAR_NOTES') {
+      let desc = keptAttributes['description'].trim();
+      let VAR_NOTES = attribute['entry'][0]['value'];
+      let sep = ". ";
+      if (desc.endsWith(".")) {
+        let sep = " ";
+      }
+      keptAttributes['description'] = desc + sep + VAR_NOTES;
+    }
   }
   return keptAttributes;
 }
@@ -1087,7 +1090,11 @@ function extractCadence(dataset, _data) {
     cadenceData = "PT" + S + "S";
     util.note(dsid, `Inferred cadence of ${cadenceData} based on ${Nr} records.`);
   } else {
-    util.note(dsid, `Could not infer cadence from ${Nr} time record(s) because more than one (${Nu}) unique Δt values.`);
+    if (Nr > 1) {
+      util.note(dsid, `Could not infer cadence from ${Nr} time record(s) because more than one (${Nu}) unique Δt values.`);
+    } else {
+      util.note(dsid, `Could not infer cadence from ${Nr} time record.`);      
+    }
     let dtmsg = "";
     let n = 1;
     for (let i in dthist) {
@@ -1110,12 +1117,6 @@ function extractCadence(dataset, _data) {
     }
   }
 
-  // Get cadence from SPASE
-  let cadenceSPASE = extractFromSPASE(dsid, dataset['_spase'], "Cadence");
-  if (cadenceSPASE !== undefined) {
-    util.note(dsid, 'Cadence from SPASE: ' + cadenceSPASE);
-  }
-
   // Get cadence from CDF
   let cadenceCDF = undefined;
   if (dataset['info']['cadence']) {
@@ -1125,6 +1126,12 @@ function extractCadence(dataset, _data) {
     } else {
       util.warning(dsid, 'Could not parse CDF attribute TIME_RESOLUTION: ' + dataset['info']['cadence'] + ' to use for cadence.');
     }
+  }
+
+  // Get cadence from SPASE
+  let cadenceSPASE = extractFromSPASE(dsid, dataset['_spase'], "Cadence");
+  if (cadenceSPASE !== undefined) {
+    util.note(dsid, 'Cadence from SPASE: ' + cadenceSPASE);
   }
 
   // Summarize

@@ -178,6 +178,7 @@ function getFileLists1(CATALOG) {
 
   if (meta.argv['omit'].includes('files1')) {
     getInventories(CATALOG);
+    return;
   }
 
   for (dataset of CATALOG['datasets']) {
@@ -199,7 +200,12 @@ function getFileLists1(CATALOG) {
         if (err) {
           util.error(id, [url, 'Error message', err], false, logExt);
         }
+        let _files1Size = 0;
+        for (let file of json['FileDescription']) {
+          _files1Size += file['Length'];
+        }
         dataset['_files1'] = fnameCoverage;
+        dataset['_files1Size'] = _files1Size;
         finished(err);
     });
   }
@@ -584,10 +590,17 @@ function getSPASERecords(CATALOG) {
     }
 
     //console.log(`${dataset['id']}: Reading ${dataset['_data']}`)
-    let cdfml = util.readSync(dataset['_data']);
-    if (resourceID === "" && cdfml) {
-      _data = JSON.parse(cdfml)['CDF'][0];
-      resourceID = getGAttribute(_data['cdfGAttributes'], 'SPASE_DATASETRESOURCEID');
+    if (dataset['_data']) {
+      let cdfml = util.readSync(dataset['_data']);
+      if (resourceID === "" && cdfml) {
+        _data = JSON.parse(cdfml)['CDF'][0];
+        resourceID = getGAttribute(_data['cdfGAttributes'], 'SPASE_DATASETRESOURCEID');
+        if (!resourceID) {
+          emsg += "No SPASE_DATASETRESOURCEID in sample CDF file. ";
+          finished(dataset, null, emsg);
+          return;
+        }
+      }
     } else {
       emsg += "No sample CDF file available to search for SPASE_DATASETRESOURCEID. ";
     }
