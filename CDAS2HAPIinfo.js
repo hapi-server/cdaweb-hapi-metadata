@@ -22,23 +22,19 @@ let argv = yargs
                 idregex: '^AC_',    
                 skipids: '^ALOUETTE2,AIM_CIPS_SCI_3A',
                 omit: ' ',
-                include: '',
                 maxsockets: 3,
                 maxage: 3600*24,
                 infodir: 'hapi/bw',
                 cachedir: 'cache/bw',
-                allfull:  'cache/bw/all-hapi-full.json',
-                cdasr:  'https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/',
+                cdasr: 'https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/',
                 allxml: 'https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml',
                 debug: false,
                 maxtries: 4,
                 minrecords: 1440,
                 hapiversion: '3.1',
-                cdf2cdfml: 'java CDF2CDFML',
-                cdfexport: 'DYLD_LIBRARY_PATH=.:$CDF_BASE/lib $CDF_BASE/bin/cdfexport',
+                cdf2cdfml: 'java CDF2CDFML'
               }).argv;
 
-argv['include'] = argv['include'].split(',');
 argv['skipids'] = argv['skipids'].split(',');
 argv['omit'] = argv['omit'].split(',');
 
@@ -58,7 +54,7 @@ meta.run(() => buildHAPI());
 //buildHAPI()
 
 // Create HAPI info responses for file list datasets
-//buildHAPIfiles()
+//buildHAPIFiles()
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -85,7 +81,7 @@ function buildHAPI(CATALOG) {
     util.log(null, "Read " + datasets.length + " combined.json files", "");
   }
 
-  buildHAPIfiles(datasets);
+  buildHAPIFiles(datasets);
 
   //console.log(datasets);
   util.log(null, '\n*Creating HAPI catalog and info responses for CDAWeb data datasets.*\n', "");
@@ -270,7 +266,7 @@ function buildHAPI(CATALOG) {
   util.note(null, "Console messages written to " + util.log.logFileName);
 }
 
-function buildHAPIfiles(datasets) {
+function buildHAPIFiles(datasets) {
 
   let all = [];
   let catalog = [];
@@ -663,7 +659,6 @@ function deleteUnderscoreKeys(dataset) {
 
 function subsetDatasets(datasets) {
 
-  //let datasetsExpanded = util.copy(datasets);
   let datasetsExpanded = [];
 
   for (let [dsidx, dataset] of Object.entries(datasets)) {
@@ -1045,76 +1040,10 @@ function extractCadence(dataset, _data) {
       break;
     }
   }
-
-  let dts = [];
   if (timeRecords === undefined) {
-    util.warning(dsid, "Could not find DEPEND_0 records.");
+    util.warning(dsid, "No DEPEND_0 records.");
   } else {
-    for (r = 0; r < timeRecords.length - 1; r++) {
-      // slice(0,24) keeps only to ms precision.
-      //dt = new Date(timeRecords[r+1]['value'][0].slice(0,24)).getTime() 
-      //   - new Date(timeRecords[r]['value'][0].slice(0,24)).getTime();
-      dt = new Date(timeRecords[r+1]['value'][0]).getTime() 
-         - new Date(timeRecords[r]['value'][0]).getTime();
-      dts.push(dt);
-      if (false && dt <= 0) {
-        let msg = timeRecords[r]['value'][0];
-        msg += " followed by " + timeRecords[r+1]['value'][0]
-        util.error(dsid, "Time records not monotonic. " + msg, false);
-      }
-    }    
-  }
-
-  function histogram(dts) {
-    let counts = {};
-    for (let i = 0; i < dts.length; i++) {
-      counts[dts[i]] = 1 + (counts[dts[i]] || 0);
-    }
-    let sorted = [];
-    for (let entry in counts) {
-      sorted.push([parseFloat(entry)/1000, counts[entry]]);
-    }
-
-    // Sort on counts
-    sorted.sort(function(a, b) {
-      return b[1] - a[1];
-    });
-    return sorted;
-  }
-  dthist = histogram(dts);
-  Nu = Object.keys(dthist).length;
-
-  let Nr = timeRecords.length;
-  if (Nu == 1) {
-    let S = dthist[0][0];
-    cadenceData = "PT" + S + "S";
-    util.note(dsid, `Inferred cadence of ${cadenceData} based on ${Nr} records.`);
-  } else {
-    if (Nr > 1) {
-      util.note(dsid, `Could not infer cadence from ${Nr} time record(s) because more than one (${Nu}) unique Δt values.`);
-    } else {
-      util.note(dsid, `Could not infer cadence from ${Nr} time record.`);      
-    }
-    let dtmsg = "";
-    let n = 1;
-    for (let i in dthist) {
-      let p = (100*dthist[i][1]/Nr);
-      if (n == 5 || p < 2) break;
-      dtmsg += `${p.toFixed(1)}% @ ${dthist[i][0]}s, `;
-      n++;
-    }
-    if (dthist.length > n) {
-      dtmsg += "...";
-    }
-    if (Nr > 1) {
-      util.note(dsid, "Δt histogram: " + dtmsg);
-    }
-  }
-  if (dthist.length > 0) {
-    dthist.sort(function(a, b) {return a[0] - b[0];});
-    if (dthist[0][0] <= 0) {
-      util.error(dsid, "Time records not monotonic.", false, false);
-    }
+    cadenceData = inferCadence(timeRecords, dsid);
   }
 
   // Get cadence from CDF
@@ -1165,3 +1094,77 @@ function extractCadence(dataset, _data) {
     util.warning(dsid, 'No SPASE cadence or CDF attribute of TIME_RESOLUTION found to use for cadence.');
   }
 }
+
+function inferCadence(timeRecords, dsid) {
+
+  let dts = [];
+  for (r = 0; r < timeRecords.length - 1; r++) {
+    // slice(0,24) keeps only to ms precision.
+    //dt = new Date(timeRecords[r+1]['value'][0].slice(0,24)).getTime() 
+    //   - new Date(timeRecords[r]['value'][0].slice(0,24)).getTime();
+    dt = new Date(timeRecords[r+1]['value'][0]).getTime() 
+       - new Date(timeRecords[r]['value'][0]).getTime();
+    dts.push(dt);
+  }
+
+  dthist = histogram(dts);
+
+  let cadenceData = undefined;
+
+  let Nu = Object.keys(dthist).length;
+  let Nr = timeRecords.length;
+  if (Nu == 1) {
+    let S = dthist[0][0];
+    cadenceData = "PT" + S + "S";
+    util.note(dsid, `Inferred cadence of ${cadenceData} based on ${Nr} records.`);
+  } else {
+    if (Nr > 1) {
+      util.note(dsid, `Could not infer cadence from ${Nr} time record(s) because more than one (${Nu}) unique Δt values.`);
+    } else {
+      util.note(dsid, `Could not infer cadence from ${Nr} time record.`);      
+    }
+    let dtmsg = "";
+    let n = 1;
+    for (let i in dthist) {
+      let p = (100*dthist[i][1]/Nr);
+      if (n == 5 || p < 2) break;
+      dtmsg += `${p.toFixed(1)}% @ ${dthist[i][0]}s, `;
+      n++;
+    }
+    if (dthist.length > n) {
+      dtmsg += "...";
+    }
+    if (Nr > 1 && dtmsg !== "") {
+      util.note(dsid, "Δt histogram: " + dtmsg);
+    }
+  }
+
+  if (dthist.length > 0) {
+    dthist.sort(function(a, b) {return a[0] - b[0];});
+    if (dthist[0][0] <= 0) {
+      util.error(dsid, "Time records not monotonic.", false, false);
+    }
+  }
+
+  return cadenceData;
+
+
+  function histogram(dts) {
+    let counts = {};
+    for (let i = 0; i < dts.length; i++) {
+      counts[dts[i]] = 1 + (counts[dts[i]] || 0);
+    }
+    let sorted = [];
+    for (let entry in counts) {
+      sorted.push([parseFloat(entry)/1000, counts[entry]]);
+    }
+
+    // Sort on counts
+    sorted.sort(function(a, b) {
+      return b[1] - a[1];
+    });
+    return sorted;
+  }
+
+}
+
