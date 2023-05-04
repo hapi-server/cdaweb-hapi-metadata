@@ -25,6 +25,7 @@ module.exports.util = {
   "sameDateTime": sameDateTime,
   "str2ISODateTime": str2ISODateTime,
   "str2ISODuration": str2ISODuration,
+  "idFilter": idFilter,
   "sizeOf": sizeOf
 }
 util = module.exports.util;
@@ -414,6 +415,35 @@ function str2ISODuration(cadenceStr) {
 }
 // End time-related functions
 /////////////////////////////////////////////////////////////////////////////
+
+function idFilter(id, keeps, omits) {
+
+  if (Array.isArray(id)) {
+    let keeps = [];
+    for (let i of id) {
+      if (idFilter(i)) {
+        keeps.push(i)
+      }
+    }
+    return keeps;
+  }
+
+  for (let keep of keeps) {
+    let re = new RegExp(keep);
+    if (re.test(id) == true) {
+      return true;
+    }
+  }
+
+  for (let omit of omits) {
+    let re = new RegExp(omit);
+    if (re.test(id) == true) {
+      return false;
+    }
+  }
+
+  return false;
+}
 
 function sizeOf(bytes) {
   // https://stackoverflow.com/a/28120564

@@ -306,14 +306,14 @@ function text2csv(body) {
       body
         .toString()
         .split("\n")
-        .map(function(line){
+        .map(function(line) {
             if (line.search(re1) != -1) {
               if (FROM === "cdas-text-using-js") {
                 // First replace converts to restricted HAPI 8601
                 // Second converts fractional sections from form
                 // .xxx.yyyy to .xxxyyy.
                 // Last replaces whitespace with comma (this assumes data are
-                // never strings with spaces).                                    
+                // never strings with spaces).
                 line = line
                         .replace(/^([0-9]{2})-([0-9]{2})-([0-9]{4}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]{3})\.([0-9]{3})/, "$3-$2-$1T$4.$5$6Z")
                         .replace(/^([0-9]{2})-([0-9]{2})-([0-9]{4}) ([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3})\s/, "$3-$2-$1T$4Z ")

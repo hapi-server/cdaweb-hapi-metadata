@@ -6,36 +6,86 @@
 //   https://cdaweb.gsfc.nasa.gov/WebServices/REST/
 
 // Command line options
-const yargs = require('yargs');
-let argv = yargs
+let argv = require('yargs')
             .help()
-            .describe('idregex', 'Comma-separated list of regex patterns to process')
-            .describe('skipids', 'Comma-separated list of regex patterns to exclude')
-            .describe('omit', 'Comma-separated list of steps to omit from: {inventory, files0, files1, masters, spase}')
-            .describe('maxsockets', 'Maximum open sockets per server')
-            .describe('maxage', 'Do HEAD requests if file age < maxage (in seconds)')
-            .describe('maxretries', 'Maximum # of retries for CDAS data requests')
-            .describe('minrecords', 'Minimum # of records for CDAS data request to be successful')
-            .describe('debug', 'Show additional logging information')
-            .default(
-              {
-                idregex: '^AC_',    
-                skipids: '^ALOUETTE2,AIM_CIPS_SCI_3A',
-                omit: ' ',
-                maxsockets: 3,
-                maxage: 3600*24,
-                infodir: 'hapi/bw',
-                cachedir: 'cache/bw',
-                cdasr: 'https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/',
-                allxml: 'https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml',
-                debug: false,
-                maxtries: 4,
-                minrecords: 1440,
-                hapiversion: '3.1',
-                cdf2cdfml: 'java CDF2CDFML'
-              }).argv;
+            .option('keepids', {
+              describe: 'Comma-separated list of regex patterns to include',
+              default: '^AC_',
+              type: 'string'
+            })
+            .option('omitids', {
+              describe: 'Comma-separated list of regex patterns to exclude (ignored for ids that match keepids pattern)',
+              default: '^ALOUETTE2,AIM_CIPS_SCI_3A',
+              type: 'string'
+            })
+            .option('minrecords', {
+              describe: 'Minimum # of records for CDAS data request to be successful',
+              minrecords: 1440,
+              type: 'number'
+            })
+            .option('debug', {
+              describe: "Show additional logging information",
+              default: false
+            })
+            .option("omit", {
+              describe: "Comma-separated list of steps to omit from: {inventory, files0, files1, masters, spase}",
+              default: "",
+              type: "string"
+            })
+            .option("maxsockets", {
+              describe: "Maximum open sockets per server",
+              default: 3,
+              type: "number"
+            })
+            .option('maxage', {
+              describe: 'Do HEAD requests if file age < maxage (in seconds)',
+              default: 3600*24,
+              type: "number"
+            })
+            .option('maxtries', {
+              describe: 'Maximum # of retries for CDAS data requests',
+              default: 4,
+              type: "number"
+            })
+            .option('infodir', {
+              describe: '',
+              default: "hapi/bw",
+              type: "string"
+            })
+            .option('cachedir', {
+              describe: '',
+              default: "cache/bw",
+              type: "string"
+            })
+            .option('cdasr', {
+              describe: "",
+              default: "https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/",
+              type: "string"
+            })
+            .option('allxml', {
+              describe: "",
+              default: "https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml",
+              type: "string"
+            })
+            .option('allxml', {
+              describe: "",
+              default: "https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml",
+              type: "string"
+            })
+            .option('hapiversion', {
+              describe: "",
+              default: "3.1",
+              type: "number"
+            })
+            .option('cdf2cdfml', {
+              describe: "",
+              default: "java CDF2CDFML",
+              type: "string"
+            })
+            .argv;
 
-argv['skipids'] = argv['skipids'].split(',');
+argv['keepids'] = argv['keepids'].split(',');
+argv['omitids'] = argv['omitids'].split(',');
 argv['omit'] = argv['omit'].split(',');
 
 const {util} = require('./CDAS2HAPIinfo.util.js');
@@ -45,13 +95,13 @@ const {meta} = require('./CDAS2HAPIinfo.meta.js');
 meta.argv = argv;
 
 // meta.run() gets all needed metadata files.
-meta.run(() => buildHAPI());
+//meta.run(buildHAPI);
 
 // To only get metadata files:
 //meta.run();
 
 // To only build HAPI metadata based on cached metadata files:
-//buildHAPI()
+buildHAPI()
 
 // Create HAPI info responses for file list datasets
 //buildHAPIFiles()
@@ -65,26 +115,27 @@ function heapUsed() {
 
 function buildHAPI(CATALOG) {
 
-  let datasets;
+  let datasets = [];
   if (CATALOG !== undefined) {
     datasets = CATALOG['datasets'];
   } else {
-
-    let allIdsFile = argv["cachedir"] + '/ids-cdas-processed.txt';
-    let ids = util.readSync(allIdsFile).toString().split("\n");
-    util.log(null, `\n*Reading ${ids.length} combined.json input files*\n`, "");
-    datasets = [];
-    for (id of ids) {
-      let fnameCombined = util.baseDir(id) + "/" + id + "-combined.json";
-      datasets.push(JSON.parse(util.readSync(fnameCombined)));
+    const globSync = require('glob').globSync;
+    const globStr = argv['cachedir'] + '/**/*-combined.json';
+    util.log(null, `\n*Reading cached metadata in -combined.json files.*\n`, "");
+    const combinedFiles = globSync(globStr);
+    util.log(null, `  ${combinedFiles.length} cached files match ${globStr}`, "");
+    for (let file of combinedFiles) {
+      let id = file.split('/').slice(-1)[0].split("-combined")[0];
+      if (util.idFilter(id, meta["argv"]['keepids'], meta["argv"]['omitids'])) {
+        datasets.push(JSON.parse(util.readSync(file)));
+      }
     }
-    util.log(null, "Read " + datasets.length + " combined.json files", "");
+    util.log(null, `  ${datasets.length} files after keepids and omitids filter`, "");
   }
 
   buildHAPIFiles(datasets);
 
-  //console.log(datasets);
-  util.log(null, '\n*Creating HAPI catalog and info responses for CDAWeb data datasets.*\n', "");
+  util.log(null, `\n*Processing datasets*\n`, "");
 
   let dataset;
   for (dsidx in datasets) {
@@ -250,6 +301,7 @@ function buildHAPI(CATALOG) {
     deleteUnderscoreKeys(dataset);
     catalog.push({'id': dataset['id'], 'title': dataset['title']});
   }
+  //process.exit(0);
 
   console.log("");
 
@@ -376,11 +428,11 @@ function buildHAPIFiles(datasets) {
       return;
     }
 
-    util.log(null, '\n*Creating HAPI catalog and info responses for CDAWeb files datasets (version 0 method).*\n', "");
+    util.log(null, '\n*Creating HAPI catalog and info responses for CDAWeb files datasets (version 0 method).*\n');
 
     for (let dataset of datasets) {
-      let id = dataset['id'];
 
+      let id = dataset['id'];
       util.log(id, id, "", 'blue');
 
       let fileList = dataset['_files0'];
@@ -399,7 +451,6 @@ function buildHAPIFiles(datasets) {
         timeLen = Math.max(startLen,files[0][0].length);
         urlLen = Math.max(urlLen,files[0][1].length);
       }
-
       let fileData1 = fileList.replace(/\.json$/,".csv");
       let dirData2 = argv.infodir + '/CDAWeb-files/data/';
       let fileData2 =  dirData2 + id + '/files0.csv';
@@ -467,16 +518,16 @@ function buildHAPIFiles(datasets) {
                   }
                 ]
             }
-
       if (cadence === "") {delete info['cadence'];}
       let fnameInfo = argv.infodir + '/CDAWeb-files/info/' + id + '-files0.json';
       util.writeSync(fnameInfo, util.obj2json(info));
-      util.note(id,'Wrote ' + fnameInfo);
+      util.note(id, 'Wrote ' + fnameInfo);
       let title = "List of files obtained from index.html files at access URL in all.xml";
       let ida = id + "/files0";
       all.push({"id": ida, "title": title, "info": info});
       catalog.push({"id": ida, "title": title});
     }
+
     //util.log(`\nWrote: ${datasets.length} files0.json files to ` + argv.infodir + '/CDAWeb-files/info/');
   }
 
@@ -589,6 +640,7 @@ function buildHAPIFiles(datasets) {
       let ida = id + "/files";
       all.push({"id": ida, "title": title, "info": info});
       catalog.push({"id": ida, "title": title});
+
     }
     //util.log(`\nWrote: ${datasets.length} files.csv files to ` + argv.infodir + '/CDAWeb-files/data/');
     //util.log(`Wrote: ${datasets.length} files.json files to ` + argv.infodir + '/CDAWeb-files/info/');
@@ -1165,6 +1217,4 @@ function inferCadence(timeRecords, dsid) {
     });
     return sorted;
   }
-
 }
-

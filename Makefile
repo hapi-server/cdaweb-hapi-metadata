@@ -18,23 +18,23 @@ all: node_modules
 	#make jf IDREGEX=$(IDREGEX)
 
 bw:
-	node CDAS2HAPIinfo.js --idregex '$(IDREGEX)'
+	node CDAS2HAPIinfo.js --keepids '$(IDREGEX)'
 
 # Nand's Lal's (nl) production HAPI server
 nl:
-	node bin/HAPIinfo.js --version 'nl' --idregex '$(IDREGEX)'
+	node bin/HAPIinfo.js --version 'nl' --keepids '$(IDREGEX)'
 
 # Jeremy Faden's (jf) test version of nl's server
 nljf:
-	node bin/HAPIinfo.js --version 'nljf' --idregex '$(IDREGEX)' --hapiurl 'https://jfaden.net/server/cdaweb/hapi'
+	node bin/HAPIinfo.js --version 'nljf' --keepids '$(IDREGEX)' --hapiurl 'https://jfaden.net/server/cdaweb/hapi'
 
 # Bernie Harris' (bh) prototype HAPI server
 bh:
-	node bin/HAPIinfo.js --version 'bh' --idregex '$(IDREGEX)'	
+	node bin/HAPIinfo.js --version 'bh' --keepids '$(IDREGEX)'	
 
 # Jeremy Faden's (jf) AutoplotDataServer HAPI server
 jf: bin/autoplot.jar
-	node bin/HAPIinfo.js --version 'jf' --idregex '$(IDREGEX)'	
+	node bin/HAPIinfo.js --version 'jf' --keepids '$(IDREGEX)'	
 
 jf-test:
 	java -Djava.awt.headless=true -cp bin/autoplot.jar org.autoplot.AutoplotDataServer -q --uri='vap+cdaweb:ds=OMNI2_H0_MRG1HR&id=DST1800' -f hapi-info	

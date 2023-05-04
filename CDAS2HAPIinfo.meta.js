@@ -32,7 +32,6 @@ function getAllXML() {
 
   let fnameAllXML  = meta.argv.cachedir + '/all.xml';
   let fnameAllJSON = fnameAllXML + '.json';
-
   let CATALOG = {all: {url: meta.argv.allxml}};
   util.get({uri: meta.argv.allxml, id: null, outFile: fnameAllXML},
     function (err, allObj) {
@@ -558,7 +557,6 @@ function getVariableDetails(CATALOG) {
       datasets[ididx]['_data'] = fnameCDFML;
 
     }
-
     if (finished.N == datasets.length) {
       //util.debug(null, 'datasets after variableDetails():', logExt);
       //util.debug(null, datasets, logExt);
@@ -598,7 +596,7 @@ function getSPASERecords(CATALOG) {
         if (!resourceID) {
           emsg += "No SPASE_DATASETRESOURCEID in sample CDF file. ";
           finished(dataset, null, emsg);
-          return;
+          continue;
         }
       }
     } else {
@@ -666,19 +664,9 @@ function createDatasets(json) {
 
     allIds.push(id);
 
-    let re = new RegExp(meta["argv"]["idregex"]);
-    if (re.test(id) == false) {continue;}
+    let keep = util.idFilter(id, meta["argv"]['keepids'], meta["argv"]['omitids']);
 
-    let omit = false;
-    for (skip of meta["argv"]['skipids']) {
-      let re = new RegExp(skip);
-      if (re.test(id) == true) {
-        util.log(null, `Note: Skipping ${id} b/c it matches regex ${id} in skips.`, "", null, logExt);
-        omit = true;
-        break;
-      }
-    }
-    if (omit) {continue;}
+    if (keep === false) continue;
 
     keptIds.push(id);
 
@@ -707,7 +695,11 @@ function createDatasets(json) {
     });
   }
 
-  util.debug(null, `idregex = ${meta["argv"]["idregex"]} kept ${datasets.length}/${datasets_allxml.length} datasets.`, logExt);
+  let msgo  = `keepids = ${meta["argv"]["keepids"]} and `;
+      msgo += `omitids = ${meta["argv"]["omitids"]} filter `;
+  let msg = msgo + `left ${datasets.length}/${datasets_allxml.length} datasets.`;
+
+  util.debug(null, msg, logExt);
 
   let allIdsFile = meta["argv"]["cachedir"] + '/ids-cdas.txt';
   util.writeSync(allIdsFile, allIds.join('\n'), 'utf8');
@@ -716,9 +708,8 @@ function createDatasets(json) {
   util.writeSync(keptIdsFile, keptIds.join('\n'), 'utf8');
 
   if (datasets.length == 0) {
-    util.error(null,
-      `Regex '${meta["argv"]["idregex"]}' did not match and dataset ids.`,
-      true, logExt);
+    let msg = msgo + `left 0/${datasets_allxml.length} datasets.`;
+    util.error(null, msg, true, logExt);
   }
 
   return datasets;

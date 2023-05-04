@@ -8,14 +8,14 @@ const {exec}  = require('node:child_process');
 const argv    = require('yargs')
                   .default
                     ({
-                      'idregex': '^AC_',
+                      'keepids': '^AC_',
                       'version': 'nl',
                       'hapiurl': '',
                       'maxsockets': 1
                     })
                   .argv;
 
-let DATSET_ID_RE = new RegExp(argv.idregex);
+let DATSET_ID_RE = new RegExp(argv.keepids);
 let HAPIURL = argv.hapiurl;
 
 // pool should be set outside of loop. See
