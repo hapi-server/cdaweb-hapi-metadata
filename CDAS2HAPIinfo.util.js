@@ -7,7 +7,7 @@ module.exports.util = {
   "existsSync": fs.existsSync,
   "rmSync": rmSync,
   "writeSync": writeSync,
-  "readSync": fs.readFileSync,
+  "readSync": readSync,
   "appendSync": appendSync,
   "copy": function (obj) {return JSON.parse(JSON.stringify(obj))},
   "log": log,
@@ -17,7 +17,6 @@ module.exports.util = {
   "debug": debug,
   "error": error,
   "obj2json": obj2json,
-  "xml2js": xml2js,
   "baseDir": baseDir,
   "incrementTime": incrementTime,
   "decrementTime": decrementTime,
@@ -51,6 +50,10 @@ function cp(src, dest, mode) {
   }
   fs.copyFileSync(src, dest, mode);
 }
+function readSync(fname, opts) {
+  util.debug(null, 'Reading: ' + fname, logExt);
+  return fs.readFileSync(fname, opts);
+}
 function writeSync(fname, data, opts) {
   const path = require('path');
   let dir = path.dirname(fname);
@@ -77,6 +80,7 @@ function get(opts, cb) {
   if (!opts["headers"]) {
     opts["headers"] = {};
   }
+
   opts["headers"]["User-Agent"] = "CDAS2HAPI; https://github.com/hapi-server/cdaweb-hapi-metadata";
 
   opts['pool'] = pool;
@@ -87,23 +91,27 @@ function get(opts, cb) {
   let outFileURL = outFile +  ".url";
   let outDir = path.dirname(outFile);
 
-  let hrs = Infinity;
+  let secs = Infinity;
   if (fs.existsSync(outFileHeaders) && fs.existsSync(outFile)) {
-    util.debug(opts.id, `Stating: ${outFileHeaders}`, logExt);
+    util.debug(null, `Stat-ing: ${outFileHeaders}`, logExt);
     let stat = fs.statSync(outFileHeaders);
-    hrs = (new Date().getTime() - stat['mtimeMs'])/3600000;
-    let secs = hrs*3600;
-    util.debug(opts.id, `         file age    = ${secs.toFixed(0)} [s]`, logExt);
-    util.debug(opts.id, `         argv.maxage = ${util.argv.maxage} [s]`, logExt);
-    let headersLast = JSON.parse(fs.readFileSync(outFileHeaders,'utf-8'));
-    parse(outFile, null, headersLast, cb);
-    return;
+    secs = (new Date().getTime() - stat['mtimeMs'])/1000;
+    util.debug(null, `file age    = ${secs.toFixed(0)} [s]`, logExt);
+    util.debug(null, `argv.maxheadage = ${util.argv.maxheadage} [s]`, logExt);
+    util.debug(null, `argv.maxfileage = ${util.argv.maxfileage} [s]`, logExt);
+    util.debug(null, `opts.maxFileAge = ${opts.maxFileAge} [s]`, logExt);
+    util.debug(null, `opts.maxHeadAge = ${opts.maxHeadAge} [s]`, logExt);
+    if (secs < Math.min(opts.maxHeadAge || Infinity) && util.argv.maxfileage && !opts['ignoreCache']) {
+      let headersLast = JSON.parse(fs.readFileSync(outFileHeaders,'utf-8'));
+      parse(outFile, null, headersLast, cb);
+      return;
+    }
   }
 
-  if (hrs < util.argv.maxage && !opts['ignoreCache'] && fs.existsSync(outFileHeaders)) {
+  if (secs < Math.min(opts.maxFileAge || Infinity,util.argv.maxfileage) && !opts['ignoreCache'] && fs.existsSync(outFileHeaders)) {
 
     opts.method = "HEAD";
-    util.debug(opts.id, "Requesting (HEAD): " + opts.uri, logExt);
+    util.debug(null, "Requesting (HEAD): " + opts.uri, logExt);
     request(opts, function (err, res, body) {
       if (err) {
         error(null, [opts.uri, err], true);
@@ -147,7 +155,7 @@ function get(opts, cb) {
     }
 
     res.headers['x-Request-URL'] = opts.uri;
-    util.debug(null, "Writing: " + outFileHeaders);
+    util.debug(null, "Writing: " + outFileHeaders, logExt);
     util.writeSync(outFileHeaders, obj2json(res.headers), 'utf-8');
 
     parse(outFile, body, res.headers, cb);
@@ -175,6 +183,9 @@ function get(opts, cb) {
       if (/application\/json/.test(headers['content-type'])) {
         util.writeSync(outFile, obj2json(JSON.parse(body)), encoding(headers));
       } else {
+        //console.log(headers)
+        //console.log(encoding(headers))
+        //console.log(body.length)
         util.writeSync(outFile, body, encoding(headers));
       }
     }
@@ -188,9 +199,9 @@ function get(opts, cb) {
     if (/application\/json/.test(headers['content-type'])) {
       cb(null, JSON.parse(body));
     } else if (/text\/xml/.test(headers['content-type'])) {
-      xml2js(body, (err, obj) => cb(err, obj));
+      xml2json(body, (err, obj) => cb(err, obj));
     } else if (/application\/xml/.test(headers['content-type'])) {
-      xml2js(body, (err, obj) => cb(err, obj));
+      xml2json(body, (err, obj) => cb(err, obj));
     } else if (/application\/x-cdf/.test(headers['content-type'])) {
       cdf2json(outFile, (err, obj) => cb(err, obj));
     } else {
@@ -200,45 +211,64 @@ function get(opts, cb) {
 }
 
 function cdf2json(fnameCDF, cb) {
-  
+
   let fnameBase = fnameCDF.replace(/\.cdf$/,"");
-  let fnameJSON = fnameBase + "-xml2js.json";
-  let fnameXML  = fnameBase + "-cdfxdf.xml";
+  let fnameJSON = fnameBase + "-" + util.argv["cdf2json-method"] + ".json";
 
-  if (fs.existsSync(fnameXML) && fs.existsSync(fnameJSON)) {
-    let json = JSON.parse(util.readSync(fnameJSON));
-    let xml = util.readSync(fnameJSON).toString();
-    cb(null, {"json": json, "xml": xml});
+  if (util.argv["cdf2json-method"] === "cdf2json.py") {
+    let opts = {maxBuffer: 1e8};
+    let cmd = util.argv["cdf2json"] + ' --in=' + fnameCDF + ' --out=' + fnameJSON + ' --maxrecs=' + 1440;
+    util.debug(null, "Executing " + cmd, logExt)
+    require('child_process').exec(cmd, opts, function (err, stdout, stderr) {
+      if (err) {
+        cb(err, null);
+        return;
+      }
+      cb(stderr, {"file": fnameJSON, "json": stdout});
+    });
     return;
   }
 
-  let cdfxml;
-  let args = " -withZ -mode:cdfxdf -output:STDOUT " 
-  let cmd = util.argv.cdf2cdfml + args + fnameCDF;
-  try {
-    util.debug(opts.id, "Executing: " + cmd, logExt);
-    cdfxml = util.execSync(cmd, {maxBuffer: 8*1024*1024});
-  } catch (err) {
-    cb(err, null);
-    return;
+  if (false) {
+    // Old method using CDF2CDFML + xml2js.
+    fnameBase = fnameCDF.replace(/\.cdf$/,"");
+    let fnameXML  = fnameBase + "-cdfxdf.xml";
+
+    if (fs.existsSync(fnameXML) && fs.existsSync(fnameJSON)) {
+      let json = JSON.parse(util.readSync(fnameJSON));
+      let xml = util.readSync(fnameJSON).toString();
+      cb(null, {"json": json, "xml": xml});
+      return;
+    }
+
+    let cdfxml;
+    let args = " -withZ -mode:cdfxdf -output:STDOUT " 
+    let cmd = util.argv.cdf2cdfml + args + fnameCDF;
+    try {
+      util.debug(null, "Executing: " + cmd, logExt);
+      cdfxml = util.execSync(cmd, {maxBuffer: 8*1024*1024});
+    } catch (err) {
+      cb(err, null);
+      return;
+    }
+
+    util.debug(null, "Writing: " + fnameXML, logExt);
+    cdfxml = cdfxml.toString()
+    util.writeSync(fnameXML, cdfxml, 'utf8');
+
+    util.debug(null, "Converting " + fnameXML + " to JSON.", logExt);
+    xml2json(cdfxml,
+      function (err, obj) {
+        util.debug(null, "Writing: " + fnameJSON, logExt);
+        util.writeSync(fnameJSON, obj2json(obj), 'utf8');
+        cb(err, {"file": fnameJSON, "json": obj, "xml": cdfxml});
+    });
   }
-
-  util.debug(opts.id, "Writing: " + fnameXML, logExt);
-  cdfxml = cdfxml.toString()
-  util.writeSync(fnameXML, cdfxml, 'utf8');
-
-  util.debug(opts.id, "Converting " + fnameXML + " to JSON.", logExt);
-  util.xml2js(cdfxml,
-    function (err, obj) {
-      util.debug(opts.id, "Writing: " + fnameJSON, logExt);
-      util.writeSync(fnameJSON, obj2json(obj), 'utf8');
-      cb(err, {"json": obj, "xml": cdfxml});
-  });
 }
 
-function xml2js(body, cb) {
-  const _xml2js = require('xml2js').parseString;
-  _xml2js(body, function (err, obj) {
+function xml2json(body, cb) {
+  const xml2js = require('xml2js').parseString;
+  xml2js(body, function (err, obj) {
     cb(null, {"json": obj, "xml": body.toString()});
   });
 }
@@ -263,7 +293,7 @@ function log(dsid, msg, prefix, color, fext) {
 
   if (Array.isArray(msg)) {
     msg[0] = prefix + msg[0];
-    msg = msg.join('\n').replace(/\n/g,'\n' + " ".repeat(msg[0].length));
+    msg = msg.join('\n').replace(/\n/g,'\n' + " ".repeat(4));
   } else {
     msg = prefix + msg;
   }
@@ -325,7 +355,7 @@ function note(dsid, msg, mtype) {
 }
 
 function error(dsid, msg, exit, mtype) {
-  log(dsid, msg, "Error:   ", "red", msgtype("error", mtype));
+  log(dsid, msg, "", "red", msgtype("error", mtype));
   if (exit === undefined || exit == true) {
     process.exit(1);
   }
@@ -428,19 +458,22 @@ function idFilter(id, keeps, omits) {
     return keeps;
   }
 
+  for (let omit of omits) {
+    if (omit == '') continue;
+    let re = new RegExp(omit);
+    if (re.test(id) == true) {
+      return false;
+    }
+  }
+
   for (let keep of keeps) {
+    if (keep === '') return true;
     let re = new RegExp(keep);
     if (re.test(id) == true) {
       return true;
     }
   }
 
-  for (let omit of omits) {
-    let re = new RegExp(omit);
-    if (re.test(id) == true) {
-      return false;
-    }
-  }
 
   return false;
 }

@@ -121,10 +121,7 @@ After these files are created, the program `compare-meta.js` can be executed to 
 
 # TODO:
 
-Add virtual variable discussion. See
-https://mail.google.com/mail/u/0/#search/jeremy/QgrcJHrjBQxNxwTckbhqnscttvqszHNjSrl
-and
-https://mail.google.com/mail/u/0/#sent/QgrcJHsTfRRbLXlQzkDnqxfpFdwhrCFRVXb
+Add virtual variable discussion. See Virtual.md
 
 # SPASE Comments
 
@@ -132,10 +129,10 @@ https://mail.google.com/mail/u/0/#sent/QgrcJHsTfRRbLXlQzkDnqxfpFdwhrCFRVXb
 
 ## Issues
 
+* SPASE records have parameters that are not returned by request for data from the SPDF APIs that are backed by data provider-generated CDF files (CDAWeb and CDAS). The only way to access these variables is by reading the data provider-generated CDF files. It is not possible to determine which variables are available from the API vs. only from data provider-generated CDF files. Example where the primary time variable is virtual [THEMIS/A/EFI](https://hpde.io/NASA/NumericalData/THEMIS/A/EFI/PT3S.html). The SPASE record mentions "This parameter is virtual. It is calculated by calling the function COMP_THEMIS_EPOCH with the following input parameters: tha_efs_dot0_epoch0, tha_efs_dot0_time." Without mentioning where the "function" exists. This is the primary reason why SPASE records cannot be used to build HAPI metadata
 * Stop time is relative
-* SPASE records have variables that are not returned by request for data from the SPDF APIs that are backed by data provider-generated CDF files (CDAWeb and CDAS). The only way to access these variables is by reading the data provider-generated CDF files. It is not possible to determine which variables are available from the API vs. only from data provider-generated CDF files.
 * Data Variable Descriptions
-* Data provider metadata is modified. For example, at At https://cdaweb.gsfc.nasa.gov/misc/NotesA.html under `AC_H5_SWI`, there is the sentence
+* Data provider metadata is modified. For example, at https://cdaweb.gsfc.nasa.gov/misc/NotesA.html under `AC_H5_SWI`, there is the sentence
   
   "The charge state distribution is the abundance of each charge state relative tothe total abundance for analyzed ions of the specified element."
 

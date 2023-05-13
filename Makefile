@@ -5,6 +5,9 @@ AUTOPLOT=https://ci-pw.physics.uiowa.edu/job/autoplot-release-2022/lastSuccessfu
 
 .PHONY: all bw jf nl bh
 
+# Time varying bins
+# RBSPB_REL04_ECT-HOPE-SCI-L2SA
+
 #all: node_modules bin/autoplot.jar
 all: node_modules
 	@mkdir -p hapi
@@ -84,10 +87,7 @@ clean:
 	make clean-jf
 	rm -f package-lock.json
 
-a:
-	rsync -avz tmp weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata
-
 rsync:
-	rsync -avz --delete cache weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata
 	rsync -avz --delete hapi weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata
 	rsync -avz --delete verify/data weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata/verify
+	rsync -avz --delete cache weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata
