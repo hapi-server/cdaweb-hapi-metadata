@@ -3,6 +3,9 @@ module.exports.meta = {
 }
 meta = module.exports.meta;
 
+const argv = require('./CDAS2HAPIinfo.cli.js').argv();
+const {util} = require('./CDAS2HAPIinfo.util.js');
+
 function run(cb) {
 
   util.log(null, '\n*Preparing input files.*\n', "", null);
@@ -30,15 +33,15 @@ function getAllXML() {
   // does not provide SPASE IDs (could still get SPASE IDs from data
   // request as it is in its metadata).
 
-  let fnameAllXML  = meta.argv.cachedir + '/all.xml';
+  let fnameAllXML  = argv.cachedir + '/all.xml';
   let fnameAllJSON = fnameAllXML + '.json';
-  let CATALOG = {all: {url: meta.argv.allxml}};
-  util.get({uri: meta.argv.allxml, id: null, outFile: fnameAllXML},
+  let CATALOG = {all: {url: argv.allxml}};
+  util.get({uri: argv.allxml, id: null, outFile: fnameAllXML},
     function (err, allObj) {
       CATALOG['datasets'] = createDatasets(allObj['json']);
       //util.debug(null, "CATALOG:", logExt);
       //util.debug(null, CATALOG, logExt);
-      getFileLists0(CATALOG);
+      getFileLists1(CATALOG);
   });
 
   function createDatasets(json) {
@@ -65,7 +68,7 @@ function getAllXML() {
 
       allIds.push(id);
 
-      let keep = util.idFilter(id, meta["argv"]['keepids'], meta["argv"]['omitids']);
+      let keep = util.idFilter(id, argv['keepids'],argv['omitids']);
 
       if (keep === false) continue;
 
@@ -82,30 +85,27 @@ function getAllXML() {
 
       datasets.push(
         {
-          id: id,
-          info: {
-            startDate: startDate,
-            stopDate: stopDate,
-          },
-        _allxml: dataset_allxml,
-        _masters: {
-          cdf: {url: mastercdf},
-          skt: {url: masterskt},
-          json: {url: masterjson}
+          "id": id,
+          "info": {"startDate": startDate, "stopDate": stopDate},
+          "_allxml": dataset_allxml,
+          "_masters": {
+            "cdf": {"url": mastercdf},
+            "skt": {"url": masterskt},
+            "json": {"url": masterjson}
         }
       });
     }
 
-    let msgo  = `keepids = ${meta["argv"]["keepids"]} and `;
-        msgo += `omitids = ${meta["argv"]["omitids"]} filter `;
+    let msgo  = `keepids = '${argv["keepids"]}' and `;
+        msgo += `omitids = '${argv["omitids"]}' filter `;
     let msg   = msgo + `left ${datasets.length}/${datasets_allxml.length} datasets.`;
 
     util.debug(null, msg, logExt);
 
-    let allIdsFile = meta["argv"]["cachedir"] + '/ids-cdas.txt';
+    let allIdsFile = argv["cachedir"] + '/ids-cdas.txt';
     util.writeSync(allIdsFile, allIds.join('\n'), 'utf8');
 
-    let keptIdsFile = meta["argv"]["cachedir"] + '/ids-cdas-processed.txt';
+    let keptIdsFile = argv["cachedir"] + '/ids-cdas-processed.txt';
     util.writeSync(keptIdsFile, keptIds.join('\n'), 'utf8');
 
     if (datasets.length == 0) {
@@ -117,181 +117,56 @@ function getAllXML() {
   }
 }
 
-function getFileLists0(CATALOG) {
-
-  // This function is not needed b/c getFileLists1() does
-  // the same thing. Could use results from this function
-  // as a check, however. This function was written before
-  // it was realized that there was a CDAS query that
-  // provided similar information.
-
-  if (meta.argv['omit'].includes('files0')) {
-    getFileLists1(CATALOG);
-    return;
-  }
-
-  for (let dataset of CATALOG['datasets']) {
-    let rootURL = dataset['_allxml']['access'][0]['URL'][0];
-    if (!rootURL.endsWith('/')) {
-      rootURL = rootURL + '/';
-    }
-    getFileList(dataset, rootURL);
-  }
-
-  function getFileList(dataset, rootURL) {
-
-    const cheerio = require('cheerio');
-
-    let id = dataset['id'];
-    let inventory = {};
-    inventory[id] = {};
-    let inventory_flat = [];
-
-    if (getFileList.finished === undefined) {getFileList.finished = 0;}
-    util.debug(id, `Started a dir walk for ${id}; # of walks left = ${getFileList.finished}`, logExt);
-
-    let outFile = meta.argv.cachedir + '/' + id.split('_')[0] + '/' + id + '/files0/index.html';
-    getDirIndex(id, rootURL, outFile, inventory[id]);
-
-    function finished(id) {
-
-      getDirIndex[id].started = getDirIndex[id].started - 1;
-      util.debug(id, `Finished a dir listing for ${id}; # left = ${getDirIndex[id].started}`, logExt);
-
-      if (getDirIndex[id].started == 0) {
-
-        util.debug(id, `Finished walking dirs for ${id}`, logExt);
-        getFileList.finished = getFileList.finished + 1;
-
-        let inventoryJSON0 = util.baseDir(id) + '/' + id + '-files0-tree.json';
-        util.writeSync(inventoryJSON0, util.obj2json(inventory));
-
-        let inventoryJSON1 = util.baseDir(id) + '/' + id + '-files0.json';
-
-        inventory_flat_split = [];
-        let _files0Size = 0;
-        for (line of inventory_flat) {
-          inventory_flat_split.push(line.split(","));
-          _files0Size += parseFloat(inventory_flat_split.slice(-1)[0][3]);
-        }
-        util.writeSync(inventoryJSON1, util.obj2json(inventory_flat_split));
-
-        let inventoryCSV = util.baseDir(id) + '/' + id + '-files0.csv';
-        util.writeSync(inventoryCSV, inventory_flat.join('\n'));
-
-        dataset['_files0Size'] = _files0Size;
-        dataset['_files0'] = inventoryJSON1;
-        if (getFileList.finished == CATALOG['datasets'].length) {
-          util.debug(null, 'Finished dir walk for all datasets', logExt);
-          getFileLists1(CATALOG);
-        }
-      }
-    }
-
-    function getDirIndex(id, url, outFile, parent) {
-
-      if (getDirIndex[id] === undefined) getDirIndex[id] = {};
-      if (getDirIndex[id].started === undefined) getDirIndex[id].started = 0;
-      getDirIndex[id].started = getDirIndex[id].started + 1;
-
-      let reqOpts = {uri: url, id: id, outFile: outFile};
-      util.get(reqOpts, (err, html) => {
-        if (err) {
-          util.error(id, [url, err], false, logExt);
-          finished(id);
-          return;
-        }
-        parent['files'] = [];
-        parent['dirs'] = {};
-        const $ = cheerio.load(html);
-        $('tr').each((i, elem) => {
-          // .each is sync so no callback needed.
-          // May break if Apache dir listing HTML changes.
-          // First three links are not relevant.
-
-          let cols = $(elem).find('td');
-          let href = $($(cols[0]).find('a')[0]).attr('href');
-          // i < 2 b/c first two rows are header and "Parent Directory"
-          if (!href || i < 2) return;
-          let mtime = $(cols[1]).text().replace(/([0-9]) ([0-9])/, '$1T$2').trim() + 'Z';
-          let size = $(cols[2]).text().trim();
-          size = size
-                  .replace("E","e18")
-                  .replace("P","e15")
-                  .replace("T","e12")
-                  .replace("G","e9")
-                  .replace("M","e6")
-                  .replace("K","e3")
-                  .replace("B","");
-
-          if (href.endsWith('.cdf')) {
-            let fileDate = href.replace(/.*([0-9]{4})([0-9]{2})([0-9]{2}).*/,'$1-$2-$3Z');
-            let fileVersion = href.replace(/.*_v(.*)\.cdf/, '$1');
-            parent['files'].push([fileDate, url + href, mtime, size, fileVersion]);
-            inventory_flat.push(`${fileDate},${url + href},${mtime},${size},${fileVersion}`);
-          }
-          if (href.endsWith('/')) {
-            let subdir = href.replace('/', '');
-            let newOutDir = outFile.split('/').slice(0, -1).join('/') + '/' + href;
-            let newOutFile = newOutDir + 'index.html';
-            parent['dirs'][subdir] = {};
-            getDirIndex(id, url + href, newOutFile, parent['dirs'][subdir]);
-          }
-        });
-
-        let inventoryFile = outFile.replace('.html', '.json');
-        util.writeSync(inventoryFile, util.obj2json(parent));
-        finished(id);
-      });
-    }
-  }
-}
-
 function getFileLists1(CATALOG) {
 
-  if (meta.argv['omit'].includes('files1')) {
+  if (argv['omit'].includes('files1')) {
     getInventories(CATALOG);
     return;
   }
 
-  let sum = 0;
   for (let dataset of CATALOG['datasets']) {
 
     let id = dataset['id'];
     let stop = dataset['info']['stopDate'];
     let start = dataset['info']['startDate'];
 
-    let url = meta.argv.cdasr + id + '/orig_data/' 
+    let url = argv.cdasr + id + '/orig_data/' 
             + start.replace(/-|:/g, '')
             + ',' 
             + stop.replace(/-|:/g, '') 
             + '/';
 
-    let fnameCoverage = util.baseDir(id) + "/" + id + "-files1.json";
-    let headers = {"Accept": "application/json"};
-    util.get({"uri": url, id: id, "outFile": fnameCoverage, "headers": headers, "parse": true},
-      (err, json) => {
+    let fnameFiles1 = util.baseDir(id) + "/" + id + "-files1.json";
+    let reqObj = {
+                    "uri": url,
+                    "id": id,
+                    "outFile": fnameFiles1,
+                    "headers": {"Accept": "application/json"},
+                    "parse": true
+                  };
+    util.get(reqObj, (err, json) => {
+      if (err) {
+        util.error(id, [url, 'Error message', err], false, logExt);
+      }
 
-        if (err) {
-          util.error(id, [url, 'Error message', err], false, logExt);
-        }
-
-        if (!json['FileDescription']) {
-          let emsg = url + '\nNo FileDescription in returned JSON:' + JSON.stringify(json,null,2);
-          dataset['_files1Error'] = emsg;
-          util.error(id, emsg, false, logExt);
-          finished(err);
-          return;
-        }
-
-        for (description of json['FileDescription']) {
-          sum += description['Length'];
-        }
-
-        dataset['_files1Last'] = json['FileDescription'].slice(-1)[0];
-        dataset['_files1First'] = json['FileDescription'][0];
-        dataset['_files1'] = fnameCoverage;
+      if (!json['FileDescription']) {
+        let emsg = url + '\nNo FileDescription in returned JSON:' + JSON.stringify(json,null,2);
+        dataset['_files1Error'] = emsg;
+        util.error(id, emsg, false, logExt);
         finished(err);
+        return;
+      }
+
+      let sum = 0;
+      for (let description of json['FileDescription']) {
+        sum += description['Length']; 
+      }
+
+      dataset['_files1Last'] = json['FileDescription'].slice(-1)[0];
+      dataset['_files1First'] = json['FileDescription'][0];
+      dataset['_files1Sum'] = sum;
+      dataset['_files1'] = fnameFiles1;
+      finished(err);
     });
   }
 
@@ -299,9 +174,6 @@ function getFileLists1(CATALOG) {
     if (finished.N == undefined) {finished.N = 0;}
     finished.N = finished.N + 1;
     if (finished.N == CATALOG['datasets'].length) {
-      //util.debug(null, 'catalog after masters:', logExt);
-      //util.debug(null, CATALOG, logExt);
-      console.log("Total of all files: " + (sum/1e12).toFixed(0));
       getInventories(CATALOG);
     }
   }  
@@ -309,7 +181,7 @@ function getFileLists1(CATALOG) {
 
 function getInventories(CATALOG) {
 
-  if (meta.argv['omit'].includes('inventory')) {
+  if (argv['omit'].includes('inventory')) {
     getMasters(CATALOG);
     return;
   }
@@ -317,7 +189,7 @@ function getInventories(CATALOG) {
   for (let dataset of CATALOG['datasets']) {
 
     let id = dataset['id'];
-    let url = meta.argv.cdasr + dataset['id'] + '/inventory/';
+    let url = argv.cdasr + dataset['id'] + '/inventory/';
     let fnameInventory = util.baseDir(id) + "/" + id + "-inventory.json";
     let headers = {"Accept": 'application/json'};
     util.get({"uri": url, id: id, "outFile": fnameInventory, "headers": headers, "parse": true},
@@ -331,11 +203,9 @@ function getInventories(CATALOG) {
   }
 
   function finished(err) {
-    if (finished.N == undefined) {finished.N = 0;}
+    if (finished.N === undefined) {finished.N = 0;}
     finished.N = finished.N + 1;
     if (finished.N == CATALOG['datasets'].length) {
-      //util.debug(null, 'catalog after getInventories():', logExt);
-      //util.debug(null, CATALOG, logExt);
       getMasters(CATALOG);
     }
   }  
@@ -349,13 +219,13 @@ function getMasters(CATALOG) {
   // has already applied the supplementary metadata in the masters
   // to the metadata stored in the raw cdf files.
 
-  if (meta.argv['omit'].includes('masters')) {
+  if (argv['omit'].includes('masters')) {
     getVariables(CATALOG);
     return;
   }
 
   let datasets = CATALOG['datasets'];
-  for (dataset of datasets) {
+  for (let dataset of datasets) {
 
     let id = dataset['id']; 
 
@@ -415,9 +285,9 @@ function getVariables(CATALOG) {
   // by making a request to /data.
 
   let datasets = CATALOG['datasets'];
-  for (dataset of datasets) {
+  for (let dataset of datasets) {
     let id = dataset['id'];
-    let url = meta.argv.cdasr + dataset['id'] + '/variables';
+    let url = argv.cdasr + dataset['id'] + '/variables';
     let fnameVariables = util.baseDir(id) + '/' + id + '-variables.json';
     requestVariables(url, fnameVariables, dataset);
   }
@@ -438,17 +308,10 @@ function getVariables(CATALOG) {
   }
 
   function finished(err) {
-    if (!finished.N) {
-      finished.N = 0;
-    }
+    if (finished.N === undefined) finished.N = 0;
     finished.N = finished.N + 1;
-
     if (finished.N == datasets.length) {
-      //datasets = datasets.filter(function (el) {return el != null;});
-      //util.debug(null, 'datasets after requestVariables():', logExt);
-      //util.debug(null, datasets, logExt);
-      getVariableData(CATALOG);
-      //getVariableDataNew(CATALOG);
+      getVariableDataNew(CATALOG);
     }
   }
 }
@@ -469,48 +332,31 @@ function getVariableDataNew(CATALOG) {
     requestData(ididx, names);
   }
 
-  function requestData(ididx, names, seconds, reason) {
+  function requestData(ididx, names) {
 
     let id = datasets[ididx]['id'];
     let fnameFileDescription = util.baseDir(id) + "/" + id + '-filedescription.json';
 
-    let tries = 1;
-    if (seconds === undefined) seconds = 86400;
-    //let start = datasets[ididx]['info']['startDate'];
-    //let stop = util.incrementTime(start, seconds, 'seconds');
-    //console.log(datasets[ididx])
-    //process.exit(0);
-    //THA_L2_EFI
-    let start  = datasets[ididx]['_files1Last']['StartTime']
-    console.log(start)
-    start = util.incrementTime(start, 0, 'seconds')
+    let seconds = 86400;
+    let start  = datasets[ididx]['_files1Last']['StartTime'];
+    start = util.incrementTime(start, 0, 'seconds'); // Formats
     let stop = util.incrementTime(start, seconds, 'seconds')
 
     start = start.replace(/-|:|\.[0-9].*/g,'')
     stop = stop.replace(/-|:|\.[0-9].*/g,'')
-    if (reason === undefined) {
-      util.log(id, `Trying ${id} (attempt # ${tries}/${meta.argv['maxtries']})`, "", null, logExt);
-      util.log(id, `Requesting ${id} over ${seconds} second time range starting at ${start}.`, "", null, logExt);
-    } else {
-      util.log(id, `Retrying ${id} (attempt # ${tries}/${meta.argv['maxtries']}) because: ${reason}`, "", null, logExt);
-      util.log(id, `Requesting ${id} over ${seconds} second time range starting at ${start}.`, "", null, logExt);
-    }
+    util.log(id, `If needed, requesting ${id} over ${seconds} second time range starting at ${start}.`, "", null, logExt);
 
-    let url = meta.argv.cdasr + id + '/data/' + start + ',' + stop + '/' + names + '?format=cdf';
-
-    let headers = {Accept: 'application/json'};
+    let url = argv.cdasr + id + '/data/' + start + ',' + stop + '/' + names + '?format=cdf';
     let reqOpts = {
                     uri: url,
-                    headers: headers,
+                    headers: {Accept: 'application/json'},
                     id: id,
                     outFile: fnameFileDescription,
                     parse: true,
                     maxFileAge: 0
                   };
     util.get(reqOpts, function (err, obj) {
-      //console.log(datasets[ididx])
-      console.log(obj);
-      url = obj['FileDescription'][0]['Name'];
+      let url = obj['FileDescription'][0]['Name'];
       let fnameCDF = util.baseDir(id) + "/" + url.split("/").slice(-1)[0].replace(".cdf","") + '-cdas.cdf';
       let reqOpts = {
                       uri: url,
@@ -520,280 +366,30 @@ function getVariableDataNew(CATALOG) {
                       parse: true,
                       maxAge: 3600*12
                     };
-      // TODO: If these files get large, will need to switch to piping to
-      // file.
+      // TODO: If these files get large, will need to switch to piping to file.
       util.get(reqOpts, function (err, obj) {
         if (err) {
           util.error(id, err, true, logExt);
-        }
-        console.log(obj)
-        finished(obj['file']);
-      });
-    });
-
-    function finished(fnameJSON) {
-
-      if (!finished.N) {finished.N = 0;}
-      finished.N = finished.N + 1;
-
-      let id = datasets[ididx]['id']
-
-      datasets[ididx]['_data'] = fnameJSON;
-
-      if (finished.N == CATALOG['datasets'].length) {
-        //util.debug(null, 'datasets after variableDetails():', logExt);
-        //util.debug(null, datasets, logExt);
-        getSPASERecords(CATALOG);
-      }
-    }
-  }
-}
-
-function getVariableData(CATALOG) {
-
-  // Call /data endpoint to get CDFML with data for all variables in each dataset.
-
-  let datasets = CATALOG['datasets'];
-
-  for (let ididx = 0; ididx < datasets.length; ididx++) {
-    let names = [];
-    let variableDescriptions = datasets[ididx]['_variables']['VariableDescription'];
-    for (let variableDescription of variableDescriptions) {
-      names.push(variableDescription['Name']);
-    }
-    names = names.join(',');
-    requestData(ididx, names);
-  }
-
-  function requestData(ididx, names, seconds, reason) {
-
-    // TODO: Reconsider using command line call to 'HAPIdata.js --lib
-    // cdflib ...' (which calls cdf2csv.py) to get data from first 
-    // file in _files0 or _files1 in order to find time range for
-    // sample{Start,Stop}. 
-
-    let id = datasets[ididx]['id'];
-    let fnameCDFML = util.baseDir(id) + "/" + id + '-cdas.json';
-
-    if (seconds === undefined) {
-      seconds = 100;
-    }
-
-    if (util.existsSync(fnameCDFML + ".nexttry")) {
-      seconds = parseFloat(util.readSync(fnameCDFML + ".nexttry"));
-      util.rmSync(fnameCDFML + ".nexttry");
-      if (false && isNaN(seconds)) {
-        finished(ididx, names, fnameCDFML, null, null);
-        return;
-      }
-    }
-
-    if (!requestData.tries) {
-      requestData.tries = {};
-    }
-    if (!requestData.tries[ididx]) {
-      requestData.tries[ididx] = 0;
-    }
-    requestData.tries[ididx] += 1;
-    let tries = requestData.tries[ididx];
-
-
-    if (util.existsSync(fnameCDFML) && tries == 1) {
-      //util.log(id, `Reading: ${fnameCDFML}`, null, logExt);
-      //let body = util.readSync(fnameCDFML);
-      //finished(ididx, names, fnameCDFML, JSON.parse(body), null);
-      util.log(id, `Found: ${fnameCDFML}`, null, logExt);
-      finished(ididx, names, fnameCDFML, null, null, true);
-      return;
-    }
-
-    if (tries > 1) {util.rmSync(fnameCDFML);}
-
-    //let start = datasets[ididx]['info']['startDate'];
-    //let stop = util.incrementTime(start, seconds, 'seconds');
-    //console.log(datasets[ididx])
-    //process.exit(0);
-    //THA_L2_EFI
-    let stop = datasets[ididx]['info']['stopDate'];
-    let start = util.decrementTime(stop, seconds, 'seconds');
-
-    if (reason === undefined) {
-      util.log(id, `Trying ${id} (attempt # ${tries}/${meta.argv['maxtries']})`, "", null, logExt);
-      util.log(id, `Requesting ${id} over ${seconds} second time range starting at ${start}.`, "", null, logExt);
-    } else {
-      util.log(id, `Retrying ${id} (attempt # ${tries}/${meta.argv['maxtries']}) because: ${reason}`, "", null, logExt);
-      util.log(id, `Requesting ${id} over ${seconds} second time range starting at ${start}.`, "", null, logExt);
-    }
-
-    let url = meta.argv.cdasr + id + '/data/' + start.replace(/-|:/g, '') + ',' +
-              stop.replace(/-|:/g, '') + '/' + names + '?format=json';
-
-    let headers = {Accept: 'application/json'};
-    let reqOpts = {uri: url, headers: headers, id: id, outFile: fnameCDFML};
-    util.get(reqOpts, function (err, body) {
-
-      let error = false;
-      let abort = false;
-      let reason = null;
-      if (err !== null) {
-        error = true;
-        abort = true;
-        reason = err.message;
-      } else {
-        if (body === null) {
-          error = true;
-          abort = true;
-          reason = 'Empty body (usually non-200 HTTP status)';
-        }
-        if (typeof body === 'string') {
-          if (body.match('Internal Server Error') || 
-              body.match('Bad Request') ||
-              body.match('Not Found')) {
-            error = true;
-            abort = true;
-            reason = body;
-          } else if (body.match('No data available')) {
-            error = true;
-            reason = body;            
-            seconds = 10*seconds;
-          } else if (body.match('Requested amount of data is too large')) {
-            error = true;
-            // TODO: Don't send scaled down request if last request was a scale up request.
-            seconds = seconds/10;
-            reason = 'Requested amount of data is too large';
-          } else {
-            // TODO: Handle this case.
-            util.error(id, [id, " Un-handled error condition in requestData.get(). Body:", body], false, logExt);
-            error = true;
-            abort = true;
-            reason = body;
-          }
-        }
-      }
-
-      if (error == true && abort == false && tries < meta.argv['maxtries']) {
-        requestData(ididx, names, seconds, reason);
-      } else {
-        if (error == true) {
-          body = null;
-        }
-        if (abort == true) {
-          util.writeSync(fnameCDFML + ".nexttry", "");
-        } else {
-          util.writeSync(fnameCDFML + ".nexttry", "" + seconds);
-        }
-        finished(ididx, names, fnameCDFML, body, seconds);
-      }
-    });
-  }
-
-  function finished(ididx, names, fnameCDFML, body, seconds, fnameCDFMLFound) {
-
-    if (!finished.N) {finished.N = 0;}
-    finished.N = finished.N + 1;
-
-    let id = datasets[ididx]['id']
-
-    if (fnameCDFMLFound === true) {
-      datasets[ididx]['_data'] = fnameCDFML;
-      done();
-      return;
-    }
-
-    if (body === null) {
-      util.rmSync(fnameCDFML);
-    } else {
-      if (!body['CDF']) {
-        util.error(id, 'CDFML JSON has no CDF element. Returned content:\n' +
-                        util.obj2json(body), false, logExt);
-
-        if (body['Error'] && body['Error'].length > 0) {
-          util.error(id,
-              [
-                'Request for ' + datasets[ididx]['id'] + ' gave',
-                'Error: ' + body['Error'][0],
-                'Message: ' + body['Message'][0],
-                'Status: ' + body['Message'][0],
-                'Omitting.',
-              ],
-              false, logExt);
-        }
-        util.rmSync(fnameCDFML);
-        body = null;
-      } else if (body['CDF'] && !body['CDF'][0]) {
-
-        util.error(id,'CDFML JSON has no CDF[0] element. Returned content:\n' +
-                  util.obj2json(body), false, logExt);
-        util.rmSync(fnameCDFML);
-        body = null;
-      } else if (seconds !== null) {
-
-        let cdfVariables = body['CDF'][0]['cdfVariables'];
-        if (cdfVariables.length > 1) {
-          util.error(id, ['Case of more than one cdfVariables elements not implemented.',
-                          cdfVariables], true, logExt);
-        }
-
-        util.cp(fnameCDFML, fnameCDFML + ".lastok");
-
-        let rstats = getRecordStats(cdfVariables);
-        let Nr = rstats['N'];
-        let tries = requestData.tries[ididx];
-        if (Nr < meta.argv['minrecords'] && tries < meta.argv['maxtries']) {
-          let secondsLast = seconds;
-          seconds = 10*seconds;
-          let reason = `# of records returned (${Nr}) < ${meta.argv['minrecords']}`;
-          if (rstats['Rps'] !== null) {
-            let secondsNew = (meta.argv['minrecords']+1)/rstats['Rps'];
-            if (secondsLast != secondsNew) {
-              seconds = secondsNew;
-            }
-          }
-          requestData(ididx, names, seconds, reason);
-          finished.N = finished.N - 1;
+          finished(err);
           return;
         }
-      }
-    }
-
-    datasets[ididx]['_data'] = null;
-    if (body !== null || util.existsSync(fnameCDFML + ".lastok")) {
-
-      if (body === null) {
-        body = JSON.parse(util.readSync(fnameCDFML + ".lastok"));
-        util.rmSync(fnameCDFML + ".lastok");
-      }
-
-      let orphanAttributes = body['CDF'][0]['orphanAttributes'];
-      if (orphanAttributes && orphanAttributes['attribute'].length > 0) {
-          let fnameOrphan = fnameCDFML.replace('.json', '.orphan.json');
-          util.writeSync(fnameOrphan, util.obj2json(orphanAttributes['attribute']));
-      }
-
-      util.writeSync(fnameCDFML, util.obj2json(body), 'utf8');
-      if (body['Warning'].length > 0) {
-        let fnameCDFMLWarn = fnameCDFML.replace('.json', '.warning.json');
-        util.writeSync(fnameCDFMLWarn,util.obj2json(body['Warning']),'utf8');
-      }
-
-      datasets[ididx]['_data'] = fnameCDFML;
-    }
-
-    done();
-
-    function done() {
-      if (finished.N == CATALOG['datasets'].length) {
-        //util.debug(null, 'datasets after variableDetails():', logExt);
-        //util.debug(null, datasets, logExt);
-        getSPASERecords(CATALOG);
-      }
+        datasets[ididx]['_data'] = obj['file'];
+        finished(err);
+      });
+    });
+  }
+  function finished(err) {
+    if (finished.N === undefined) finished.N = 0;
+    finished.N = finished.N + 1;
+    if (finished.N == CATALOG['datasets'].length) {
+      getSPASERecords(CATALOG);
     }
   }
 }
 
 function getSPASERecords(CATALOG) {
 
-  if (meta.argv['omit'].includes('spase')) {
+  if (argv['omit'].includes('spase')) {
     run.finished(CATALOG);
     return;
   }
@@ -837,7 +433,7 @@ function getSPASERecords(CATALOG) {
     }
 
     let spaseURL = resourceID.replace('spase://', 'https://hpde.io/') + '.xml';
-    let spaseFile = meta.argv.cachedir + '/' +
+    let spaseFile = argv.cachedir + '/' +
                     dataset['id'].split('_')[0] + '/' +
                     dataset['id'] + '/' +
                     dataset['id'] + '-spase.xml';
@@ -878,41 +474,8 @@ function getSPASERecords(CATALOG) {
 
 ////////////////////////////////////
 
-function getRecordStats(cdfVariables) {
-
-  let nameIndex = {};
-  let DEPEND_0 = null;
-  for (let [idx, variable] of Object.entries(cdfVariables['variable'])) {
-    if (!DEPEND_0) {
-      DEPEND_0 = getVAttribute(variable['cdfVAttributes'],"DEPEND_0");
-    }
-    nameIndex[variable['name']] = parseInt(idx);
-  }
-
-  let timeRecords = cdfVariables['variable'][nameIndex[DEPEND_0]]['cdfVarData']['record'];
-  let N = timeRecords.length;
-  if (N < 2) {
-    return {"N": N, "Rps": null};
-  }
-  let firstTime = timeRecords[0]['value'];
-  let lastTime = timeRecords[N-1]['value'];
-  let dt = new Date(lastTime).getTime() - new Date(firstTime).getTime();
-
-  return {"N": N, "Rps": (N-1)/(dt/1000)};
-}
-
 function getGAttribute(cdfGAttributes, attributeName) {
   for (let attribute of cdfGAttributes['attribute']) {
-    if (attribute['name'] === attributeName) {
-      return attribute['entry'][0]['value'];
-    }
-  }
-  return null;
-}
-
-function getVAttribute(cdfVAttributes, attributeName) {
-
-  for (let attribute of cdfVAttributes['attribute']) {
     if (attribute['name'] === attributeName) {
       return attribute['entry'][0]['value'];
     }

@@ -25,9 +25,12 @@ module.exports.util = {
   "str2ISODateTime": str2ISODateTime,
   "str2ISODuration": str2ISODuration,
   "idFilter": idFilter,
-  "sizeOf": sizeOf
+  "sizeOf": sizeOf,
+  "plural": (arr) => {return arr.length == 1 ? "" : "s"},
+  "heapUsed": heapUsed
 }
-util = module.exports.util;
+const util = module.exports.util;
+const argv = require('./CDAS2HAPIinfo.cli.js').argv();
 
 let logExt = "request";
 
@@ -63,9 +66,8 @@ function writeSync(fname, data, opts) {
   util.debug(null, 'Writing: ' + fname, logExt);
   fs.writeFileSync(fname, data, opts);
 }
-
 function baseDir(id) {
-  return util.argv.cachedir + '/' + id.split('_')[0] + '/' + id;
+  return argv.cachedir + '/' + id.split('_')[0] + '/' + id;
 }
 
 // pool should be set in outer-most scope. See
@@ -77,64 +79,75 @@ function get(opts, cb) {
   const path = require("path");
   const request = require('request');
 
-  if (!opts["headers"]) {
-    opts["headers"] = {};
-  }
+  opts = util.copy(opts);
+
+  if (opts["headers"] === undefined) opts["headers"] = {};
+  if (opts['ignoreCache'] === undefined) opts['ignoreCache'] = false
+  if (opts['parse'] === undefined) opts['parse'] = true;
 
   opts["headers"]["User-Agent"] = "CDAS2HAPI; https://github.com/hapi-server/cdaweb-hapi-metadata";
 
   opts['pool'] = pool;
-  pool['maxSockets'] = util.argv.maxsockets;
+  pool['maxSockets'] = argv.maxsockets;
 
   let outFile = opts['outFile'];
   let outFileHeaders = outFile +  ".httpheader";
-  let outFileURL = outFile +  ".url";
-  let outDir = path.dirname(outFile);
 
-  let secs = Infinity;
-  if (fs.existsSync(outFileHeaders) && fs.existsSync(outFile)) {
-    util.debug(null, `Stat-ing: ${outFileHeaders}`, logExt);
-    let stat = fs.statSync(outFileHeaders);
-    secs = (new Date().getTime() - stat['mtimeMs'])/1000;
-    util.debug(null, `file age    = ${secs.toFixed(0)} [s]`, logExt);
-    util.debug(null, `argv.maxheadage = ${util.argv.maxheadage} [s]`, logExt);
-    util.debug(null, `argv.maxfileage = ${util.argv.maxfileage} [s]`, logExt);
-    util.debug(null, `opts.maxFileAge = ${opts.maxFileAge} [s]`, logExt);
-    util.debug(null, `opts.maxHeadAge = ${opts.maxHeadAge} [s]`, logExt);
-    if (secs < Math.min(opts.maxHeadAge || Infinity) && util.argv.maxfileage && !opts['ignoreCache']) {
-      let headersLast = JSON.parse(fs.readFileSync(outFileHeaders,'utf-8'));
-      parse(outFile, null, headersLast, cb);
-      return;
-    }
-  }
+  if (fs.existsSync(outFileHeaders) && opts['ignoreCache'] === false) {
 
-  if (secs < Math.min(opts.maxFileAge || Infinity,util.argv.maxfileage) && !opts['ignoreCache'] && fs.existsSync(outFileHeaders)) {
+    let secs = Infinity;
+    if (fs.existsSync(outFileHeaders)) {
 
-    opts.method = "HEAD";
-    util.debug(null, "Requesting (HEAD): " + opts.uri, logExt);
-    request(opts, function (err, res, body) {
-      if (err) {
-        error(null, [opts.uri, err], true);
-        cb(err, null);
+      util.debug(null, `Stat-ing: ${outFileHeaders}`, logExt);
+      let stat = fs.statSync(outFileHeaders);
+      secs = (new Date().getTime() - stat['mtimeMs'])/1000;
+      util.debug(null, `file age        = ${secs.toFixed(0)} [s]`, logExt);
+      util.debug(null, `argv.maxheadage = ${argv.maxheadage} [s]`, logExt);
+      util.debug(null, `argv.maxfileage = ${argv.maxfileage} [s]`, logExt);
+      util.debug(null, `opts.maxFileAge = ${opts.maxFileAge} [s]`, logExt);
+      util.debug(null, `opts.maxHeadAge = ${opts.maxHeadAge} [s]`, logExt);
+      let fresh = secs < Math.min(opts.maxHeadAge || Infinity, argv.maxheadage);
+      if (fresh) {
+        let headersLast = JSON.parse(fs.readFileSync(outFileHeaders,'utf-8'));
+        util.debug(null, `HEAD check not needed`, logExt);
+        parse(outFile, null, headersLast['content-type'], cb);
         return;
       }
+    }
 
-      if (res.headers['last-modified'] !== undefined) {
-        let headersLast = JSON.parse(fs.readFileSync(outFileHeaders,'utf-8'));
-        let lastLastModified = new Date(headersLast['last-modified']).getTime();
-        let currLastModified = new Date(res.headers['last-modified']).getTime();
-        let d = (currLastModified - lastLastModified)/86400000;
-        if (currLastModified > lastLastModified) {
-          util.debug(null, "File " + outFile + " is " + d.toFixed(2) + " days older than that reported by HEAD request");
-          opts['ignoreCache'] = true;
-          get(opts, cb);
-        } else {
-          util.debug(null, outFile + " does not need to be updated.");
-          parse(outFile, null, res.headers, cb);
+    let fresh = secs < Math.min(opts.maxFileAge || Infinity, argv.maxfileage);
+    if (fresh) {
+
+      opts.method = "HEAD";
+      util.debug(null, "Requesting (HEAD): " + opts.uri, logExt);
+      request(opts, function (err, res, body) {
+
+        if (err) {
+          error(null, [opts.uri, err], true);
+          cb(err, null);
+          return;
         }
-      }
-    });
-    return;
+
+        if (res.headers['last-modified'] !== undefined) {
+          let headersLast = JSON.parse(fs.readFileSync(outFileHeaders,'utf-8'));
+          let lastLastModified = new Date(headersLast['last-modified']).getTime();
+          let currLastModified = new Date(res.headers['last-modified']).getTime();
+          let d = (currLastModified - lastLastModified)/86400000;
+          if (currLastModified > lastLastModified) {
+            let msg = "File " + outFile + " is " + d.toFixed(2) 
+                    + " days older than that reported by HEAD request. Updating.";
+            util.debug(null, msg, logExt);
+            optsx = util.copy(opts);
+            optsx.ignoreCache = true;
+            get(optsx, cb);
+          } else {
+            util.debug(null, outFile + " does not need to be updated.");
+            parse(outFile, null, res.headers['content-type'], cb);
+          }
+        }
+      });
+      return;
+    }
   }
 
   util.log(opts.id, "Requesting: " + opts.uri, "", null, logExt);
@@ -158,73 +171,89 @@ function get(opts, cb) {
     util.debug(null, "Writing: " + outFileHeaders, logExt);
     util.writeSync(outFileHeaders, obj2json(res.headers), 'utf-8');
 
-    parse(outFile, body, res.headers, cb);
+    parse(outFile, body, res.headers['content-type'], cb);
   });
 
-  function encoding(headers) {
-    if (/json|xml/.test(headers['content-type'])) {
+  function encoding(contentType) {
+    if (/json|xml/.test(contentType)) {
       return 'utf8';
     } else {
       return null;
     }
   }
 
-  function parse(outFile, body, headers, cb) {
+  function parse(outFile, body, contentType, cb) {
 
     if (body === null) {
-      // Cached local file
-      if (outFile.endsWith(".cdf") === false && opts["parse"] !== false) {
+      // Cached local file if body === null
+      if (opts['parse'] === true && /application\/x-cdf/.test(contentType) === false) {
         // If CDF file, processing is done from command line
         // call, so don't need to read.
         util.log(opts.id, "Reading: " + outFile, null, logExt);
         body = fs.readFileSync(outFile);
       }
     } else {
-      if (/application\/json/.test(headers['content-type'])) {
-        util.writeSync(outFile, obj2json(JSON.parse(body)), encoding(headers));
+      if (/application\/json/.test(contentType)) {
+        util.writeSync(outFile, obj2json(JSON.parse(body)), encoding(contentType));
       } else {
         //console.log(headers)
         //console.log(encoding(headers))
         //console.log(body.length)
-        util.writeSync(outFile, body, encoding(headers));
+        util.writeSync(outFile, body, encoding(contentType));
       }
     }
 
-    if (opts["parse"] === false) {
+    if (opts['parse'] === false) {
       // This option is used when we only want to download the file.
       cb(null, body);
       return;
     }
 
-    if (/application\/json/.test(headers['content-type'])) {
+    if (/application\/json/.test(contentType)) {
       cb(null, JSON.parse(body));
-    } else if (/text\/xml/.test(headers['content-type'])) {
+    } else if (/text\/xml/.test(contentType)) {
       xml2json(body, (err, obj) => cb(err, obj));
-    } else if (/application\/xml/.test(headers['content-type'])) {
+    } else if (/application\/xml/.test(contentType)) {
       xml2json(body, (err, obj) => cb(err, obj));
-    } else if (/application\/x-cdf/.test(headers['content-type'])) {
-      cdf2json(outFile, (err, obj) => cb(err, obj));
+    } else if (/application\/x-cdf/.test(contentType)) {
+      if (body) {
+        cdf2json(outFile, false, (err, obj) => cb(err, obj));
+      } else {
+        cdf2json(outFile, true, (err, obj) => cb(err, obj));
+      }
     } else {
       cb(null, body.toString());
     }    
   }
 }
 
-function cdf2json(fnameCDF, cb) {
+function cdf2json(fnameCDF, useCache, cb) {
 
   let fnameBase = fnameCDF.replace(/\.cdf$/,"");
-  let fnameJSON = fnameBase + "-" + util.argv["cdf2json-method"] + ".json";
+  let fnameJSON = fnameBase + "-" + argv["cdf2json-method"] + ".json";
 
-  if (util.argv["cdf2json-method"] === "cdf2json.py") {
+  if (util.existsSync(fnameJSON) && useCache) {
+    util.debug(null, "Returning cached " + fnameJSON, logExt);
+    cb(null, {
+      "file": fnameJSON,
+      "json": JSON.parse(fs.readFileSync(fnameJSON))
+    });
+    return;
+  }
+
+  if (argv["cdf2json-method"] === "cdf2json.py") {
     let opts = {maxBuffer: 1e8};
-    let cmd = util.argv["cdf2json"] + ' --in=' + fnameCDF + ' --out=' + fnameJSON + ' --maxrecs=' + 1440;
+    let cmd = argv["cdf2json"] + ' --in=' + fnameCDF + ' --out=' + fnameJSON;
     util.debug(null, "Executing " + cmd, logExt)
     require('child_process').exec(cmd, opts, function (err, stdout, stderr) {
       if (err) {
         cb(err, null);
         return;
       }
-      cb(stderr, {"file": fnameJSON, "json": stdout});
+      cb(stderr, {
+          "file": fnameJSON,
+          "json": JSON.parse(fs.readFileSync(fnameJSON))
+        });
     });
     return;
   }
@@ -243,7 +272,7 @@ function cdf2json(fnameCDF, cb) {
 
     let cdfxml;
     let args = " -withZ -mode:cdfxdf -output:STDOUT " 
-    let cmd = util.argv.cdf2cdfml + args + fnameCDF;
+    let cmd = argv.cdf2cdfml + args + fnameCDF;
     try {
       util.debug(null, "Executing: " + cmd, logExt);
       cdfxml = util.execSync(cmd, {maxBuffer: 8*1024*1024});
@@ -298,7 +327,7 @@ function log(dsid, msg, prefix, color, fext) {
     msg = prefix + msg;
   }
 
-  let fname1 = util.argv.cachedir + "/" + fext + ".txt";
+  let fname1 = argv.cachedir + "/" + fext + ".txt";
   log["logFileName"] = fname1;
   if (!log[fname1]) {
     util.rmSync(fname1, { recursive: true, force: true });
@@ -339,7 +368,7 @@ function msgtype(mtype1, mtype2) {
 }
 
 function debug(dsid, msg, mtype) {
-  if (!util.argv.debug) return;
+  if (!argv.debug) return;
   if (typeof msg !== 'string') {
     msg = "\n" + JSON.stringify(msg, null, 2);
   }
@@ -404,7 +433,7 @@ function str2ISODateTime(stro) {
   moment.suppressDeprecationWarnings = true
   let offset = ""
   if (str.length === 8) {
-    let offset = " +0000";
+    offset = " +0000";
   }
   let dateObj = moment(str + offset);
   if (dateObj.isValid()) {
@@ -473,9 +502,12 @@ function idFilter(id, keeps, omits) {
       return true;
     }
   }
-
-
   return false;
+}
+
+function heapUsed() {
+  const used = process.memoryUsage().heapUsed / 1024 / 1024;
+  console.log(`heapUsed ${Math.round(used * 100) / 100} MB`);
 }
 
 function sizeOf(bytes) {

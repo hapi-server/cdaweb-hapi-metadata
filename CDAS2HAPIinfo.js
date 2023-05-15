@@ -6,109 +6,10 @@
 //   https://cdaweb.gsfc.nasa.gov/WebServices/REST/
 
 // Command line options
-let argv = require('yargs')
-            .help()
-            .option('keepids', {
-              describe: 'Comma-separated list of regex patterns to include',
-              default: '^AC_',
-              type: 'string'
-            })
-            .option('omitids', {
-              describe: 'Comma-separated list of regex patterns to exclude (ignored for ids that match keepids pattern)',
-              default: '^ALOUETTE2,AIM_CIPS_SCI_3A,^MMS,PO_.*_UVI',
-              default: '',
-              type: 'string'
-            })
-            .option('minrecords', {
-              describe: 'Minimum # of records for CDAS data request to be successful',
-              minrecords: 1440,
-              type: 'number'
-            })
-            .option('debug', {
-              describe: "Show additional logging information",
-              default: false
-            })
-            .option("omit", {
-              describe: "Comma-separated list of steps to omit from: {inventory, files0, files1, masters, spase}",
-              default: "files0",
-              type: "string"
-            })
-            .option("maxsockets", {
-              describe: "Maximum open sockets per server",
-              default: 3,
-              type: "number"
-            })
-            .option('maxheadage', {
-              describe: 'Skip HEAD request and use cached file if header age < maxheadage',
-              default: 100*3600*24,
-              type: "number"
-            })
-            .option('maxfileage', {
-              describe: 'Request file if age < maxage (in seconds) and HEAD indicates expired',
-              default: 100*3600*24,
-              type: "number"
-            })
-            .option('maxtries', {
-              describe: 'Maximum # of tries for CDAS data requests',
-              default: 4,
-              type: "number"
-            })
-            .option('infodir', {
-              describe: '',
-              default: "hapi/bw",
-              type: "string"
-            })
-            .option('cachedir', {
-              describe: '',
-              default: "cache/bw",
-              type: "string"
-            })
-            .option('cdasr', {
-              describe: "",
-              default: "https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/",
-              type: "string"
-            })
-            .option('allxml', {
-              describe: "",
-              default: "https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml",
-              type: "string"
-            })
-            .option('allxml', {
-              describe: "",
-              default: "https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml",
-              type: "string"
-            })
-            .option('hapiversion', {
-              describe: "",
-              default: "3.1",
-              type: "number"
-            })
-            .option('cdf2json-method', {
-              describe: "cdf2json.py or CDF2CDFML+xml2json",
-              default: "cdf2json.py",
-              type: "string"
-            })
-            .option('cdf2cdfml', {
-              describe: "",
-              default: "CDF_BASE=/Applications/cdf/cdf38_1-dist; CLASSPATH=.:$CDF_BASE/cdfjava/classes/cdfjava.jar:$CDF_BASE/cdfjava/classes/cdfjson.jar:$CDF_BASE/cdfjava/classes/gson-2.8.6.jar:$CDF_BASE/cdfjava/classes/javax.json-1.0.4.jar:$CDF_BASE/cdfjava/cdftools/CDFToolsDriver.jar:$CDF_BASE/cdfjava/cdfml/cdfml.jar java CDF2CDFML",
-              type: "string"
-            })
-            .option('cdf2json', {
-              describe: "",
-              default: "python3 " + __dirname + "/bin/cdf2json.py --maxrecs=1440",
-              type: "string"
-            })
-            .argv;
 
-argv['keepids'] = argv['keepids'].split(',');
-argv['omitids'] = argv['omitids'].split(',');
-argv['omit'] = argv['omit'].split(',');
-
+const argv = require('./CDAS2HAPIinfo.cli.js').argv();
 const {util} = require('./CDAS2HAPIinfo.util.js');
-util.argv = argv;
-
 const {meta} = require('./CDAS2HAPIinfo.meta.js');
-meta.argv = argv;
 
 // meta.run() gets all needed metadata files.
 // buildHAPI() is called when complete.
@@ -121,11 +22,6 @@ meta.run(buildHAPI);
 //buildHAPI()
 
 //////////////////////////////////////////////////////////////////////////////
-
-function heapUsed() {
-  const used = process.memoryUsage().heapUsed / 1024 / 1024;
-  console.log(`heapUsed ${Math.round(used * 100) / 100} MB`);
-}
 
 function buildHAPI(CATALOG) {
 
@@ -145,24 +41,27 @@ function buildHAPI(CATALOG) {
         process.stdout.write("\r" + " ".repeat(80) + "\r");
         process.stdout.write(id);
       }
-      if (util.idFilter(id, meta["argv"]['keepids'], meta["argv"]['omitids'])) {
+      if (util.idFilter(id, argv['keepids'], argv['omitids'])) {
         datasets.push(JSON.parse(util.readSync(file)));
       }
     }
     if (!argv['debug']) {
       process.stdout.write("\r" + " ".repeat(80) + "\r");
     }
-    let plural = datasets.length == 1 ? "" : "s";
-    util.log(null, `  ${datasets.length} file${plural} after keepids and omitids filter`, "");
+    let plural = util.plural(datasets);
+    let msg = `  ${datasets.length} file${plural} after keepids and omitids filter`;
+    util.log(null, msg, "");
 
   }
 
   buildHAPIFiles(datasets);
 
+  //console.log(datasets)
+  //process.exit()
   util.log(null, `\n*Processing ${datasets.length} datasets*\n`, "");
 
   let dataset;
-  for (dsidx in datasets) {
+  for (let dsidx in datasets) {
     // Create dataset['info']['parameters'] array of objects. Give each object
     // a name and description taken CDAS /variables request.
     dataset = datasets[dsidx];
@@ -174,13 +73,10 @@ function buildHAPI(CATALOG) {
     process.stdout.write("\r" + " ".repeat(80) + "\r");
     process.stdout.write(dataset['id']);
     extractParameterAttributes(dataset, _data);
-    //heapUsed();
   }
   process.stdout.write("\r" + " ".repeat(80) + "\r");
 
   datasets = datasets.filter(item => item !== null);
-  if (datasets.length == 0) {
-  }
 
   util.debug(null, 'Looking for datasets with more than one DEPEND_0.');
   datasets = subsetDatasets(datasets);
@@ -194,7 +90,8 @@ function buildHAPI(CATALOG) {
     util.log(dsid, dsid, "", 'blue');
 
     if (dataset['_data'] === null) {
-      util.error(dsid, 'Omitting ' + dsid + ' because no data sample obtained', false);
+      let msg = 'Omitting ' + dsid + ' because no data sample obtained';
+      util.error(dsid, msg, false);
       continue;
     }
 
@@ -206,8 +103,10 @@ function buildHAPI(CATALOG) {
     let _allxml = dataset["_allxml"];
     dataset['title'] = _allxml['description'][0]['$']['short'];
     let producer = _allxml['data_producer'][0]['$']
-    dataset['info']['contact'] = producer['name'].trim() + ' @ ' + producer['affiliation'].trim();
-    dataset['info']['resourceURL'] = 'https://cdaweb.gsfc.nasa.gov/misc/Notes.html#' + dataset["id"];
+    let contact = producer['name'].trim() + ' @ ' + producer['affiliation'].trim();
+    dataset['info']['contact'] = contact;
+    let rURL = 'https://cdaweb.gsfc.nasa.gov/misc/Notes.html#' + dataset["id"];
+    dataset['info']['resourceURL'] = rURL;
 
     if (dataset['_spaseError']) {
       util.warning(dsid, dataset['_spaseError']);
@@ -215,7 +114,9 @@ function buildHAPI(CATALOG) {
 
     if (/\s\s.*|\( | \)/.test(dataset['title'])) {
       // TODO: Get from SPASE, if available.
-      util.warning(dsid, "Check title formatting for extra spaces: '" + dataset['title'] + "'");
+      let msg = 'Check title formatting for extra spaces: '
+      msg += `'${dataset['title']}'`
+      util.warning(dsid, msg);
     }
 
     let _data = JSON.parse(util.readSync(dataset['_data']))['CDF'][0];
@@ -225,7 +126,6 @@ function buildHAPI(CATALOG) {
     extractCadence(dataset, _data);
 
     let DEPEND_0s = [];
-    let pidx = 0;
     let parameterArray = [];
     let parameters = dataset['info']['parameters'];
     for (let name of Object.keys(parameters)) {
@@ -247,12 +147,14 @@ function buildHAPI(CATALOG) {
       }
 
       if (!parameter['fill'] && varType == 'data') {
-        util.warning(dataset['id'], 'No fill for data parameter ' + parameter['name']);
+        let msg = 'No fill for data parameter ' + parameter['name'];
+        util.warning(dataset['id'], msg);
       }
 
       if (parameter['fill'] && varType == 'data' && parameter['fill'].toLowerCase() == "nan") {
         // Found in THA_L2_MOM
-        //util.warning(dataset['id'], 'FILLVAL cast to lower case is nan for ' + parameter['name'] + '. Setting to -1e31');
+        //util.warning(dataset['id'], 'FILLVAL cast to lower case is nan 
+        //for ' + parameter['name'] + '. Setting to -1e31');
         //parameter['fill'] = "-1e31";
       }
 
@@ -263,8 +165,9 @@ function buildHAPI(CATALOG) {
 
       let DEPEND_0 = parameter['_vAttributesKept']['_DEPEND_0'];
       if (DEPEND_0 && !DEPEND_0.toLowerCase().startsWith('epoch')) {
-        util.warning( dataset['id'],
-          `${parameter['name']} has DEPEND_0 name of '${DEPEND_0}'; expected 'Epoch'`);
+        let msg = `${parameter['name']} has DEPEND_0 name of `
+        msg += `'${DEPEND_0}'; expected 'Epoch'`;
+        util.warning( dataset['id'], msg);
       }
       DEPEND_0s.push(DEPEND_0);
 
@@ -286,7 +189,9 @@ function buildHAPI(CATALOG) {
       }
 
       if (parameter['bins'] && !parameter['bins'][0]['units']) {
-        util.warning(dataset['id'], `No bin units for bin parameter '${parameter['bins'][0]["name"]}' of '${parameter['name']}'`);
+        let msg = `No bin units for bin parameter `
+        msg += `'${parameter['bins'][0]["name"]}' of '${parameter['name']}'`
+        util.warning(dataset['id'], msg);
         parameter['bins']['units'] = null;
       }
 
@@ -304,24 +209,22 @@ function buildHAPI(CATALOG) {
       }
     }
 
-    if (dataset === null) {
-      continue;
-    }
+    if (dataset === null) continue;
 
     let EpochName = DEPEND_0s[0];
     let vidx = parameters[EpochName]['_variableIndex'];
-    let firstTimeValue = cdfVariables[vidx]['cdfVarData']['record'][0]['value'][0];
+    let firstTimeValue = extractRecords(cdfVariables[vidx]['cdfVarData']['record'])[0];
     //let firstTimeValue = parameters[EpochName]['_variable']['cdfVarData']['record'][0]['value'][0];
     //let timePadValue = parameters[EpochName]['_variable']['cdfVarInfo']['padValue'];
     parameterArray
-            .unshift(
-                      {
-                        name: 'Time',
-                        type: 'isotime',
-                        units: 'UTC',
-                        length: firstTimeValue.length,
-                        fill: null,
-                      });
+          .unshift(
+                    {
+                      name: 'Time',
+                      type: 'isotime',
+                      units: 'UTC',
+                      length: firstTimeValue.length,
+                      fill: null,
+                    });
 
     dataset['info']['parameters'] = parameterArray;
 
@@ -346,7 +249,6 @@ function buildHAPI(CATALOG) {
   util.note(null, 'Wrote ' + fnameAll);
 
   util.note(null, "Console messages written to " + util.log.logFileName);
-  //process.exit(0)
 }
 
 function buildHAPIFiles(datasets) {
@@ -355,7 +257,6 @@ function buildHAPIFiles(datasets) {
   let catalog = [];
 
   inventory();
-  files0();
   files1();
 
   // Sort by part of ID before slash
@@ -374,7 +275,7 @@ function buildHAPIFiles(datasets) {
 
   function inventory() {
 
-    if (meta.argv['omit'].includes('inventory')) {
+    if (argv['omit'].includes('inventory')) {
       return;
     }
 
@@ -395,20 +296,19 @@ function buildHAPIFiles(datasets) {
       let data = [];
       let startLen = 0;
       let endLen = 0;
-      for (interval of intervals) {
+      for (let interval of intervals) {
         data.push([interval['Start'],interval['End']]);
         startLen = Math.max(startLen,interval['Start'].length);
         endLen = Math.max(endLen,interval['End'].length);
       }
-      startDate = data[0][0];
+      let startDate = data[0][0];
       let stopDate = data[data.length-1][1];
 
       if (data.length == 0) {
         util.warning(id, 'No intervals');
         continue;
       } else {
-        let plural = data.length == 1 ? "" : "s";
-        util.note(id, `${data.length} interval${plural}`);
+        util.note(id, `${data.length} interval${util.plural(data)}`);
       }
 
       let info = 
@@ -453,123 +353,17 @@ function buildHAPIFiles(datasets) {
     //util.log(`Wrote: ${datasets.length} inventory.csv files to ` + argv.infodir + '/CDAWeb-files/data/');
   }
 
-  function files0() {
-
-    if (meta.argv['omit'].includes('files0')) {
-      return;
-    }
-
-    util.log(null, '\n*Creating HAPI catalog and info responses for CDAWeb files datasets (version 0 method).*\n');
-
-    for (let dataset of datasets) {
-
-      let id = dataset['id'];
-      util.log(id, id, "", 'blue');
-
-      let fileList = dataset['_files0'];
-      if (!fileList) {
-        util.warning(id, 'No _files1');
-        continue;
-      }
-      let files = JSON.parse(util.readSync(fileList));
-      if (files.length === 0) {
-        util.warning(id, 'No files in ' + fileList);
-        continue;
-      }
-
-      let startLen = 0; let endLen = 0; let urlLen = 0;
-      for (file of files) {
-        timeLen = Math.max(startLen,files[0][0].length);
-        urlLen = Math.max(urlLen,files[0][1].length);
-      }
-      let fileData1 = fileList.replace(/\.json$/,".csv");
-      let dirData2 = argv.infodir + '/CDAWeb-files/data/';
-      let fileData2 =  dirData2 + id + '/files0.csv';
-      util.cp(fileData1, fileData2);
-
-      if (files.length == 0) {
-        util.warning(id, 'No files');
-        continue;
-      } else {
-        let plural = files.length == 1 ? "" : "s";
-        util.note(id, `${files.length} file${plural}; ${util.sizeOf(dataset['_files0Size'])}`);
-      }
-      let startDate = files[0][0];
-      let stopDate = files[files.length-1][0];
-    
-      let cadence = "";
-      if (files.length > 1) {
-        let dt = new Date(files[1][0].replace(/Z$/,"")).getTime() 
-               - new Date(startDate.replace(/Z$/,"")).getTime();
-        cadence = "PT" + (dt/(3600*1000)) + "H";
-      }
-      if (/0101_v/.test(files[files.length-1][0]) && /0101_v/.test(files[files.length-2][0])) {
-        // One file per year.
-        cadence = "P1Y";
-      }
-      let info = 
-            {
-              "startDate": startDate,
-              "stopDate" : stopDate,
-              "cadence": cadence,
-              "parameters":
-                [
-                  { 
-                    "name": "Time",
-                    "type": "isotime",
-                    "units": "UTC",
-                    "fill": null,
-                    "length": timeLen
-                  },
-                  { 
-                    "name": "URL",
-                    "type": "string",
-                    "units": null,
-                    "fill": null,
-                    "length": urlLen
-                  },
-                  { 
-                    "name": "LastModified",
-                    "type": "isotime",
-                    "units": "UTC",
-                    "fill": null,
-                    "length": 17
-                  },
-                  { 
-                    "name": "Length",
-                    "type": "integer",
-                    "fill": null,
-                    "units": "bytes"
-                  },
-                  { 
-                    "name": "FileVersion",
-                    "type": "string",
-                    "fill": null,
-                    "units": null
-                  }
-                ]
-            }
-      if (cadence === "") {delete info['cadence'];}
-      let fnameInfo = argv.infodir + '/CDAWeb-files/info/' + id + '-files0.json';
-      util.writeSync(fnameInfo, util.obj2json(info));
-      util.note(id, 'Wrote ' + fnameInfo);
-      let title = "List of files obtained from index.html files at access URL in all.xml";
-      let ida = id + "/files0";
-      all.push({"id": ida, "title": title, "info": info});
-      catalog.push({"id": ida, "title": title});
-    }
-
-    //util.log(`\nWrote: ${datasets.length} files0.json files to ` + argv.infodir + '/CDAWeb-files/info/');
-  }
-
   function files1() {
 
-    if (meta.argv['omit'].includes('files1')) {
+    if (argv['omit'].includes('files1')) {
       return;
     }
 
-    util.log(null, '\n*Creating HAPI catalog and info responses for CDAWeb files datasets (version 1 method).*\n', "");
+    let msg = '\n*Creating HAPI catalog and info responses for CDAWeb ';
+    msg += 'files datasets (version 1 method).*\n';
+    util.log(null, msg, "");
 
+    let sum = 0;
     for (let dataset of datasets) {
       let id = dataset['id'];
       util.log(id, id, "", 'blue');
@@ -590,10 +384,9 @@ function buildHAPIFiles(datasets) {
       let endLen = 0;
       let urlLen = 0;
       let lastLen = 0;
-      let _files1Size = 0;
 
       dataset['_files1Size'] = 0;
-      for (file of files) {
+      for (let file of files) {
         dataset['_files1Size'] += file['Length'];
         data.push([
             file['StartTime'],
@@ -607,6 +400,8 @@ function buildHAPIFiles(datasets) {
         urlLen = Math.max(urlLen,file['Name'].length);
         lastLen = Math.max(urlLen,file['LastModified'].length);
       }
+      sum += dataset['_files1Size'];
+
       let startDate = data[0][0];
       let stopDate = data[data.length-1][1];
     
@@ -614,8 +409,9 @@ function buildHAPIFiles(datasets) {
         util.warning(id, 'No files');
         continue;
       } else {
-        let plural = data.length == 1 ? "" : "s";
-        util.note(id, `${files.length} file${plural}; ${util.sizeOf(dataset['_files1Size'])}`);
+        let msg = `${files.length} file${util.plural(data)}; `
+        msg += `${util.sizeOf(dataset['_files1Size'])}`;
+        util.note(id, msg);
       }
 
       let info = 
@@ -671,14 +467,14 @@ function buildHAPIFiles(datasets) {
       util.writeSync(fnameInfo, util.obj2json(info));
       util.note(id,'Wrote ' + fnameInfo);
 
-      let title = "List of files obtained from /orig_data of https://cdaweb.gsfc.nasa.gov/WebServices/REST/";
+      let title = "List of files obtained from /orig_data of ";
+      title += "https://cdaweb.gsfc.nasa.gov/WebServices/REST/";
       let ida = id + "/files";
       all.push({"id": ida, "title": title, "info": info});
       catalog.push({"id": ida, "title": title});
 
     }
-    //util.log(`\nWrote: ${datasets.length} files.csv files to ` + argv.infodir + '/CDAWeb-files/data/');
-    //util.log(`Wrote: ${datasets.length} files.json files to ` + argv.infodir + '/CDAWeb-files/info/');
+    console.log(`Total size of all files: ${util.sizeOf(sum)}`);
   }
 }
 
@@ -706,7 +502,7 @@ function writeInfoFile(dataset) {
           }
   dataset['info'] = Object.assign(order, dataset['info']);
 
-  for (key of Object.keys(dataset['info'])) {
+  for (let key of Object.keys(dataset['info'])) {
     if (dataset['info'][key] === null) {
       delete dataset['info'][key];
     } 
@@ -748,7 +544,7 @@ function subsetDatasets(datasets) {
 
   let datasetsExpanded = [];
 
-  for (let [dsidx, dataset] of Object.entries(datasets)) {
+  for (let dataset of datasets) {
     let subdatasets = subsetDataset(dataset);
     if (subdatasets.length > 1) {
       util.log(dataset['id'], dataset['id'], "", 'blue');
@@ -757,7 +553,7 @@ function subsetDatasets(datasets) {
     if (dataset._dataError !== undefined) {
       util.error(dataset['id'], dataset._dataError, false);
     }
-    for (d of subdatasets) {
+    for (let d of subdatasets) {
       datasetsExpanded.push(d);
     }
   }
@@ -775,11 +571,10 @@ function subsetDatasets(datasets) {
     // dataset into datasets that has parameters with the same DEPEND_0.
     let parameters = dataset['info']['parameters'];
     let DEPEND_0s = {};
-    for (parameter of Object.keys(parameters)) {
+    for (let parameter of Object.keys(parameters)) {
       if (parameters[parameter]['_vAttributesKept']['_VAR_TYPE'] !== 'data') {
         continue;
       }
-
       let DEPEND_0 = parameters[parameter]['_vAttributesKept']['_DEPEND_0'];
       if (DEPEND_0 !== undefined) {
         DEPEND_0s[DEPEND_0] = DEPEND_0;
@@ -793,12 +588,12 @@ function subsetDatasets(datasets) {
     }
 
     let datasets = [];
-    for ([sdsidx, DEPEND_0] of Object.entries(DEPEND_0s)) {
+    for (let [sdsidx, DEPEND_0] of Object.entries(DEPEND_0s)) {
       //console.log(DEPEND_0)
-      newdataset = util.copy(dataset);
+      let newdataset = util.copy(dataset);
       newdataset['id'] = newdataset['id'] + '@' + sdsidx;
       newdataset['info']['x_DEPEND_0'] = DEPEND_0;
-      for (parameter of Object.keys(newdataset['info']['parameters'])) {
+      for (let parameter of Object.keys(newdataset['info']['parameters'])) {
         let _VAR_TYPE = parameters[parameter]['_vAttributesKept']['_VAR_TYPE'];
         // Non-data parameters are kept even if they are not referenced by
         // variables in the new dataset. This is acceptable because
@@ -832,9 +627,21 @@ function extractParameterNames(dataset) {
   dataset['info']['parameters'] = parameters;
 }
 
+function extractRecords(recordArray) {
+  let records = [];
+  if (records['value']) {
+    for (let r of recordArray) {
+      records.append(r['value']);
+    }
+  } else {
+    return recordArray;
+  }
+}
+
 function extractDatasetAttributes(dataset, _data) {
 
   let epochVariableName = dataset['info']['x_DEPEND_0'];
+  let epochVariable;
   for (let variable of _data['cdfVariables']['variable']) {
     if (variable['name'] === epochVariableName) {
       epochVariable = variable;
@@ -842,12 +649,13 @@ function extractDatasetAttributes(dataset, _data) {
     }
   }
 
+  let epochRecords = extractRecords(epochVariable['cdfVarData']['record']);
   let Nr = epochVariable['cdfVarData']['record'].length;
-  dataset['info']['sampleStartDate'] = epochVariable['cdfVarData']['record'][0]['value'][0];
-  if (Nr > argv['minrecords']) {
-    Nr = argv['minrecords'];
-  }
-  dataset['info']['sampleStopDate'] = epochVariable['cdfVarData']['record'][Nr-1]['value'][0];
+  dataset['info']['sampleStartDate'] = epochRecords[0];
+
+  if (Nr > argv['minrecords']) Nr = argv['minrecords']
+
+  dataset['info']['sampleStopDate'] = epochRecords[Nr-1];
   dataset['info']['x_numberOfSampleRecords'] = Nr;
 
   for (let attribute of _data['cdfGAttributes']['attribute']) {
@@ -876,66 +684,68 @@ function extractDatasetAttributes(dataset, _data) {
 
 function extractParameterAttributes(dataset, _data) {
 
-  //console.log(_data);
-  //process.exit();
   let cdfVariables = _data['cdfVariables']['variable'];
 
   let cdfVariableNames = [];
-  for (let [idx, variable] of Object.entries(cdfVariables)) {
+  for (let variable of cdfVariables) {
     cdfVariableNames.push(variable['name']);
   }
   for (let parameterName of Object.keys(dataset['info']['parameters'])) {
     if (!cdfVariableNames.includes(parameterName)) {
-      dataset._dataError = `/variables has '${parameterName}', which was not found in CDF. Omitting.`;
+      let msg = `/variables has '${parameterName}', `;
+      msg += `which was not found in CDF. Omitting.`;
+      dataset._dataError = msg;
       delete dataset['info']['parameters'][parameterName];
     }
   }
 
   let parameters = dataset['info']['parameters'];
   for (let [idx, variable] of Object.entries(cdfVariables)) {
-    let vAttributesKept = extractVariableAttributes(dataset['id'], variable);
 
-    if (!parameters[variable['name']]) {
-      parameters[variable['name']] = {};
-      // CATALOG[ididx]['parameters'] was initialized with all of the
-      // variables returned by /variables endpoint. This list does not
-      // include support variables. So we add them here.
-      parameters[variable['name']]['name'] = variable['name'];
+    let vAttributesKept = extractVariableAttributes(dataset['id'], variable);
+    let cdfVarInfo = variable['cdfVarInfo'];
+    let name = variable['name'];
+    if (!parameters[name]) {
+      parameters[name] = {};
+      // parameters was initialized with all of the variables returned by
+      // the /variables endpoint. This list does not include variables that
+      // may be needed
+      parameters[name] = variable;
     }
 
     if (vAttributesKept['_VAR_TYPE'] === 'data') {
-      let cdftype = cdftype2hapitype(variable['cdfVarInfo']['cdfDatatype']);
-      parameters[variable['name']]['type'] = cdftype;
+      let cdftype = cdftype2hapitype(cdfVarInfo['cdfDatatype']);
+      parameters[name]['type'] = cdftype;
       if (cdftype === 'string') {
-        parameters[variable['name']]['length'] = variable['cdfVarInfo']['padValue'].length;
-        parameters[variable['name']]['fill'] = variable['cdfVarInfo']['padValue'];
+        parameters[name]['length'] = cdfVarInfo['padValue'].length;
+        parameters[name]['fill'] = cdfVarInfo['padValue'];
       }
     }
 
-    parameters[variable['name']]['_vAttributesKept'] = vAttributesKept;
-    //parameters[variable['name']]['_variable'] = variable;
-    parameters[variable['name']]['_variableIndex'] = idx;
+    parameters[name]['_vAttributesKept'] = vAttributesKept;
+    parameters[name]['_variableIndex'] = idx;
   }
 
   function cdftype2hapitype(cdftype) {
-    if (
-      ['CDF_FLOAT', 'CDF_DOUBLE', 'CDF_REAL4', 'CDF_REAL8'].includes(cdftype)
-    ) {
+    if (floatType(cdftype)) {
       return 'double';
-    } else if (
-      cdftype.startsWith('CDF_INT') ||
-      cdftype.startsWith('CDF_UINT') ||
-      cdftype.startsWith('CDF_BYTE')
-    ) {
+    } else if (intType(cdftype)) {
       return 'integer';
     } else if (cdftype.startsWith('CDF_EPOCH')) {
       return 'integer';
     } else if (cdftype.startsWith('CDF_CHAR')) {
       return 'string';
     } else {
-      util.error(dataset['id'], 'Un-handled CDF datatype ' + cdftype, true);      
+      util.error(dataset['id'], `Un-handled CDF datatype '${cdftype}'`, true);      
     }
   }
+}
+
+function intType(cdfType) {
+  return cdfType.startsWith('CDF_INT') || cdfType.startsWith('CDF_UINT');
+}
+function floatType(cdfType) {
+  return ['CDF_FLOAT', 'CDF_DOUBLE', 'CDF_REAL4', 'CDF_REAL8'].includes(cdfType);
 }
 
 function extractVariableAttributes(dsid, variable) {
@@ -944,11 +754,6 @@ function extractVariableAttributes(dsid, variable) {
 
   let keptAttributes = {};
   for (let attribute of attributes) {
-    if (0) {
-      console.log(
-        dsid + '/' + variable['name'] + ' has attribute ' + attribute['name']
-      );
-    }
     if (attribute['name'] === 'LABLAXIS') {
       keptAttributes['label'] = attribute['entry'][0]['value'];
     }
@@ -993,12 +798,8 @@ function extractVariableAttributes(dsid, variable) {
       }
       let VAR_NOTES = attribute['entry'][0]['value'];
       let sep = ". ";
-      if (desc.endsWith(".")) {
-        sep = " ";
-      }
-      if (desc == "") {
-        sep = "";
-      }
+      if (desc.endsWith(".")) sep = " ";
+      if (desc == "") sep = "";
       keptAttributes['description'] = desc + sep + VAR_NOTES;
     }
   }
@@ -1030,24 +831,17 @@ function extractDepend1(dsid, depend1Variable) {
     bins['label'] = keptAttributes['label'];
     bins['units'] = keptAttributes['units'] || null;
     if (depend1Variable['cdfVarInfo']['recVariance'] === 'VARY') {
-
+      util.error(dsid, "Un-handled DEPEND1 with recVariance of 'VARY'.",true);
     }
 
     bins['centers'] =
       depend1Variable['cdfVarData']['record'][0]['value'][0].split(' ');
-    if (
-      ['CDF_FLOAT', 'CDF_DOUBLE', 'CDF_REAL4', 'CDF_REAL8'].includes(
-        DEPEND_1_TYPE
-      )
-    ) {
-      for (cidx in bins['centers']) {
+    if (floatType(DEPEND_1_TYPE)) {
+      for (let cidx in bins['centers']) {
         bins['centers'][cidx] = parseFloat(bins['centers'][cidx]);
       }
-    } else if (
-      DEPEND_1_TYPE.startsWith('CDF_INT') ||
-      DEPEND_1_TYPE.startsWith('CDF_UINT')
-    ) {
-      for (cidx in bins['centers']) {
+    } else if (intType(DEPEND_1_TYPE)) {
+      for (let cidx in bins['centers']) {
         bins['centers'][cidx] = parseInt(bins['centers'][cidx]);
       }
     } else {
@@ -1139,9 +933,9 @@ function extractCadence(dataset, _data) {
   // Get cadence from data sample
   let cadenceData = undefined;
   let timeRecords = undefined;
-  for (variable of _data['cdfVariables']['variable']) {
+  for (let variable of _data['cdfVariables']['variable']) {
     if (variable['name'] === dataset['info']['x_DEPEND_0']) {
-      timeRecords = variable['cdfVarData']['record'];
+      timeRecords = extractRecords(variable['cdfVarData']['record']);
       break;
     }
   }
@@ -1156,9 +950,13 @@ function extractCadence(dataset, _data) {
   if (dataset['info']['cadence']) {
     cadenceCDF = util.str2ISODuration(dataset['info']['cadence']);
     if (cadenceCDF !== undefined) {
-      util.note(dsid, `Inferred cadence of ${cadenceCDF} from CDF attribute TIME_RESOLUTION = '${dataset['info']['cadence']}'`);
+      let msg = `Inferred cadence of ${cadenceCDF} from CDF attribute `
+      msg += `TIME_RESOLUTION = '${dataset['info']['cadence']}'`;
+      util.note(dsid, msg);
     } else {
-      util.warning(dsid, 'Could not parse CDF attribute TIME_RESOLUTION: ' + dataset['info']['cadence'] + ' to use for cadence.');
+      let msg = 'Could not parse CDF attribute TIME_RESOLUTION: '
+      msg += dataset['info']['cadence'] + ' to use for cadence.';
+      util.warning(dsid, msg);
     }
   }
 
@@ -1176,12 +974,16 @@ function extractCadence(dataset, _data) {
   }
   if (cadenceSPASE !== undefined && cadenceCDF !== undefined ) {
     if (!util.sameDuration(cadenceSPASE, cadenceCDF)) {
-      util.warning(dsid, "Cadence mis-match between SPASE and parsed TIME_RESOLUTION from CDF.");
+      let msg = "Cadence mis-match between SPASE and parsed "
+      msg += "TIME_RESOLUTION from CDF.";
+      util.warning(dsid, msg);
     }
   }
   if (cadenceCDF !== undefined && cadenceData !== undefined ) {
     if (!util.sameDuration(cadenceCDF, cadenceData)) {
-      util.warning(dsid, "Cadence mis-match between data sample and parsed TIME_RESOLUTION from CDF.");
+      let msg = "Cadence mis-match between data sample and parsed "
+      msg += "TIME_RESOLUTION from CDF.";
+      util.warning(dsid, msg);
     }
   }
 
@@ -1190,29 +992,29 @@ function extractCadence(dataset, _data) {
     util.note(dsid, `Using cadence ${cadenceSPASE} from SPASE`);
     dataset['info']['cadence'] = cadenceSPASE;
   } else if (cadenceCDF !== undefined) {
-    util.note(dsid, `Using cadence ${cadenceCDF} from parsed TIME_RESOLUTION from CDF`);
+    let msg = `Using cadence ${cadenceCDF} from parsed TIME_RESOLUTION from CDF`;
+    util.note(dsid, msg);
     dataset['info']['cadence'] = cadenceCDF;
   } else if (cadenceData !== undefined) {
     util.note(dsid, `Using cadence ${cadenceData} from sample data`);
     dataset['info']['cadence'] = cadenceData;
   } else {
-    util.warning(dsid, 'No SPASE cadence or CDF attribute of TIME_RESOLUTION found to use for cadence.');
+    let msg = 'No SPASE cadence or CDF attribute of TIME_RESOLUTION '
+    msg += 'found to use for cadence.';
+    util.warning(dsid, msg);
   }
 }
 
 function inferCadence(timeRecords, dsid) {
 
   let dts = [];
-  for (r = 0; r < timeRecords.length - 1; r++) {
-    // slice(0,24) keeps only to ms precision.
-    //dt = new Date(timeRecords[r+1]['value'][0].slice(0,24)).getTime() 
-    //   - new Date(timeRecords[r]['value'][0].slice(0,24)).getTime();
-    dt = new Date(timeRecords[r+1]['value'][0]).getTime() 
-       - new Date(timeRecords[r]['value'][0]).getTime();
+  for (let r = 0; r < timeRecords.length - 1; r++) {
+    let dt = new Date(timeRecords[r+1]).getTime() 
+           - new Date(timeRecords[r]).getTime();
     dts.push(dt);
   }
 
-  dthist = histogram(dts);
+  let dthist = histogram(dts);
 
   let cadenceData = undefined;
 
@@ -1224,7 +1026,9 @@ function inferCadence(timeRecords, dsid) {
     util.note(dsid, `Inferred cadence of ${cadenceData} based on ${Nr} records.`);
   } else {
     if (Nr > 1) {
-      util.note(dsid, `Could not infer cadence from ${Nr} time record(s) because more than one (${Nu}) unique Δt values.`);
+      let msg = `Could not infer cadence from ${Nr} time record(s) because `;
+      msg += `more than one (${Nu}) unique Δt values.`;
+      util.note(dsid, msg);
     } else {
       util.note(dsid, `Could not infer cadence from ${Nr} time record.`);      
     }
@@ -1236,23 +1040,17 @@ function inferCadence(timeRecords, dsid) {
       dtmsg += `${p.toFixed(1)}% @ ${dthist[i][0]}s, `;
       n++;
     }
-    if (dthist.length > n) {
-      dtmsg += "...";
-    }
-    if (Nr > 1 && dtmsg !== "") {
-      util.note(dsid, "Δt histogram: " + dtmsg);
-    }
+    if (dthist.length > n) dtmsg += "...";
+    if (Nr > 1 && dtmsg !== "") util.note(dsid, "Δt histogram: " + dtmsg);
   }
 
   if (dthist.length > 0) {
-    dthist.sort(function(a, b) {return a[0] - b[0];});
+    dthist.sort(function(a, b) {return a[0] - b[0]});
     if (dthist[0][0] <= 0) {
       util.error(dsid, "Time records not monotonic.", false, false);
     }
   }
-
   return cadenceData;
-
 
   function histogram(dts) {
     let counts = {};
@@ -1263,11 +1061,7 @@ function inferCadence(timeRecords, dsid) {
     for (let entry in counts) {
       sorted.push([parseFloat(entry)/1000, counts[entry]]);
     }
-
-    // Sort on counts
-    sorted.sort(function(a, b) {
-      return b[1] - a[1];
-    });
+    sorted.sort(function(a, b) {return b[1] - a[1]});
     return sorted;
   }
 }
