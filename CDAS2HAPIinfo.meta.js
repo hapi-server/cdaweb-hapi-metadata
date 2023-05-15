@@ -311,12 +311,12 @@ function getVariables(CATALOG) {
     if (finished.N === undefined) finished.N = 0;
     finished.N = finished.N + 1;
     if (finished.N == datasets.length) {
-      getVariableDataNew(CATALOG);
+      getVariableData(CATALOG);
     }
   }
 }
 
-function getVariableDataNew(CATALOG) {
+function getVariableData(CATALOG) {
 
   // Call /data endpoint to get CDFML with data for all variables in each dataset.
 
@@ -344,9 +344,9 @@ function getVariableDataNew(CATALOG) {
 
     start = start.replace(/-|:|\.[0-9].*/g,'')
     stop = stop.replace(/-|:|\.[0-9].*/g,'')
-    util.log(id, `If needed, requesting ${id} over ${seconds} second time range starting at ${start}.`, "", null, logExt);
 
-    let url = argv.cdasr + id + '/data/' + start + ',' + stop + '/' + names + '?format=cdf';
+    //let url = argv.cdasr + id + '/data/' + start + ',' + stop + '/' + names + '?format=cdf';
+    let url = argv.cdasr + id + '/data/' + start + ',' + stop + '/ALL-VARIABLES?format=cdf'
     let reqOpts = {
                     uri: url,
                     headers: {Accept: 'application/json'},
