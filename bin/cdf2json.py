@@ -31,6 +31,7 @@ TODO: Modify to match CDASR form exactly and add an option "--format=strict".
 import os
 import re
 import sys
+import math
 import json
 import argparse
 
@@ -69,22 +70,6 @@ def cdf2json(file):
                   }
 
     for key in list(d.keys()):
-
-      if False:
-        # https://cdaweb.gsfc.nasa.gov/WebServices/REST/ represents values
-        # as strings using FORMAT for display. To match their output
-        # we would need to do the same.
-        if key == "FILLVAL":
-          if d[key] == -9999999848243207295109594873856:
-            d[key] = "-1e31"
-          if d[key] == -1e31:
-            d[key] = "-1e31"
-
-        if key == "Pad":
-          if d[key] == -1000000015047466219876688855040:
-            d[key] = "-1e30"
-          if d[key] == -1e30:
-            d[key] = "-1e30"
 
       # Change True/False to "VARY"/"NOVARY"
       if key == "Rec_Vary":
@@ -127,10 +112,36 @@ def cdf2json(file):
 
     return d
 
+
+  def vattrs2attrlist(objo):
+    attrlist = []
+    for key in objo.keys():
+      if objo[key] == None:
+        continue
+      value = objo[key][0]
+      if isinstance(value, list):
+        value = map(str, value)
+        value = " ".join(value)
+      else:
+        value = str(value)
+
+      attrlist.append({
+                  "name": key,
+                  "entry": [
+                    {
+                      "cdfDatatype": objo[key][1],
+                      "value": value
+                    }
+                  ]
+                })
+    return attrlist
+
   def lists2entries(d):
     darray = []
     for i, ikey in enumerate(list(d.keys())):
       entries = []
+      if d[ikey] is None:
+        continue
       for j, jkey in enumerate(list(d[ikey].keys())):
         value = d[ikey][jkey][0]
         if isinstance(value, list):
@@ -146,15 +157,6 @@ def cdf2json(file):
 
     return darray
 
-  def list2records(l):
-    pad1 = " "*15
-    pad2 = " "*12
-    if isinstance(l, list):
-      l = "".join("\n" + pad1 + "@~" + str(el) + "@~" for el in l) + "\n" + pad2
-    else:
-      l = str(l)
-    return l
-
   def from_np(cdfVarInfo):
     """
     Deal with https://github.com/MAVENSDC/cdflib/issues/176
@@ -163,25 +165,36 @@ def cdf2json(file):
     be used in varattsget b/c of 177.
     """
     import numpy
-    for k, v in cdfVarInfo.items():
-      if isinstance(v, numpy.ndarray):
-        cdfVarInfo[k] = v.tolist()
-      elif isinstance(v, numpy.generic):
-        cdfVarInfo[k] = v.item()
-      # TODO: Anything else?
+    for key, val in cdfVarInfo.items():
+      if isinstance(val, numpy.ndarray):
+        cdfVarInfo[key] = val.tolist()
+      elif isinstance(val, numpy.generic):
+        cdfVarInfo[key] = val.item()
+
+      if isinstance(cdfVarInfo[key], list) and len(cdfVarInfo[key]) == 1:
+        if key =='Pad' and val == -1.0000000150474662e+30:
+          cdfVarInfo[key][0] = "-1e30"
+
+      if isinstance(cdfVarInfo[key], list) and len(cdfVarInfo[key]) > 1:
+        if cdfVarInfo[key][1] == "CDF_DOUBLE":
+          if cdfVarInfo[key][0] == -9.999999848243207e+30:
+            cdfVarInfo[key][1] = "-1e31"
+          if cdfVarInfo[key][0] == -1e31:
+            cdfVarInfo[key][0] = "-1e31"
+        if cdfVarInfo[key][1] == "CDF_FLOAT":
+          if cdfVarInfo[key][0] == -9.999999848243207e+30:
+            cdfVarInfo[key][0] = "-1e31"
+          if cdfVarInfo[key][0] == -1.0000000150474662e+30:
+            cdfVarInfo[key][0] = "-1e30"
+
 
     return cdfVarInfo
 
   cdffile = cdflib.CDF(file)
-
-  cdfGAttributes = cdffile.globalattsget(expand=True);
-
-  #print(json.dumps(cdfGAttributes, indent=2))
-  #sys.exit()
   cdfInfo  = cdffile.cdf_info()
   cdfInfo['name'] = file
 
-  variables = [*cdfInfo['rVariables'], *cdfInfo['zVariables']]
+  cdfGAttributes = cdffile.globalattsget(expand=True);
 
   cdfdict = {"CDF":
               [
@@ -197,21 +210,12 @@ def cdf2json(file):
               ]
             }
 
-  #print(json.dumps(normalize(cdfGAttributes), indent=2))
+  variables = [*cdfInfo['rVariables'], *cdfInfo['zVariables']]
   for variable in variables:
 
     cdfVarInfo = from_np(cdffile.varinq(variable))
-    #print(cdffile.varattsget(variable, expand=True, to_np=True))
-    #print(cdffile.varattsget(variable, expand=False, to_np=True))
     cdfVAttributes = from_np(cdffile.varattsget(variable, expand=True, to_np=True))
-
-    #print(variable)
-    #print(cdfVarInfo)
     cdfVarInfo = normalize(cdfVarInfo)
-    #print(json.dumps(cdfVarInfo, indent=2))
-
-    #if variable == ''
-    #sys.exit()
 
     if argv['maxrecs'] is None:
       cdfVarData = cdffile.varget(variable, expand=True, to_np=False)
@@ -222,21 +226,32 @@ def cdf2json(file):
         endrec = min(numrecs, int(argv['maxrecs']))
 
       cdfVarInfo['numRecordsAllocate'] = endrec
-
       cdfVarData = cdffile.varget(variable, startrec=0, endrec=endrec-1, expand=True, to_np=False)
-    #print(cdfVarData)
 
-    #print(json.dumps(cdfVarData, indent=2))
-    data = cdfVarData['Data']
-    #print(json.dumps(data, indent=2))
+    # We only keep CDF_EPOCH and CDF_TIME_* variables and NOVARY variables
+    # because others are not needed.
+    data = []
+    if cdfVarInfo["recVariance"] == "NOVARY":
+      for d in range(len(cdfVarData['Data'])):
+        if isinstance(cdfVarData['Data'][d], str):
+          continue
+        # TODO: How to recover -NaN and -Inf?
+        if math.isnan(cdfVarData['Data'][d]):
+          cdfVarData['Data'][d] = "NaN"
+        if math.isinf(cdfVarData['Data'][d]):
+          cdfVarData['Data'][d] = "Inf"
 
-    if cdfVarInfo['cdfDatatype'].startswith('CDF_EPOCH'):
+      data = cdfVarData['Data']
+
+    if cdfVarInfo['cdfDatatype'].startswith('CDF_EPOCH') or cdfVarInfo['cdfDatatype'].startswith('CDF_TIME'):
+      data = cdfVarData['Data']
       data = cdflib.cdfepoch.encode(data, iso_8601=True)
       if isinstance(data, list):
         for i in range(len(data)):
           data[i] += "Z"
       else:
         data = data + "Z"
+
 
       cdfVarInfo["padValue"] = cdflib.cdfepoch.encode(cdfVarInfo["padValue"], iso_8601=True) 
       cdfVarInfo["padValue"] += "Z"
@@ -245,38 +260,16 @@ def cdf2json(file):
       cdfVarInfo["padValue"] = " "*cdfVarInfo["numElements"]
       data = [{
                   "recNum": 0,
-                  "value": list2records(data),
-                  "elementDelimiter": "@~"
+                  "value": data
               }]
     
-    #print(json.dumps(normalize(cdfVAttributes), indent=2))
-    aarray = []
-    obj = normalize(cdfVAttributes)
-    for key in obj.keys():
-      if obj[key] == None:
-        continue
-      value = obj[key][0]
-      if isinstance(value, list):
-        value = map(str, value)
-        value = " ".join(value)
-      else:
-        value = str(value)
+    cdfVAttributes = vattrs2attrlist(normalize(cdfVAttributes))  
 
-      aarray.append({
-                  "name": key,
-                  "entry": [
-                    {
-                      "cdfDatatype": obj[key][1],
-                      "value": value
-                    }
-                  ]
-                })
-    cdfVAttributes = aarray  
     cdfVariable = {
                     "name": variable,
                     "cdfVarInfo": cdfVarInfo,
                     "cdfVAttributes": {
-                        "attribute": aarray
+                        "attribute": cdfVAttributes
                     },
                     "cdfVarData": {
                         "record": data
