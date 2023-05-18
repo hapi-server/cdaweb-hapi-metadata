@@ -22,13 +22,11 @@ The four methods that produce HAPI metadata are
 
    2. For each dataset, makes a `/variables` request to https://cdaweb.gsfc.nasa.gov/WebServices/REST/ to get the list of variable in the dataset that is needed for the next step
 
-   3. Makes a `/data` request to https://cdaweb.gsfc.nasa.gov/WebServices/REST/ to obtain a sample data file (in JSON format, but could be modified to use CDF) with the final needed pieces of metadata. Note that often several requests are needed because the web service will not return data if the time range of the request is such that there are no data. In addition, if the time range of the request is too large, the request is rejected.
-
-   `CDAS2HAPIinfo.js` starts with a 100-second timespan starting at the start (or stop) date given in CDAWeb's `all.xml` and increases (or decreases) this timespan by a factor of $10^n$ for up to $n=4$. If the timespan is to large, it decreases the timespan by $1/10^n$. Ideally this trial-and-error approach would not be required and there would be an endpoint where parameter-level metadata was returned without the need to form a data request that works. (Note: this approach should be replaced with a request for a CDF file, assuming that this will work for files with virtual variables.)
+   3. Makes a `/data` request to https://cdaweb.gsfc.nasa.gov/WebServices/REST/ to obtain a sample data file. The time range used is that of the last file returned from a `/orig_data` request for all files over the timerange in `
 
    4. After step 3., all of the metadata needed to form a HAPI response is available. The final step is to generate HAPI `/info` responses for each dataset. There is one complication. HAPI mandates that all variables in a dataset have the same time tags. Some CDAWeb datasets have datasets with variables with different time tags. So prior to creating `/info` responses, new HAPI datasets are formed. These new datasets have ids that match the CDAWeb ids but have an "@0", "@1", ... appended, where the number indicates the time tag variable index in the original dataset.
 
-   The initial generation of the the HAPI `all-info.json` file using `CDAS2HAPIinfo.js` can take up to 30 minutes, which is similar to the update time required daily by the `nl` server. In contrast, subsequent updates using `CDAS2HAPIinfo.js` takes less than a second; on a daily basis, only the `startDate` and `stopDate` must be updated, which requires reading `all.xml` and updating `all-info.json`. When CDAWeb adds datasets or the master CDF changes, the process outlined above is only required for those dataset; this process typically takes less than 10 seconds per dataset.
+   The initial generation of the the HAPI `all.json` file using `CDAS2HAPIinfo.js` can take up to 30 minutes, which is similar to the update time required daily by the `nl` server. In contrast, subsequent updates using `CDAS2HAPIinfo.js` takes less than a second; on a daily basis, only the `startDate` and `stopDate` must be updated, which requires reading `all.xml` and updating `all-info.json`. When CDAWeb adds datasets or the master CDF changes, the process outlined above is only required for those dataset; this process typically takes less than 10 seconds per dataset.
 
 2. `nl`, which uses an approach similar to the above for datasets with virtual variables and an approach similar to `jf` below otherwise.
 
@@ -119,25 +117,3 @@ In reference to the above four options, to create metadata for all CDAWeb IDs th
 
 After these files are created, the program `compare-meta.js` can be executed to generate the file `compare/compare-meta.json` that shows the metadata created by the four approaches in a single file.
 
-# TODO:
-
-Add virtual variable discussion. See Virtual.md
-
-# SPASE Comments
-
-* The process of creating HAPI metadata is complex. If CDAWeb had a complete set of _validated_ SPASE records _that were continously updated_, we would not have needed to write much of the code for this process. In fact, much of the code in `CDAS2HAPIinfo.js` duplicates functionality in the (unpublished?) code used to generate CDAWeb SPASE Numerical data records.
-
-## Issues
-
-* SPASE records have parameters that are not returned by request for data from the SPDF APIs that are backed by data provider-generated CDF files (CDAWeb and CDAS). The only way to access these variables is by reading the data provider-generated CDF files. It is not possible to determine which variables are available from the API vs. only from data provider-generated CDF files. Example where the primary time variable is virtual [THEMIS/A/EFI](https://hpde.io/NASA/NumericalData/THEMIS/A/EFI/PT3S.html). The SPASE record mentions "This parameter is virtual. It is calculated by calling the function COMP_THEMIS_EPOCH with the following input parameters: tha_efs_dot0_epoch0, tha_efs_dot0_time." Without mentioning where the "function" exists. This is the primary reason why SPASE records cannot be used to build HAPI metadata
-* Stop time is relative
-* Data Variable Descriptions
-* Data provider metadata is modified. For example, at https://cdaweb.gsfc.nasa.gov/misc/NotesA.html under `AC_H5_SWI`, there is the sentence
-  
-  "The charge state distribution is the abundance of each charge state relative tothe total abundance for analyzed ions of the specified element."
-
-  In the corresponding [SPASE record](https://hpde.io/NASA/NumericalData/ACE/SWICS_SWIMS/L2/ChargeState/PT2H) under parameter 2, I see
-
-  "The Charge State Distribution is the Abundance of each Charge State relative to the total Abundance for analyzed Ions of the specified Element."
-
-  If SPASE is making changes, these changes should be propagated back into the CDF metadata (in this case, the reason for the change is not clear, however).

@@ -1,11 +1,9 @@
-// Create a HAPI all.json catalog based on
+// Create a HAPI all.json catalog and one info file per datasets based on
 //   https://spdf.gsfc.nasa.gov/pub/catalogs/all.xml
 // and queries to
 //   https://cdaweb.gsfc.nasa.gov/WS/cdasr
 // CDASR documentation:
 //   https://cdaweb.gsfc.nasa.gov/WebServices/REST/
-
-// Command line options
 
 const argv    = require('./lib/cli.js').argv();
 const types   = require('./lib/types.js');
@@ -22,15 +20,17 @@ meta.run(buildHAPI);
 //meta.run();
 
 // To only build HAPI metadata based on cached metadata files:
-//buildHAPI()
+//buildHAPI();
 
 //////////////////////////////////////////////////////////////////////////////
 
 function buildHAPI(CATALOG) {
-
   let datasets = CATALOG ? CATALOG['datasets'] : readDatasets();
-
   buildHAPIFiles(datasets);
+  buildHAPIInfos(datasets);
+}
+
+function buildHAPIInfos(datasets) {
 
   let msg = `\n*Processing ${datasets.length} dataset${util.plural(datasets)}*\n`;
   util.log(null, msg, "");
@@ -42,27 +42,30 @@ function buildHAPI(CATALOG) {
   datasets = datasets.filter(item => item !== null);
   
   if (datasets.length == 0) {
-    util.log(null, '\n\nNo datasets to process. Exiting.');
+    util.log(null, '\n\nNo datasets to process.');
+    dropDataset(); // Write file
+    console.log("Exiting.");
     process.exit(0);
   }
 
   util.debug(null, 'Looking for datasets with more than one DEPEND_0.');
   datasets = subsetDatasets(datasets);
 
-  let catalog = [];  for (let dsidx in datasets) {
+  let catalog = [];
+  for (let dsidx in datasets) {
 
     let dataset = datasets[dsidx];
     let dsid = dataset['id'];
     util.log(dsid, dsid, "", 'blue');
 
     if (dataset['_data'] === null) {
-      let emsg = '(CDAWeb) No data sample obtained';
-      dropDataset(dataset, emsg);
+      let emsg = 'No data sample obtained';
+      dropDataset(dsidx, dataset, emsg, "CDAWeb");
       continue;
     }
 
     if (!dataset['_variables']) {
-      dropDataset(dataset, '(CDAWeb) No _variables.');
+      dropDataset(dsidx, dataset, 'No _variables.', "CDAWeb");
       continue;
     }
 
@@ -110,13 +113,13 @@ function buildHAPI(CATALOG) {
 
       let err = checkDeltaVar(dsidx, datasets, parameter, parameters);
       if (err !== null) {
-        dropDataset(dsidx, datasets, err);
+        dropDataset(dsidx, datasets, err.message, err.cause);
         break;
       }
 
       if (parameter['_vAttributesKept']['_DEPEND_2'] === null) {
-        let msg = `(Not implemented) Parameter '${name}' has an un-handled DEPEND_2.`;
-        dropDataset(dsidx, datasets, msg);
+        let msg = `Parameter '${name}' has an un-handled DEPEND_2.`;
+        dropDataset(dsidx, datasets, msg, "NotImplemented");
         break;
       }
 
@@ -139,7 +142,7 @@ function buildHAPI(CATALOG) {
       }
       
       if (!parameter['units'] && varType == 'data') {
-        util.warning(dataset['id'], '(CDAWeb) No units in CDF for ' + parameter['name']);
+        util.warning(dataset['id'], '(CDAWeb) No units in for ' + parameter['name']);
 
         let spaseUnits = spase.extractSPASEUnits(dataset['_spase'], parameter['name']);
         if (!spaseUnits) {
@@ -155,16 +158,16 @@ function buildHAPI(CATALOG) {
         let vidx = parameters[DEPEND_1]['_variableIndex']
 
         if (cdfVariables[vidx]['cdfVarInfo']['recVariance'] === 'VARY') {
-          let msg = `(Not implemented) Parameter '${name}' has an un-handled DEPEND_1 with `
+          let msg = `Parameter '${name}' has an un-handled DEPEND_1 with `
           msg += `recVariance 'VARY'.`;
-          dropDataset(dsidx, datasets, msg);
+          dropDataset(dsidx, datasets, msg, "NotImplemented");
           break;
         }
         let DEPEND_1_TYPE = cdfVariables[vidx]['cdfVarInfo']['cdfDatatype'];
         if (!types.handledType(DEPEND_1_TYPE)) {
-          let msg = `(Not implemented) Parameter '${name}' has an DEPEND_1 with cdfDatatype `
+          let msg = `Parameter '${name}' has an DEPEND_1 with cdfDatatype `;
           msg += `'${DEPEND_1_TYPE}', which is not handled.`;
-          dropDataset(dsidx, datasets, msg);
+          dropDataset(dsidx, datasets, msg, "NotImplemented");
           break;
         }
 
@@ -195,17 +198,17 @@ function buildHAPI(CATALOG) {
       if (varType === 'data') {    
         let DEPEND_0 = parameter['_vAttributesKept']['_DEPEND_0'];
         if (name !== DEPEND_0 && !parameter['_vAttributesKept']['_DEPEND_0']) {
-          let msg = `(CDAWeb) No DEPEND_0 for variable '${name}'`;
-          dropDataset(dsidx, datasets, msg);
+          let msg = `No DEPEND_0 for variable '${name}'`;
+          dropDataset(dsidx, datasets, msg, "CDAWeb");
           break;
         }
     
         let vidx = parameters[DEPEND_0]['_variableIndex']
         let cdfDatatype = cdfVariables[vidx]['cdfVarInfo']['cdfDatatype'];
         if (!types.timeType(cdfDatatype)) {
-          let msg = `(CDAWeb) DEPEND_0 variable '${name}' has type '${cdfDatatype}', `
+          let msg = `DEPEND_0 variable '${name}' has type '${cdfDatatype}', `
           msg += `which is a CDF_EPOCH or CDF_TIME type.`;
-          dropDataset(dsidx, datasets, msg);
+          dropDataset(dsidx, datasets, msg, "CDAWeb");
           break;
         }
 
@@ -245,11 +248,7 @@ function buildHAPI(CATALOG) {
 
   console.log("");
 
-  if (dropDataset.log !== undefined) {
-    let fnameDropped = argv.cachedir + '/ids-cdas-processed-dropped.json';
-    util.writeSync(fnameDropped, util.obj2json(dropDataset.log));
-    util.note(null, 'Wrote ' + fnameDropped);
-  }
+  dropDataset(); // Write file
 
   // Write HAPI catalog.json containing /catalog response JSON
   let fnameCatalog = argv.infodir + '/CDAWeb/catalog.json';
@@ -660,11 +659,14 @@ function checkDeltaVar(dsidx, datasets, parameter, parameters, direction) {
 
   if (direction === undefined) {
     let msgPlus = checkDeltaVar(dsidx, datasets, parameter, parameters, "PLUS");
+    if (msgPlus) {
+      return msgPlus;
+    }
     let msgMinus = checkDeltaVar(dsidx, datasets, parameter, parameters, "MINUS");
-    let msg = "";
-    if (msgPlus !== null) msg += msgPlus;
-    if (msgMinus !== null) msg += " " + msgMinus;
-    return msg || null;
+    if (msgMinus) {
+      return msgMinus;
+    }
+    return null;
   }
 
   let name = parameter['name'];
@@ -672,18 +674,50 @@ function checkDeltaVar(dsidx, datasets, parameter, parameters, direction) {
   if (parameter['_vAttributesKept'][deltaVarName]) {
     let deltaVar = parameter['_vAttributesKept'][deltaVarName];
     if (!parameters[deltaVar]) {
-      let msg = `(Not implemented) Parameter '${name}' a ${deltaVarName} = `;
-      msg += ` '${deltaVar}' that was not found in list of variables.`;
-      return msg;
+      let msg = `Parameter '${name}' has ${deltaVarName} = `;
+      msg += `'${deltaVar}' that was not found in list of variables.`;
+      return {'message': msg, 'cause': 'CDAWeb'};
     }
-    let msg = `(Not implemented) Parameter '${name}' has an un-handled ${deltaVarName}.`;
-    return msg;
+    let msg = `Parameter '${name}' has an un-handled ${deltaVarName}.`;
+    return {'message': msg, 'cause': 'NotImplemented'};
   }
   return null;
 }
 
-function dropDataset(dsidx, datasets, msg, showid) {
-  if (dropDataset.log === undefined) dropDataset.log = {};
+function dropDataset(dsidx, datasets, msg, category, showid) {
+
+  if (!dsidx) {
+    if (dropDataset.log !== undefined) {
+      for (let origin of Object.keys(dropDataset.log)) {
+        let fnameDropped = argv.cachedir 
+                         + `/ids-cdas-processed-dropped-${origin}.txt`;
+        let log = "";
+        for (let key of Object.keys(dropDataset.log[origin])) {
+          let msg = dropDataset.log[origin][key];
+          if (Array.isArray(msg)) {
+            msg = msg.join("\n  ");
+          }
+          log += key + "\n  " + msg + "\n";
+        }
+        util.writeSync(fnameDropped, log);
+        let Nd = Object.keys(dropDataset.log[origin]).length;
+        util.note(null, `Wrote ${Nd} IDs to ` + fnameDropped);
+      }
+    }
+    return;
+  }
+
+  if (dropDataset.log === undefined) {
+    dropDataset.log = {"NotImplemented": {}, "CDAWeb": {}};
+  }
+  if (category === "NotImplemented") {
+    dropDataset.log[category][datasets[dsidx]['id']] = msg;
+    msg = "(Not implemented) " + msg;
+  }
+  if (category === "CDAWeb") {
+    dropDataset.log[category][datasets[dsidx]['id']] = msg;
+    msg = "(CDAWeb) " + msg;
+  }
   msg = msg + " Dropping dataset.";
   if (showid) {
     msg = datasets[dsidx]['id'] + "\n  Error:   " + msg;
@@ -691,7 +725,6 @@ function dropDataset(dsidx, datasets, msg, showid) {
   } else {
     util.error(datasets[dsidx]['id'], "  Error:   " + msg, false);
   }
-  dropDataset.log[datasets[dsidx]['id']] = msg;
   datasets[dsidx] = null;
 }
 
@@ -699,16 +732,16 @@ function createParameters(dsidx, datasets) {
   // Create dataset['info']['parameters'] array of objects. Give each object
   // a name and description taken CDAS /variables request.
   if (datasets[dsidx]['_variablesError']) {
-    let emsg = "(CDAWeb) " + datasets[dsidx]['_variablesError'];
-    dropDataset(dsidx, datasets, emsg, true);
+    let emsg = datasets[dsidx]['_variablesError'];
+    dropDataset(dsidx, datasets, emsg, "CDAWeb", true);
     return;
   }
 
   extractParameterNames(datasets[dsidx]);
 
   if (datasets[dsidx]['_dataError']) {
-    let emsg = "(CDAWeb) " + datasets[dsidx]['_dataError'];
-    dropDataset(dsidx, datasets, emsg, true);
+    let emsg = datasets[dsidx]['_dataError'];
+    dropDataset(dsidx, datasets, emsg, "CDAWeb", true);
     return;
   }
 
@@ -719,7 +752,7 @@ function createParameters(dsidx, datasets) {
 
   let err = extractParameterAttributes(datasets[dsidx], _data);
   if (err !== null) {
-    dropDataset(dsidx, datasets, "(Not implemented) " + err, true);
+    dropDataset(dsidx, datasets, err, "NotImplemented", true);
     return;
   }
 }
