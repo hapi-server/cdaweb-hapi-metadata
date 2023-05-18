@@ -1,4 +1,6 @@
-__pycache__/
+
+.eslintrc.json
+c__pycache__/
 tmp/
 all/
 hapi/
