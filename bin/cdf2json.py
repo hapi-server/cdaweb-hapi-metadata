@@ -210,7 +210,7 @@ def cdf2json(file):
               ]
             }
 
-  variables = [*cdfInfo['rVariables'], *cdfInfo['zVariables']]
+  variables = [*cdfInfo['zVariables'], *cdfInfo['rVariables']]
   for variable in variables:
 
     cdfVarInfo = from_np(cdffile.varinq(variable))
@@ -238,7 +238,7 @@ def cdf2json(file):
         # TODO: How to recover -NaN and -Inf?
         if math.isnan(cdfVarData['Data'][d]):
           cdfVarData['Data'][d] = "NaN"
-        if math.isinf(cdfVarData['Data'][d]):
+        elif math.isinf(cdfVarData['Data'][d]):
           cdfVarData['Data'][d] = "Inf"
 
       data = cdfVarData['Data']
