@@ -38,7 +38,6 @@ function buildHAPIInfos(datasets) {
   for (let dsidx in datasets) {
     createParameters(dsidx, datasets);
   }
-
   datasets = datasets.filter(item => item !== null);
   
   if (datasets.length == 0) {
@@ -49,7 +48,10 @@ function buildHAPIInfos(datasets) {
   }
 
   util.debug(null, 'Looking for datasets with more than one DEPEND_0.');
+
   datasets = subsetDatasets(datasets);
+
+  //configureParameterInfo(datasets);
 
   let catalog = [];
   for (let dsidx in datasets) {
@@ -118,10 +120,11 @@ function buildHAPIInfos(datasets) {
         break;
       }
 
+
       if (parameter['_vAttributesKept']['_DEPEND_2'] === null) {
         let msg = `Parameter '${name}' has an un-handled DEPEND_2.`;
-        dropDataset(dsidx, datasets, msg, "NotImplemented");
-        break;
+        //dropDataset(dsidx, datasets, msg, "NotImplemented");
+        //break;
       }
 
       // Move kept vAttributes up
@@ -656,6 +659,55 @@ function subsetDatasets(datasets) {
   }
 }
 
+function configureParameterInfo(datasets) {
+
+  let variables = datasets[0]['_masters']['json']['CDFVariables'];
+  let parameters = datasets[0]['info']['parameters'];
+  for (let variable of variables) {
+
+    let key = Object.keys(variable)[0];
+    console.log(key)
+    if (!parameters[key]) {
+      console.log("Error " + key + " in master but not cdf");
+      parameters[key] = {'cdfVAttributes': undefined};
+    } else {
+      // Create object with keys of attribute names, for convenience.
+      let _vAttributes = {};
+      let attributes = parameters[key]['cdfVAttributes']['attribute'];
+      for (let attribute of attributes) {
+        _vAttributes[attribute['name']] = attribute['entry'][0]['value']
+      }
+      parameters[key]['cdfVAttributes'] = sortKeys(_vAttributes);
+    }
+    parameters[key]['cdfVarInfoMaster'] = array2Object(variable[key][0]['VarDescription']);
+    parameters[key]['cdfVarAttributesMaster'] = array2Object(variable[key][1]['VarAttributes']);
+    parameters[key]['cdfVarDataMaster'] = undefined;
+    if (variable[key][2]) {
+      parameters[key]['cdfVarDataMaster'] = variable[key][2]['VarData'];
+    }
+
+    parameters[key] = sortKeys(parameters[key]);
+  }
+
+  function sortKeys(object) {
+    return Object.keys(object).sort().reduce(
+      (objEntries, key) => {
+        objEntries[key] = object[key]; 
+        return objEntries;
+      }, {});  
+  }
+  
+  function array2Object(array) {
+    console.log(array)
+    let object = {};
+    for (let element of array) {
+      let key = Object.keys(element)[0];
+      object[key] = element[key];
+    }
+    return object;
+  }
+}
+
 function checkDeltaVar(dsidx, datasets, parameter, parameters, direction) {
 
   if (direction === undefined) {
@@ -837,6 +889,10 @@ function extractParameterAttributes(dataset, _data) {
     cdfVariableNames.push(variable['name']);
   }
 
+  // The /variables step was previously needed b/c we were
+  // making a request for CDF in JSON and the ALL-VARIABLES option
+  // was not available.
+  // TODO: Add command line option to skip /variables steps.
   for (let parameterName of Object.keys(dataset['info']['parameters'])) {
     if (!cdfVariableNames.includes(parameterName)) {
       let msg = `(CDAWeb) /variables has '${parameterName}', `;
@@ -846,19 +902,20 @@ function extractParameterAttributes(dataset, _data) {
     }
   }
 
+  // dataset['info']['parameters'] was initialized with all of the variables returned by
+  // the /variables endpoint. This list does not include all variables that
+  // may be needed, such as record-varying bins. All variables from sample
+  // CDF are added in the following loop.
   let parameters = dataset['info']['parameters'];
   for (let [idx, variable] of Object.entries(cdfVariables)) {
     let name = variable['name'];
-
     let vAttributesKept = extractVariableAttributes(dataset['id'], variable);
     let cdfVarInfo = variable['cdfVarInfo'];
+
     if (!parameters[name]) {
       parameters[name] = {};
-      // parameters was initialized with all of the variables returned by
-      // the /variables endpoint. This list does not include all variables that
-      // may be needed, such as record-varying bins
-      parameters[name] = variable;
     }
+    parameters[name] = variable;
 
     if (vAttributesKept['_VAR_TYPE'] === 'data') {
       let cdfType = types.cdfType2hapiType(cdfVarInfo['cdfDatatype']);
@@ -871,12 +928,12 @@ function extractParameterAttributes(dataset, _data) {
         parameters[name]['fill'] = cdfVarInfo['padValue'];
       }
     }
-
     parameters[name]['_vAttributesKept'] = vAttributesKept;
     parameters[name]['_variableIndex'] = idx;
-  }
-  return null;
 
+  }
+
+  return null;
 }
 
 function extractVariableAttributes(dsid, variable) {
@@ -923,8 +980,9 @@ function extractVariableAttributes(dsid, variable) {
       keptAttributes['_VAR_TYPE'] = attribute['entry'][0]['value'];
     }
     if (attribute['name'].startsWith('DELTA_')) {
-      keptAttributes[attribute['name']] = attribute['entry'][0]['value'];
+      keptAttributes["_" + attribute['name']] = attribute['entry'][0]['value'];
     }
+
     if (attribute['name'] === 'VAR_NOTES') {
       let desc = "";
       if (keptAttributes['description']) {

@@ -2,6 +2,8 @@
 
 Add virtual variable discussion. See Virtual.md
 
+naming conventions in JSON
+
 # CDAWeb Comments
 
 Point of json response if difficult to generate request that does not fail.

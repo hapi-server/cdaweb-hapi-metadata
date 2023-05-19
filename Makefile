@@ -20,7 +20,7 @@ all: node_modules
 	#@echo "\n-----jf------\n"
 	#make jf IDREGEX=$(IDREGEX)
 
-bw:
+bw: node_modules
 	node CDAS2HAPIinfo.js --keepids '$(IDREGEX)'
 
 # Nand's Lal's (nl) production HAPI server
