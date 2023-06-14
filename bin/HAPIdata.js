@@ -34,7 +34,7 @@ info = JSON.parse(info);
 let timeOnly = false;
 if (argv.parameters.trim() === '' || argv.parameters.trim() === "Time") {
   let names = [];
-  for (parameter of info['parameters']) {
+  for (let parameter of info['parameters']) {
     let name = parameter["name"];
     if (name !== "Time") {
       names.push(name);
@@ -381,12 +381,8 @@ function cdf2csv(cdfFileName) {
         + ` --uri='vap+cdaweb:ds=${IDr}&id=${argv.parameters.replace(",",";")}&timerange=${argv.start}/${argv.stop}'`;
   }
   if (FROM === 'cdas-cdf-using-pycdf' || FROM === 'cdaweb-cdf-using-pycdf') {
-    let lib = 'pycdaws';
-    let filearg = '';
-    if (FROM === 'cdaweb-cdf-using-pycdaws') {
-      lib = 'cdflib';
-      filearg = " --file=" + cdfFileName;
-    }
+    let lib = 'pycdf';
+    let filearg = " --file=" + cdfFileName;
     cmd = `python3 ${__dirname}/cdf2csv.py`
         + ` --lib=${lib}`
         + filearg
@@ -394,7 +390,6 @@ function cdf2csv(cdfFileName) {
         + " --parameters='" + argv.parameters + "'"
         + " --start=" + argv.start
         + " --stop=" + argv.stop
-        + " --infodir=" + argv.infodir
         + debugstr;
   }
   if (FROM === 'cdas-cdf-using-pycdaws') {
@@ -404,7 +399,6 @@ function cdf2csv(cdfFileName) {
         + " --parameters='" + argv.parameters + "'"
         + " --start=" + argv.start
         + " --stop=" + argv.stop
-        + " --infodir=" + argv.infodir
         + debugstr;
   }
 

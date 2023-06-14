@@ -14,7 +14,10 @@ const {meta}  = require('./lib/meta.js');
 
 // meta.run() gets all needed metadata files.
 // buildHAPI() is called when complete.
-meta.run(buildHAPI);
+
+//meta.run();
+//meta.run(buildHAPI);
+buildHAPI();
 
 // To only get metadata files:
 //meta.run();
@@ -33,13 +36,13 @@ function buildHAPI(CATALOG) {
 function buildHAPIInfos(datasets) {
 
   let msg = `\n*Processing ${datasets.length} dataset${util.plural(datasets)}*\n`;
-  util.log(null, msg, "");
+  util.log(null, msg);
 
   for (let dsidx in datasets) {
     createParameters(dsidx, datasets);
   }
   datasets = datasets.filter(item => item !== null);
-  
+
   if (datasets.length == 0) {
     util.log(null, '\n\nNo datasets to process.');
     dropDataset(); // Write file
@@ -79,8 +82,15 @@ function buildHAPIInfos(datasets) {
     let rURL = 'https://cdaweb.gsfc.nasa.gov/misc/Notes.html#' + dataset["id"];
     dataset['info']['resourceURL'] = rURL;
 
-    if (dataset['_spaseError']) {
-      util.error(dsid, "  Error:   " + dataset['_spaseError'], false);
+    if (!dataset['_spase'] && !dataset['_spaseError']) {
+      util.error(dsid, "No SPASE", false, 'spase');
+    }
+
+    if (dataset['_spaseError'] && dataset['_spaseError'].length > 0) {
+      let base = dsid.split("@");
+      if (base.length == 1 || base[1] == "0") {
+        util.error(dsid, dataset['_spaseError'], false, 'spase');
+      }
     }
 
     if (/\s\s.*|\( | \)/.test(dataset['title'])) {
@@ -94,7 +104,7 @@ function buildHAPIInfos(datasets) {
     let cdfVariables = _data['cdfVariables']['variable'];
 
     extractDatasetAttributes(dataset, _data);
-    cadence.extractCDFCadence(dataset, _data);
+    cadence.extractCadence(dataset, _data);
 
     if (dataset['_spase']) {
       if (dataset['_spase']['NumericalData']) {
@@ -216,11 +226,6 @@ function buildHAPIInfos(datasets) {
           break;
         }
 
-        if (DEPEND_0 && !DEPEND_0.toLowerCase().startsWith('epoch')) {
-          let msg = `${parameter['name']} has unconventional DEPEND_0 name of `
-          msg += `'${DEPEND_0}'; expected name cast to lower case to start with 'epoch'`;
-          util.warning( dataset['id'], msg);
-        }
         DEPEND_0s.push(DEPEND_0);  
         parameterArray.push(util.copy(parameter));
       }
@@ -297,7 +302,7 @@ function buildHAPIFiles(datasets) {
     }
 
     let msg = '\n*Creating HAPI catalog and info responses for CDAWeb inventory datasets.*\n';
-    util.log(null, msg, "");
+    util.log(null, msg);
 
     for (let dataset of datasets) {
       let id = dataset['id'];
@@ -377,7 +382,7 @@ function buildHAPIFiles(datasets) {
 
     let msg = '\n*Creating HAPI catalog and info responses for CDAWeb ';
     msg += 'files datasets (version 1 method).*\n';
-    util.log(null, msg, "");
+    util.log(null, msg);
 
     let sum = 0;
     for (let dataset of datasets) {
@@ -546,10 +551,10 @@ function readDatasets() {
   let datasets = [];
   const globSync = require('glob').globSync;
   const globStr = argv['cachedir'] + '/**/*-combined.json';
-  util.log(null, `\n*Reading cached metadata in -combined.json files.*\n`, "");
-  util.log(null, `  Finding files that match ${globStr}`, "");
+  util.log(null, `\n*Reading cached metadata in -combined.json files.*\n`);
+  util.log(null, `  Finding files that match ${globStr}`);
   const combinedFiles = globSync(globStr).sort();
-  util.log(null, `  ${combinedFiles.length} cached files match ${globStr}`, "");
+  util.log(null, `  ${combinedFiles.length} cached files match ${globStr}`);
   for (let file of combinedFiles) {
     let id = file.split('/').slice(-1)[0].split("-combined")[0];
     if (!argv['debug']) {
@@ -565,7 +570,7 @@ function readDatasets() {
   }
   let plural = util.plural(datasets);
   let msg = `  ${datasets.length} file${plural} after keepids and omitids filter`;
-  util.log(null, msg, "");
+  util.log(null, msg);
 
   return datasets;
 }
@@ -669,21 +674,21 @@ function configureParameterInfo(datasets) {
     console.log(key)
     if (!parameters[key]) {
       console.log("Error " + key + " in master but not cdf");
-      parameters[key] = {'cdfVAttributes': undefined};
+      parameters[key] = {'_cdfVAttributes': undefined};
     } else {
       // Create object with keys of attribute names, for convenience.
       let _vAttributes = {};
-      let attributes = parameters[key]['cdfVAttributes']['attribute'];
+      let attributes = parameters[key]['_cdfVAttributes']['attribute'];
       for (let attribute of attributes) {
         _vAttributes[attribute['name']] = attribute['entry'][0]['value']
       }
-      parameters[key]['cdfVAttributes'] = sortKeys(_vAttributes);
+      parameters[key]['_cdfVAttributes'] = sortKeys(_vAttributes);
     }
-    parameters[key]['cdfVarInfoMaster'] = array2Object(variable[key][0]['VarDescription']);
-    parameters[key]['cdfVarAttributesMaster'] = array2Object(variable[key][1]['VarAttributes']);
-    parameters[key]['cdfVarDataMaster'] = undefined;
+    parameters[key]['_cdfVarInfoMaster'] = array2Object(variable[key][0]['VarDescription']);
+    parameters[key]['_cdfVarAttributesMaster'] = array2Object(variable[key][1]['VarAttributes']);
+    parameters[key]['_cdfVarDataMaster'] = undefined;
     if (variable[key][2]) {
-      parameters[key]['cdfVarDataMaster'] = variable[key][2]['VarData'];
+      parameters[key]['_cdfVarDataMaster'] = variable[key][2]['VarData'];
     }
 
     parameters[key] = sortKeys(parameters[key]);
@@ -750,7 +755,7 @@ function dropDataset(dsidx, datasets, msg, category, showid) {
           if (Array.isArray(msg)) {
             msg = msg.join("\n  ");
           }
-          log += key + "\n  " + msg + "\n";
+          log += key + "\n  " + msg + "\n\n";
         }
         util.writeSync(fnameDropped, log);
         let Nd = Object.keys(dropDataset.log[origin]).length;
@@ -773,15 +778,17 @@ function dropDataset(dsidx, datasets, msg, category, showid) {
   }
   msg = msg + " Dropping dataset.";
   if (showid) {
-    msg = datasets[dsidx]['id'] + "\n  Error:   " + msg;
+    console.log(datasets[dsidx]['id']);
     util.error(datasets[dsidx]['id'], msg, false);
+    //process.exit(0);
   } else {
-    util.error(datasets[dsidx]['id'], "  Error:   " + msg, false);
+    util.error(datasets[dsidx]['id'], msg, false);
   }
   datasets[dsidx] = null;
 }
 
-function createParameters(dsidx, datasets) {     
+function createParameters(dsidx, datasets) {
+
   // Create dataset['info']['parameters'] array of objects. Give each object
   // a name and description taken CDAS /variables request.
   if (datasets[dsidx]['_variablesError']) {
@@ -915,7 +922,7 @@ function extractParameterAttributes(dataset, _data) {
     if (!parameters[name]) {
       parameters[name] = {};
     }
-    parameters[name] = variable;
+    parameters[name]['_cdfVariable'] = variable;
 
     if (vAttributesKept['_VAR_TYPE'] === 'data') {
       let cdfType = types.cdfType2hapiType(cdfVarInfo['cdfDatatype']);
@@ -982,7 +989,6 @@ function extractVariableAttributes(dsid, variable) {
     if (attribute['name'].startsWith('DELTA_')) {
       keptAttributes["_" + attribute['name']] = attribute['entry'][0]['value'];
     }
-
     if (attribute['name'] === 'VAR_NOTES') {
       let desc = "";
       if (keptAttributes['description']) {

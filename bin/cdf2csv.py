@@ -6,98 +6,79 @@ import argparse
 import cdflib
 import numpy as np
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--id', default='AC_H2_MFI')
-parser.add_argument('--parameters', default='Magnitude,BGSEc')
-# TODO: We assume start and stop always given to ns precision.
-parser.add_argument('--start', default='1997-08-26T00:00:00.000000000Z')
-parser.add_argument('--stop', default='1997-09-04T00:00:00.000000000Z')
-parser.add_argument('--file', default='notes/cdfs/ac_h2s_mfi_20090601000000_20090601120000.cdf')
-parser.add_argument('--infodir', default='hapi/bw/info')
-parser.add_argument('--debug', action='store_true', default=False)
-parser.add_argument('--lib', default='cdflib')
+def cli():
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--id', default='AC_H2_MFI')
+  parser.add_argument('--parameters', default='Magnitude,BGSEc')
+  # TODO: We assume start and stop always given to ns precision.
+  parser.add_argument('--start', default='1997-08-26T00:00:00.000000000Z')
+  parser.add_argument('--stop', default='1997-09-04T00:00:00.000000000Z')
+  parser.add_argument('--file', default='notes/cdfs/ac_h2s_mfi_20090601000000_20090601120000.cdf')
+  parser.add_argument('--infodir', default='hapi/bw/info')
+  parser.add_argument('--debug', action='store_true', default=False)
+  parser.add_argument('--lib', default='cdflib')
 
-argv   = vars(parser.parse_args())
-
-dataset    = argv['id']
-parameters = argv['parameters']
-start      = argv['start']
-stop       = argv['stop']
-
-parameters = parameters.split(",")
-
-# https://stackoverflow.com/a/30091579
-from signal import signal, SIGPIPE, SIG_DFL
-signal(SIGPIPE, SIG_DFL)
+  return vars(parser.parse_args())
 
 
-def hapi_info(infodir, dataset):
+def write(time, meta, data):
 
-  import json
-  infofile = infodir + "/" + dataset + ".json"
-  with open(infofile, 'r') as f:
-    info = json.load(f)
-  return info
+  # https://stackoverflow.com/a/30091579
+  from signal import signal, SIGPIPE, SIG_DFL
+  signal(SIGPIPE, SIG_DFL)
 
+  nrecords = 0
 
-def _print(msg, end=None):
-  print(msg,end=end)
-  return len('{}'.format(msg))
+  for t in range(len(time)):
 
+    tstr = str(time[t])
 
-def dump(time, meta, data):
-
-  nbytes = 0
-
-  for i in range(len(time)):
-
-    tstr = str(time[i])
     if tstr >= stop[0:len(tstr)]:
-      nbytes = nbytes + 1
       break
-
-    nbytes = nbytes + len(str(time[i]))
+    
     sys.stdout.write('%sZ' % tstr)
-    for p in range(0,len(data)):
 
-      # e.g., 10s => s and 10a => s
-      fmt = re.sub(r"([0-9].*)([a|s])", r"s", meta[p]['FORMAT'].lower())
+    for p, parameter in enumerate(data):
 
-      # e.g., i4 => d
-      fmt = re.sub(r"([i])([0-9].*)", r"d", meta[p]['FORMAT'].lower())
+      fmt = c_template(meta[p]['FORMAT'])
+      FILLVAL = np.array(meta[p]["FILLVAL"], dtype=parameter.dtype)
 
-      # e.g., E11.4 => %.4e
-      fmt = re.sub(r"([f|e])([0-9].*)\.([0-9].*)", r".\2\1", fmt)
+      # TODO: Check that this row-major (order-'C') is correct
+      #  and not column major ('F').
+      for value in parameter[t].flatten(order='C'):
+        if value == FILLVAL:
+          sys.stdout.write("," + str(FILLVAL))
+        else:
+          sys.stdout.write(fmt.format(value))
+      
+    # Omit trailing newline by executing if t < len(time) - 1?
+    # Does spec say last character of CSV is newline?
+    sys.stdout.write("\n")
 
-      # e.g., d => ,%d
-      fmtc = ",%" + fmt
+    nrecords += 1
 
-      if len(data[p].shape) == 1:
-        # Commented out code leads to data that appears as, e.g., 5.27 being
-        # printed as 5.26999999948.
-        #el = fmtc % data[p][i]
-        #el = el.replace("nan", FILLVAL)
-        #nbytes = nbytes + len(el)
-        nbytes = nbytes + _print(",", end='')
-        nbytes = nbytes + _print(data[p][i], end='')
-        #sys.stdout.write(el)
-      else:
-        for j in range(data[p].shape[1]):
-          #el = fmtc % data[p][i,j]
-          #el = el.replace("nan", FILLVAL)
-          #nbytes = nbytes + len(el)
-          #sys.stdout.write(el)
-          nbytes = nbytes + _print(",", end='')
-          nbytes = nbytes + _print(data[p][i,j], end='')
-
-    if i < len(time) - 1:
-      nbytes = nbytes + 1
-      sys.stdout.write("\n")
-
-  return nbytes
+  return nrecords  
 
 
-def report(begin, nbytes, nrecords, what=None):
+def c_template(f_template):
+  
+  # TODO: If invalid, return {}
+
+  f_template = f_template.lower().strip(' ')
+
+  # e.g., 10s => s and 10a => s
+  fmt = re.sub(r"([0-9].*)([a|s])", r",{:s}", f_template)
+
+  # e.g., i4 => d
+  fmt = re.sub(r"([i])([0-9].*)", r",{:d}", f_template)
+
+  # e.g., E11.4 => %.4e, F8.1 => %.1f
+  fmt = re.sub(r"([f|e])([0-9].*)\.([0-9].*)", r",{:.\3\1}", f_template)
+
+  return fmt
+
+
+def report(begin, nrecords, what=None, size=None):
 
   if argv['debug'] == False:
     return
@@ -105,12 +86,12 @@ def report(begin, nbytes, nrecords, what=None):
   dt = _time.time() - begin
 
   if what == 'read':
-    fmtstr = "Read  {0:.1f} KB | {1:.1f} KB/s | {2:d} records/s"
-    print(fmtstr.format(nbytes/1000., nbytes/(1000.*dt), int(nrecords/dt)))
+    fmtstr = "Read   {0:d} records | {1:6d} records/s | {2:d} B"
+    print(fmtstr.format(nrecords, int(nrecords/dt), size))
 
   if what == 'write':
-    fmtstr = "Wrote {0:.1f} KB | {1:.1f} KB/s | {2:d} records/s"
-    print(fmtstr.format(nbytes/1000., nbytes/(1000.*dt), int(nrecords/dt)))
+    fmtstr = "\nWrote  {0:d} records | {1:6d} records/s"
+    print(fmtstr.format(nrecords, int(nrecords/dt)))
 
 
 def tick():
@@ -119,19 +100,14 @@ def tick():
   return _time.time()
 
 
-def depend_0():
-  hapiinfo = hapi_info(argv['infodir'], dataset)
-  return re.sub(r'@[0-9].*$', "", hapiinfo['x_DEPEND_0'])
-
-
-def data():
+def read():
 
   meta = []
   data = []
-  size = []
 
   if argv['lib'] == 'pycdaws':
 
+    # No longer working.
     from cdasws import CdasWs
     from cdasws.datarepresentation import DataRepresentation
     cdas = CdasWs()
@@ -146,41 +122,55 @@ def data():
       status, xrdata = cdas.get_data(\
                         datasetr, parameters, start, stop,
                         dataRepresentation=DataRepresentation.XARRAY)
+    # Note: Assumes DEPEND_0 = 'Epoch', which is not always true.
+    # TODO: Determine how to extract DEPEND_0. Not easy b/c can't save
+    # xrdata due to a bug, so need to run request each time or modify
+    # source of CdasWs() to use cache.
+    time = xrdata['Epoch'].values
+    size = -1
 
-    time = xrdata[depend_0()].values
-
-    for p in range(len(parameters)):
-      v = xrdata[parameters[p]].values
-      data.append(v)
-      meta.append({
-                    "FORMAT": xrdata[parameters[p]].FORMAT
-                  })
-      size.append(v.size*v.itemsize)
+    for parameter in parameters:
+      data.append(xrdata[parameter].values)
+      meta.append({"FORMAT": xrdata[parameter].FORMAT})
 
   else:
 
     cdffile  = cdflib.CDF(argv['file'])
-    cdfinfo  = cdffile.cdf_info()
 
-    epoch = cdffile.varget(variable=depend_0())
+    size = 0
+    depend_0s = []
+    for parameter in parameters:
+      data.append(cdffile.varget(variable=parameter))
+      meta.append(cdffile.varattsget(variable=parameter))
+      size = size + data[-1].size*data[-1].itemsize
+      depend_0s.append(meta[-1]['DEPEND_0'])
+
+    udepend_0s = list(set(depend_0s)); # Unique depend_0s
+    assert len(udepend_0s) == 1, 'Multiple DEPEND0s not implemented. Found: ' + ", ".join(udepend_0s)
+
+    epoch = cdffile.varget(variable=depend_0s[0])
     time  = cdflib.cdfepoch.encode(epoch, iso_8601=True) 
 
-    for p in range(len(parameters)):
-      v  = cdffile.varget(variable=parameters[p])
-      va = cdffile.varattsget(variable=parameters[p])
-      data.append(v)
-      meta.append(va)
-      size.append(v.size*v.itemsize)
+  if isinstance(time, str):
+    time = [time]
 
   nrecords = len(time)
 
-  return time, data, meta, nrecords, sum(size)
+  return time, data, meta, nrecords, size
 
+argv = cli()
+
+dataset    = argv['id']
+parameters = argv['parameters']
+start      = argv['start']
+stop       = argv['stop']
+
+parameters = parameters.split(",")
 
 begin = tick()
-time, data, meta, nrecords, size = data()
-report(begin, size, nrecords, what='read')
+time, data, meta, nrecords, size = read()
+report(begin, nrecords, size=size, what='read')
 
 begin = tick()
-nbytes = dump(time, meta, data)
-report(begin, nbytes, nrecords, what='write')
+nrecords = write(time, meta, data)
+report(begin, nrecords, what='write')
