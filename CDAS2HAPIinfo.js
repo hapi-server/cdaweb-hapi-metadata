@@ -11,6 +11,7 @@ const cadence = require('./lib/cadence.js');
 const spase   = require('./lib/spase.js');
 const {util}  = require('./lib/util.js');
 const {meta}  = require('./lib/meta.js');
+const { buildMasterTable } = require('./lib/table.js');
 
 // meta.run() gets all needed metadata files.
 // buildHAPI() is called when complete.
@@ -28,6 +29,9 @@ buildHAPI();
 //////////////////////////////////////////////////////////////////////////////
 
 function buildHAPI(CATALOG) {
+  // If called using buildHAPI(), get datasets by reading *-combined.json files
+  // in cachedir. Otherwise, use datasets in CATALOG when called using
+  // buildHAPI(CATALOG).
   let datasets = CATALOG ? CATALOG['datasets'] : readDatasets();
   buildHAPIFiles(datasets);
   buildHAPIInfos(datasets);
@@ -54,7 +58,8 @@ function buildHAPIInfos(datasets) {
 
   datasets = subsetDatasets(datasets);
 
-  //configureParameterInfo(datasets);
+  //buildMasterTable(datasets, argv['cachedir'] + '/masters');
+  //process.exit(0);
 
   let catalog = [];
   for (let dsidx in datasets) {
@@ -591,7 +596,7 @@ function deleteUnderscoreKeys(dataset) {
       if (key.startsWith("_")) {
         delete dataset[key];
       }
-    }  
+    }
 }
 
 function subsetDatasets(datasets) {
@@ -661,55 +666,6 @@ function subsetDatasets(datasets) {
       datasets.push(newdataset);
     }
     return datasets;
-  }
-}
-
-function configureParameterInfo(datasets) {
-
-  let variables = datasets[0]['_masters']['json']['CDFVariables'];
-  let parameters = datasets[0]['info']['parameters'];
-  for (let variable of variables) {
-
-    let key = Object.keys(variable)[0];
-    console.log(key)
-    if (!parameters[key]) {
-      console.log("Error " + key + " in master but not cdf");
-      parameters[key] = {'_cdfVAttributes': undefined};
-    } else {
-      // Create object with keys of attribute names, for convenience.
-      let _vAttributes = {};
-      let attributes = parameters[key]['_cdfVAttributes']['attribute'];
-      for (let attribute of attributes) {
-        _vAttributes[attribute['name']] = attribute['entry'][0]['value']
-      }
-      parameters[key]['_cdfVAttributes'] = sortKeys(_vAttributes);
-    }
-    parameters[key]['_cdfVarInfoMaster'] = array2Object(variable[key][0]['VarDescription']);
-    parameters[key]['_cdfVarAttributesMaster'] = array2Object(variable[key][1]['VarAttributes']);
-    parameters[key]['_cdfVarDataMaster'] = undefined;
-    if (variable[key][2]) {
-      parameters[key]['_cdfVarDataMaster'] = variable[key][2]['VarData'];
-    }
-
-    parameters[key] = sortKeys(parameters[key]);
-  }
-
-  function sortKeys(object) {
-    return Object.keys(object).sort().reduce(
-      (objEntries, key) => {
-        objEntries[key] = object[key]; 
-        return objEntries;
-      }, {});  
-  }
-  
-  function array2Object(array) {
-    console.log(array)
-    let object = {};
-    for (let element of array) {
-      let key = Object.keys(element)[0];
-      object[key] = element[key];
-    }
-    return object;
   }
 }
 

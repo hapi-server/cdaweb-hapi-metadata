@@ -87,7 +87,12 @@ clean:
 	make clean-jf
 	rm -f package-lock.json
 
-rsync:
+rsync-pull:
+	rsync -avz --delete weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata/hapi
+	rsync -avz --delete weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata/cache
+	rsync -avz --delete verify/ weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata/verify/data
+
+rsync-push:
 	rsync -avz --delete hapi weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata
 	rsync -avz --delete verify/data weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata/verify
 	rsync -avz --delete cache weigel@mag.gmu.edu:www/git-data/cdaweb-hapi-metadata

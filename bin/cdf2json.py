@@ -102,7 +102,7 @@ def cdf2json(file):
 
     for i, ikey in enumerate(list(d.keys())):
       if isinstance(d[ikey], list):
-        if len(d[ikey]) == 0:          
+        if len(d[ikey]) == 0:
           del d[ikey]
         elif len(d[ikey]) == 1:
           # Unwrap lists with one element.
@@ -192,7 +192,12 @@ def cdf2json(file):
 
   cdffile = cdflib.CDF(file)
   cdfInfo  = cdffile.cdf_info()
-  cdfInfo['name'] = file
+
+  try:
+    cdfInfo['name'] = file
+  except:
+    # Ideally there would be a cdflib.__version__ to check.
+    print('Error. cdflib 0.4.4 being used?')
 
   cdfGAttributes = cdffile.globalattsget(expand=True);
 
