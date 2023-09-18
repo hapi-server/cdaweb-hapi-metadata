@@ -1,3 +1,5 @@
+See https://github.com/rweigel/cdaweb-hapi, this is no longer in use.
+
 # Motivation
 
 This respository was developed to improve the HAPI metadata served at https://cdaweb.gsfc.nasa.gov/hapi. Metadata-related code is discussed in Section 2. Output files are available at [mag.gmu.edu](http://mag.gmu.edu/git-data/cdaweb-hapi-metadata/hapi/bw).
